@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cRecordSet xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0" d:id="375192228">
+	<Record>
+		<cDynamicEntity d:id="391919440">
+			<cSceneryRender d:id="314361700">
+				<DetailLevel d:type="sInt32">10</DetailLevel>
+				<Global d:type="bool">0</Global>
+				<Saved d:type="bool">1</Saved>
+				<Palette0Index d:type="sUInt8">0</Palette0Index>
+				<Palette1Index d:type="sUInt8">0</Palette1Index>
+				<Palette2Index d:type="sUInt8">0</Palette2Index>
+			</cSceneryRender>
+		</cDynamicEntity>
+	</Record>
+</cRecordSet>

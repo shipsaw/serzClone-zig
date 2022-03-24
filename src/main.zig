@@ -7,8 +7,9 @@ pub fn main() anyerror!void {
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    var file = try std.fs.cwd().openFile("file.txt", .{});
+    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
 
-    var fileResult = try file.readToEndAlloc(allocator, size_limit);
-    try stdout.print("{s}", .{fileResult});
+    const fileResult = try file.readToEndAlloc(allocator, size_limit);
+    const fileResultHex = std.fmt.fmtSliceHexUpper(fileResult);
+    try stdout.print("{x} ", .{fileResultHex});
 }

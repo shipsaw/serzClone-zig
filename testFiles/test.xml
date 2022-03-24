@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cRecordSet d:id="375192228">
+	<Record>
+		<cDynamicEntity d:id="391919440">
+			<cSceneryRender d:id="314361700">
+				<DetailLevel d:type="sInt32">
+				<Global d:type="bool">
+				<Saved d:type="bool">
+				<Palette0Index d:type="sUInt8">
+				<Palette1Index d:type="sUInt8">
+				<Palette2Index d:type="sUInt8">
+			</cSceneryRender>
+		</cDynamicEntity>
+	</Record>
+</cRecordSet>
