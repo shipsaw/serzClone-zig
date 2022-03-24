@@ -10,6 +10,14 @@ pub fn main() anyerror!void {
     var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
 
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
-    const fileResultHex = std.fmt.fmtSliceHexUpper(fileResult);
-    try stdout.print("{x} ", .{fileResultHex});
+    const result = if (verifyPrelude(fileResult[0..4]) == true) "OK" else "INVALID FILE";
+    try stdout.print("File status: {s}", .{result});
+}
+
+fn verifyPrelude(preludeBytes: *[4]u8) bool {
+    const correctPrelude = "SERZ";
+    for (preludeBytes) |char, i| {
+        if (char != correctPrelude[i]) return false;
+    }
+    return true;
 }
