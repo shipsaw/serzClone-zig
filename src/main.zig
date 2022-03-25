@@ -8,7 +8,7 @@ pub fn main() anyerror!void {
     const allocator = arena.allocator();
     var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
-    try beginParse(fileResult);
+    beginParse(fileResult);
     const result = if (verifyPrelude(fileResult[0..]) == true) "OK" else "INVALID FILE";
     try stdout.print("File status: {s}", .{result});
 }
@@ -22,13 +22,23 @@ fn verifyPrelude(preludeBytes: []u8) bool {
     return true;
 }
 
-fn beginParse(fileBytes: []const u8) !void {
+fn beginParse(fileBytes: []const u8) void {
     var i: usize = 0;
-    while (i < fileBytes.len) : (i += 1) {
-        if (fileBytes[i] == 0xFF and fileBytes[i + 1] == 0xFF) {
-            var ffNum = std.mem.readIntSlice(u32, fileBytes[i + 2 ..], std.builtin.Endian.Little);
-            std.debug.print("WORD: {s}\n", .{fileBytes[i + 6 .. i + 6 + ffNum]});
+    while (i < fileBytes.len - 1) : (i += 1) {
+        if (fileBytes[i] == 0xFF) {
+            switch (fileBytes[i + 1]) {
+                0xFF => {
+                    const word = readNewWord(fileBytes[i..]);
+                    std.debug.print("{s}\n", .{word});
+                },
+                else => continue,
+            }
         }
-        i += 1;
     }
+}
+
+fn readNewWord(fileBytes: []const u8) []const u8 {
+    const wordOffset = 6;
+    var wordLen = std.mem.readIntSlice(u32, fileBytes[2..], std.builtin.Endian.Little);
+    return fileBytes[wordOffset .. wordOffset + wordLen];
 }
