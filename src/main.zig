@@ -9,7 +9,7 @@ pub fn main() anyerror!void {
     var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
     const result = if (verifyPrelude(fileResult[0..]) == true) "OK" else "INVALID FILE";
-    parse(fileResult[8..]);
+    parse(fileResult[8..], 0);
     try stdout.print("File status: {s}", .{result});
 }
 
@@ -22,26 +22,34 @@ fn verifyPrelude(preludeBytes: []u8) bool {
     return true;
 }
 
-fn parse(fileBytes: []const u8) void {
+fn parse(fileBytes: []const u8, tabs: u8) void {
     if (fileBytes.len == 0) return;
     switch (fileBytes[1]) {
         0x50 => {
-            print50(fileBytes);
+            print50(fileBytes, tabs);
         },
-        else => return,
+        else => std.debug.print("Not Parsable: {x}\n", .{fileBytes[1]}),
     }
 }
 
-fn print50(fileBytes: []const u8) void {
-    std.debug.print("\t<", .{});
+fn print50(fileBytes: []const u8, tabs: u8) void {
+    var i: u8 = 0;
+    while (i < tabs) : (i += 1) {
+        std.debug.print("\t", .{});
+    }
+    std.debug.print("<", .{});
     var nodeName: []const u8 = "";
     if (fileBytes[3] == 0xFF) {
-        const wordOffset = 6;
+        const wordOffset = 8;
         var wordLen = std.mem.readIntSlice(u32, fileBytes[4..], std.builtin.Endian.Little);
         nodeName = fileBytes[wordOffset .. wordOffset + wordLen];
-        std.debug.print("{s}>", .{nodeName});
-        parse(fileBytes[wordOffset + wordLen + 8 ..]);
+        std.debug.print("{s}>\n", .{nodeName});
+        parse(fileBytes[wordOffset + wordLen + 8 ..], tabs + 1);
     }
-    std.debug.print("\n\t</{s}>\n", .{nodeName});
+    i = 0;
+    while (i < tabs) : (i += 1) {
+        std.debug.print("\t", .{});
+    }
+    std.debug.print("</{s}>\n", .{nodeName});
     return;
 }
