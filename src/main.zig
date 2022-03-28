@@ -49,11 +49,11 @@ fn print50(fileBytes: []const u8, tabs: u8) void {
         std.debug.print("{s}>\n", .{nodeName});
         parse(fileBytes[wordOffset + wordLen + 8 ..], tabs + 1);
     }
-    i = 0;
-    while (i < tabs) : (i += 1) {
-        std.debug.print("\t", .{});
-    }
-    std.debug.print("</{s}>\n", .{nodeName});
+    // i = 0;
+    // while (i < tabs) : (i += 1) {
+    //     std.debug.print("\t", .{});
+    // }
+    // std.debug.print("</{s}>\n", .{nodeName});
     return;
 }
 
@@ -62,7 +62,7 @@ fn print56(fileBytes: []const u8, tabs: u8) void {
     while (i < tabs) : (i += 1) {
         std.debug.print("\t", .{});
     }
-    std.debug.print("<(56)", .{});
+    std.debug.print("<", .{});
     var nodeName: []const u8 = "";
     if (fileBytes[3] == 0xFF) {
         const wordOffset = 8;
@@ -73,17 +73,25 @@ fn print56(fileBytes: []const u8, tabs: u8) void {
         var attrLen: usize = 2;
         if (fileBytes[attrOffset] == 0xFF) {
             attrLen = std.mem.readIntSlice(u32, fileBytes[attrOffset + 2 ..], std.builtin.Endian.Little);
-            std.debug.print("ATTR LENGTH: {d}", .{attrLen});
             attrName = fileBytes[attrOffset + 6 .. attrOffset + 6 + attrLen];
             attrLen += 4 + 2;
         }
-        std.debug.print("{s} type={s}>\n", .{ nodeName, attrName });
+        std.debug.print("{s} type={s}, val={d}>\n", .{ nodeName, attrName, getAttrValue(fileBytes[attrOffset + attrLen ..], 4) });
         parse(fileBytes[attrOffset + attrLen + 4 ..], tabs);
     }
-    i = 0;
-    while (i < tabs) : (i += 1) {
-        std.debug.print("\t", .{});
-    }
-    std.debug.print("</{s}>\n", .{nodeName});
+    // i = 0;
+    // while (i < tabs) : (i += 1) {
+    //     std.debug.print("\t", .{});
+    // }
+    // std.debug.print("</{s}>\n", .{nodeName});
     return;
+}
+
+// Attempt this first by only sending attribute length
+fn getAttrValue(attrVal: []const u8, attrTypeLen: u8) u32 {
+    switch (attrTypeLen) {
+        4 => return attrVal[0],
+        6 => return std.mem.readIntSlice(u32, attrVal, std.builtin.Endian.Little),
+        else => return 0,
+    }
 }
