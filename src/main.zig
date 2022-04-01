@@ -7,36 +7,17 @@ const fileError = error{
     FileNotFound,
 };
 
-const stringMap = struct {
-    counter: u8,
-    hash_map: std.AutoHashMap(u8, []const u8),
-
-    fn add(self: *stringMap, str: []const u8) !void {
-        try self.hash_map.put(self.counter, str);
-        self.counter += 1;
-        return;
-    }
-
-    fn get(self: stringMap, idx: u8) []const u8 {
-        return self.hash_map.get(idx) orelse "INVALID";
-    }
-};
+var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+const allocator = arena.allocator();
+var wordList = std.ArrayList([]const u8).init(allocator);
 
 pub fn main() anyerror!void {
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
-    const allocator = arena.allocator();
-    var stringMapInst = stringMap{
-        .counter = 0,
-        .hash_map = std.AutoHashMap(u8, []const u8).init(allocator),
-    };
-
-    try stringMapInst.add("Hello");
-    std.debug.print("Map value: {s}\n", .{stringMapInst.get(0)});
-    // var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
-    // const fileResult = try file.readToEndAlloc(allocator, size_limit);
-    // const fileBegin = try verifyPrelude(fileResult[0..]);
-    // _ = try parse(fileBegin[4..]);
+    defer wordList.deinit();
+    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    const fileResult = try file.readToEndAlloc(allocator, size_limit);
+    const fileBegin = try verifyPrelude(fileResult[0..]);
+    _ = try parse(fileBegin[4..]);
 }
 
 // Verify File begins with the prelude "SERZ"
@@ -54,17 +35,25 @@ fn parse(fileBytes: []const u8) fileError![]const u8 {
     const retval = switch (fileBytes[1]) {
         0x50 => print50(fileBytes),
         0x56 => print56(fileBytes),
+        0x70 => std.debug.print("HIT A 70\n", .{}),
         else => fileError.InvalidFile,
     };
     return retval;
 }
 
 fn print50(fileBytes: []const u8) []const u8 {
-    if (fileBytes[3] == 0xFF) {
-        const wordOffset = 8;
-        var wordLen = std.mem.readIntSlice(u32, fileBytes[4..], std.builtin.Endian.Little);
-        std.debug.print("<{s}>\n", .{fileBytes[wordOffset .. wordOffset + wordLen]});
+    var bytePos: []const u8 = fileBytes[2..];
+    if (bytePos == 0xFF) {
+        bytePos = bytePos[2..];
+        const wordLen = std.mem.readIntSlice(u32, bytePos, std.builtin.Endian.Little);
+        bytePos += 4;
+        const wordEnd = wordOffset + wordLen;
+
+        try wordList.append(fileBytes[wordOffset..wordEnd]);
+        std.debug.print("<{s}>\n", .{fileBytes[wordOffset..wordEnd]});
         return fileBytes[wordOffset + wordLen + 1 ..];
+    } else {
+        const wordLen = std.mem.readIntSlice(u16, fileBytes[2], std.builtin.Endian.Little);
     }
     return fileBytes[1..];
 }
@@ -91,6 +80,7 @@ fn print56(fileBytes: []const u8) []const u8 {
     //    std.debug.print("{s} type={s}, val={d}>\n", .{ nodeName, attrName, getAttrValueLen(fileBytes[attrOffset + attrLen ..]) });
     //    parse(fileBytes[attrOffset + attrLen + 4 ..], tabs);
     //}
+    std.debug.print("HIT A 56\n", .{});
     return fileBytes;
 }
 
