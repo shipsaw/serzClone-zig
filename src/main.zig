@@ -7,14 +7,36 @@ const fileError = error{
     FileNotFound,
 };
 
+const stringMap = struct {
+    counter: u8,
+    hash_map: std.AutoHashMap(u8, []const u8),
+
+    fn add(self: *stringMap, str: []const u8) !void {
+        try self.hash_map.put(self.counter, str);
+        self.counter += 1;
+        return;
+    }
+
+    fn get(self: stringMap, idx: u8) []const u8 {
+        return self.hash_map.get(idx) orelse "INVALID";
+    }
+};
+
 pub fn main() anyerror!void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
-    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
-    const fileResult = try file.readToEndAlloc(allocator, size_limit);
-    const fileBegin = try verifyPrelude(fileResult[0..]);
-    _ = try parse(fileBegin[4..]);
+    var stringMapInst = stringMap{
+        .counter = 0,
+        .hash_map = std.AutoHashMap(u8, []const u8).init(allocator),
+    };
+
+    try stringMapInst.add("Hello");
+    std.debug.print("Map value: {s}\n", .{stringMapInst.get(0)});
+    // var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    // const fileResult = try file.readToEndAlloc(allocator, size_limit);
+    // const fileBegin = try verifyPrelude(fileResult[0..]);
+    // _ = try parse(fileBegin[4..]);
 }
 
 // Verify File begins with the prelude "SERZ"
