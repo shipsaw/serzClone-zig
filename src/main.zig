@@ -41,10 +41,10 @@ fn print50(fileBytes: []const u8) []const u8 {
     if (fileBytes[3] == 0xFF) {
         const wordOffset = 8;
         var wordLen = std.mem.readIntSlice(u32, fileBytes[4..], std.builtin.Endian.Little);
-        std.debug.print("<{s}>\n", fileBytes[wordOffset .. wordOffset + wordLen]);
+        std.debug.print("<{s}>\n", .{fileBytes[wordOffset .. wordOffset + wordLen]});
         return fileBytes[wordOffset + wordLen + 1 ..];
     }
-    return fileBytes + 1;
+    return fileBytes[1..];
 }
 
 fn print56(fileBytes: []const u8) []const u8 {
