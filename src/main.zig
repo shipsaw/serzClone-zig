@@ -18,6 +18,10 @@ pub fn main() anyerror!void {
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
     const fileBegin = try verifyPrelude(fileResult[0..]);
     _ = try parse(fileBegin[4..]);
+    std.debug.print("List of saved words = ", .{});
+    for (wordList.items) |word, idx| {
+        std.debug.print(" {d}:{s},", .{ idx, word });
+    }
 }
 
 // Verify File begins with the prelude "SERZ"
@@ -30,7 +34,7 @@ fn verifyPrelude(preludeBytes: []u8) fileError![]const u8 {
 }
 
 // Base parsing function, calls all others for node types
-fn parse(fileBytes: []const u8) fileError![]const u8 {
+fn parse(fileBytes: []const u8) ![]const u8 {
     if (fileBytes.len == 0) return fileError.InvalidFile;
     const retval = switch (fileBytes[1]) {
         0x50 => print50(fileBytes),
@@ -40,8 +44,8 @@ fn parse(fileBytes: []const u8) fileError![]const u8 {
     return retval;
 }
 
-fn print50(fileBytes: []const u8) []const u8 {
-    var bytePos: u32 = 2;
+fn print50(fileBytes: []const u8) ![]const u8 {
+    var bytePos: usize = 2;
     if (fileBytes[bytePos] == 0xFF) {
         bytePos += 2;
         const wordLen = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
@@ -54,9 +58,9 @@ fn print50(fileBytes: []const u8) []const u8 {
         std.debug.print("<{s}>\n", .{fileBytes[wordBegin..wordEnd]});
         return fileBytes[bytePos + 4 ..];
     } else {
-        const wordIndex = std.mem.readIntSlice(u16, fileBytes[2], std.builtin.Endian.Little);
-        const word = wordList[wordIndex];
-        const wordLen = word.length;
+        const wordIndex = std.mem.readIntSlice(u16, fileBytes[2..], std.builtin.Endian.Little);
+        const word = wordList.items[wordIndex];
+        const wordLen = word.len;
         std.debug.print("<{s}>\n", .{word});
         bytePos += wordLen;
         bytePos += 4;
