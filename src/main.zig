@@ -35,16 +35,22 @@ fn verifyPrelude(preludeBytes: []u8) fileError![]const u8 {
 
 // Base parsing function, calls all others for node types
 fn parse(fileBytes: []const u8) ![]const u8 {
-    if (fileBytes.len == 0) return fileError.InvalidFile;
-    const retval = switch (fileBytes[1]) {
-        0x50 => print50(fileBytes),
-        0x56 => print56(fileBytes),
-        else => fileError.InvalidFile,
-    };
-    return retval;
+    var loopPos: usize = 0;
+    std.debug.print("fileBytes size: {d}\n", .{fileBytes.len});
+    while (fileBytes.len > loopPos) : (loopPos += 1) {
+        if (fileBytes.len == 0) return fileError.InvalidFile;
+        if (fileBytes[loopPos] == 0xFF) {
+            loopPos = switch (fileBytes[1 + loopPos]) {
+                0x50 => loopPos + (try print50(fileBytes[loopPos..])),
+                0x56 => loopPos + print56(fileBytes[loopPos..]),
+                else => loopPos,
+            };
+        }
+    }
+    return "";
 }
 
-fn print50(fileBytes: []const u8) ![]const u8 {
+fn print50(fileBytes: []const u8) !usize {
     var bytePos: usize = 2;
     if (fileBytes[bytePos] == 0xFF) {
         bytePos += 2;
@@ -56,19 +62,20 @@ fn print50(fileBytes: []const u8) ![]const u8 {
 
         try wordList.append(fileBytes[wordBegin..wordEnd]);
         std.debug.print("<{s}>\n", .{fileBytes[wordBegin..wordEnd]});
-        return fileBytes[bytePos + 4 ..];
+        return bytePos + 8;
     } else {
         const wordIndex = std.mem.readIntSlice(u16, fileBytes[2..], std.builtin.Endian.Little);
         const word = wordList.items[wordIndex];
         const wordLen = word.len;
         std.debug.print("<{s}>\n", .{word});
         bytePos += wordLen;
-        bytePos += 4;
+        bytePos += 8;
     }
-    return fileBytes[bytePos..];
+    return bytePos;
 }
 
-fn print56(fileBytes: []const u8) []const u8 {
+fn print56(fileBytes: []const u8) usize {
+    _ = fileBytes;
     //var i: u8 = 0;
     //while (i < tabs) : (i += 1) {
     //    std.debug.print("\t", .{});
@@ -91,7 +98,7 @@ fn print56(fileBytes: []const u8) []const u8 {
     //    parse(fileBytes[attrOffset + attrLen + 4 ..], tabs);
     //}
     std.debug.print("HIT A 56\n", .{});
-    return fileBytes;
+    return 1;
 }
 
 // Attempt this first by only sending attribute length
