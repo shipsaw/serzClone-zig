@@ -35,27 +35,33 @@ fn parse(fileBytes: []const u8) fileError![]const u8 {
     const retval = switch (fileBytes[1]) {
         0x50 => print50(fileBytes),
         0x56 => print56(fileBytes),
-        0x70 => std.debug.print("HIT A 70\n", .{}),
         else => fileError.InvalidFile,
     };
     return retval;
 }
 
 fn print50(fileBytes: []const u8) []const u8 {
-    var bytePos: []const u8 = fileBytes[2..];
-    if (bytePos == 0xFF) {
-        bytePos = bytePos[2..];
-        const wordLen = std.mem.readIntSlice(u32, bytePos, std.builtin.Endian.Little);
+    var bytePos: u32 = 2;
+    if (fileBytes[bytePos] == 0xFF) {
+        bytePos += 2;
+        const wordLen = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
         bytePos += 4;
-        const wordEnd = wordOffset + wordLen;
+        const wordBegin = bytePos;
+        const wordEnd = wordBegin + wordLen;
+        bytePos += wordLen;
 
-        try wordList.append(fileBytes[wordOffset..wordEnd]);
-        std.debug.print("<{s}>\n", .{fileBytes[wordOffset..wordEnd]});
-        return fileBytes[wordOffset + wordLen + 1 ..];
+        try wordList.append(fileBytes[wordBegin..wordEnd]);
+        std.debug.print("<{s}>\n", .{fileBytes[wordBegin..wordEnd]});
+        return fileBytes[bytePos + 4 ..];
     } else {
-        const wordLen = std.mem.readIntSlice(u16, fileBytes[2], std.builtin.Endian.Little);
+        const wordIndex = std.mem.readIntSlice(u16, fileBytes[2], std.builtin.Endian.Little);
+        const word = wordList[wordIndex];
+        const wordLen = word.length;
+        std.debug.print("<{s}>\n", .{word});
+        bytePos += wordLen;
+        bytePos += 4;
     }
-    return fileBytes[1..];
+    return fileBytes[bytePos..];
 }
 
 fn print56(fileBytes: []const u8) []const u8 {
