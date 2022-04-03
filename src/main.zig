@@ -62,8 +62,11 @@ fn print50(fileBytes: []const u8) !usize {
     var bytePos: usize = 2;
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
-    else
-        std.debug.print("{s}, .{printSavedWord(fileBytes[bytePos..])});
+    else {
+        const savedWord = getSavedWord(fileBytes[bytePos..]);
+        std.debug.print("{s}", .{savedWord});
+        return savedWord.len;
+    };
     const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
     if (idVal != 0) {
         std.debug.print(" id=\"{d}\"", .{idVal});
@@ -80,14 +83,20 @@ fn print56(fileBytes: []const u8) !usize {
     var bytePos: usize = 2;
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
-    else
-        std.debug.print("{s}", .{printSavedWord(fileBytes[bytePos..])});
+    else blk: {
+        const savedWord = getSavedWord(fileBytes[bytePos..]);
+        std.debug.print("{s}", .{savedWord});
+        break :blk 2;
+    };
 
     std.debug.print(" type=\"", .{});
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
-    else
-        std.debug.print("{s}", .{printSavedWord(fileBytes[bytePos..])});
+    else blk: {
+        const savedWord = getSavedWord(fileBytes[bytePos..]);
+        std.debug.print("{s}", .{savedWord});
+        break :blk 2;
+    };
     std.debug.print("\"", .{});
 
     // TEMP HACK
@@ -101,7 +110,9 @@ fn print70(fileBytes: []const u8) usize {
     printTabs();
     var bytePos: usize = 2;
     std.debug.print("</", .{});
-    bytePos = printSavedWord(fileBytes[bytePos..]);
+    const savedWord = getSavedWord(fileBytes[bytePos..]);
+    std.debug.print("{s}", .{savedWord});
+    bytePos += 2;
     std.debug.print(">\n", .{});
     return bytePos;
 }
