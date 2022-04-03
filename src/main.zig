@@ -7,12 +7,13 @@ const allocator = arena.allocator();
 var wordList = std.ArrayList([]const u8).init(allocator);
 var tabs: u8 = 0;
 
-const attrInfoEnum = enum { _bool, _sUInt8, _sInt32 };
-const attrInfo = union(attrInfoEnum) {
-    _bool: u8,
-    _sUInt8: u8,
-    _sInt32: i32,
-};
+// const attrInfo = union(attrInfoEnum) {
+//     _bool: u8,
+//     _sUInt8: u8,
+//     _sInt32: i32,
+// };
+
+const attrTypes = [_]u8{ "bool", "sUInt8", "sInt32" };
 
 pub fn main() anyerror!void {
     defer arena.deinit();
@@ -62,7 +63,7 @@ fn print50(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
     else
-        printSavedWord(fileBytes[bytePos..]);
+        std.debug.print("{s}, .{printSavedWord(fileBytes[bytePos..])});
     const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
     if (idVal != 0) {
         std.debug.print(" id=\"{d}\"", .{idVal});
@@ -80,13 +81,13 @@ fn print56(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
     else
-        printSavedWord(fileBytes[bytePos..]);
+        std.debug.print("{s}", .{printSavedWord(fileBytes[bytePos..])});
 
     std.debug.print(" type=\"", .{});
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
     else
-        printSavedWord(fileBytes[bytePos..]);
+        std.debug.print("{s}", .{printSavedWord(fileBytes[bytePos..])});
     std.debug.print("\"", .{});
 
     // TEMP HACK
@@ -114,13 +115,9 @@ fn getAttrValueLen(attrVal: []const u8) u8 {
     }
 }
 
-fn printSavedWord(fileBytes: []const u8) usize {
-    var bytePos: usize = 0;
+fn getSavedWord(fileBytes: []const u8) []const u8 {
     const wordIndex = std.mem.readIntSlice(u16, fileBytes, std.builtin.Endian.Little);
-    const word = wordList.items[wordIndex];
-    std.debug.print("{s}", .{word});
-    bytePos += 2;
-    return bytePos;
+    return wordList.items[wordIndex];
 }
 
 fn printNewWord(fileBytes: []const u8) !usize {
