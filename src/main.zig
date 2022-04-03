@@ -1,12 +1,7 @@
 const std = @import("std");
 const size_limit = std.math.maxInt(u32);
 
-const fileError = error{
-    InvalidFile,
-    AccessDenied,
-    FileNotFound,
-};
-
+const fileError = error{InvalidFile};
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 const allocator = arena.allocator();
 var wordList = std.ArrayList([]const u8).init(allocator);
@@ -25,7 +20,7 @@ pub fn main() anyerror!void {
 }
 
 // Verify File begins with the prelude "SERZ"
-fn verifyPrelude(preludeBytes: []u8) fileError![]const u8 {
+fn verifyPrelude(preludeBytes: []u8) ![]const u8 {
     const correctPrelude = "SERZ";
     for (correctPrelude) |char, i| {
         if (char != preludeBytes[i]) return fileError.InvalidFile;
@@ -38,12 +33,11 @@ fn parse(fileBytes: []const u8) ![]const u8 {
     var loopPos: usize = 0;
     std.debug.print("fileBytes size: {d}\n", .{fileBytes.len});
     while (fileBytes.len > loopPos) {
-        if (fileBytes.len == 0) return fileError.InvalidFile;
         if (fileBytes[loopPos] == 0xFF) {
             loopPos = switch (fileBytes[1 + loopPos]) {
                 0x50 => loopPos + (try print50(fileBytes[loopPos..])),
-                // 0x56 => loopPos + print56(fileBytes[loopPos..]),
-                0x56 => loopPos + 1,
+                0x56 => loopPos + (try print56(fileBytes[loopPos..])),
+                0x70 => loopPos + print70(fileBytes[loopPos..]),
                 else => loopPos + 1,
             };
             continue;
@@ -56,59 +50,82 @@ fn parse(fileBytes: []const u8) ![]const u8 {
 fn print50(fileBytes: []const u8) !usize {
     var bytePos: usize = 2;
     if (fileBytes[bytePos] == 0xFF) {
-        bytePos += 2;
-        const wordLen = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
-        bytePos += 4;
-        const wordBegin = bytePos;
-        const wordEnd = wordBegin + wordLen;
-        bytePos += wordLen;
-
-        try wordList.append(fileBytes[wordBegin..wordEnd]);
-        std.debug.print("<{s}>\n", .{fileBytes[wordBegin..wordEnd]});
-        return bytePos + 8;
+        bytePos += try printNewWord(fileBytes[bytePos..]);
     } else {
-        const wordIndex = std.mem.readIntSlice(u16, fileBytes[2..], std.builtin.Endian.Little);
-        const word = wordList.items[wordIndex];
-        const wordLen = word.len;
-        std.debug.print("<{s}>\n", .{word});
-        bytePos += wordLen;
-        bytePos += 8;
+        bytePos = printSavedWord(fileBytes[bytePos..]);
     }
+    const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
+    if (idVal != 0) {
+        std.debug.print(" id=\"{d}\"", .{idVal});
+    }
+    std.debug.print(">\n", .{});
+    bytePos += 8;
     return bytePos;
 }
 
-fn print56(fileBytes: []const u8) usize {
-    _ = fileBytes;
-    //var i: u8 = 0;
-    //while (i < tabs) : (i += 1) {
-    //    std.debug.print("\t", .{});
-    //}
-    //std.debug.print("<", .{});
-    //var nodeName: []const u8 = "";
-    //if (fileBytes[3] == 0xFF) {
-    //    const wordOffset = 8;
-    //    var wordLen = std.mem.readIntSlice(u32, fileBytes[4..], std.builtin.Endian.Little);
-    //    nodeName = fileBytes[wordOffset .. wordOffset + wordLen];
-    //    var attrOffset: usize = wordOffset + wordLen;
-    //    var attrName: []const u8 = undefined;
-    //    var attrLen: usize = 2;
-    //    if (fileBytes[attrOffset] == 0xFF) {
-    //        attrLen = std.mem.readIntSlice(u32, fileBytes[attrOffset + 2 ..], std.builtin.Endian.Little);
-    //        attrName = fileBytes[attrOffset + 6 .. attrOffset + 6 + attrLen];
-    //        attrLen += 4 + 2;
-    //    }
-    //    std.debug.print("{s} type={s}, val={d}>\n", .{ nodeName, attrName, getAttrValueLen(fileBytes[attrOffset + attrLen ..]) });
-    //    parse(fileBytes[attrOffset + attrLen + 4 ..], tabs);
-    //}
-    std.debug.print("HIT A 56\n", .{});
-    return 1;
+fn print56(fileBytes: []const u8) !usize {
+    var bytePos: usize = 2;
+    if (fileBytes[bytePos] == 0xFF) {
+        bytePos += try printNewWord(fileBytes[bytePos..]);
+    } else {
+        bytePos = printSavedWord(fileBytes[bytePos..]);
+    }
+    std.debug.print(" type=\"", .{});
+    if (fileBytes[bytePos] == 0xFF) {
+        bytePos += try printNewWord(fileBytes[bytePos..]);
+    } else {
+        bytePos += printSavedWord(fileBytes[bytePos..]);
+    }
+    std.debug.print("\"", .{});
+    // TEMP HACK
+    while (fileBytes[bytePos] != 0xFF) : (bytePos += 1) {}
+    std.debug.print(">\n", .{});
+    return bytePos;
+}
+
+fn print70(fileBytes: []const u8) usize {
+    var bytePos: usize = 2;
+    std.debug.print("</", .{});
+    bytePos = printSavedWord(fileBytes[bytePos..]);
+    std.debug.print(">\n", .{});
+    return bytePos;
 }
 
 // Attempt this first by only sending attribute length
 fn getAttrValueLen(attrVal: []const u8) u8 {
     switch (attrVal[0]) {
         'b' => return 1,
-        's' => return 4,
+        's' => if (attrVal[4] == '3') 4 else 1,
         else => return 0,
     }
+}
+
+fn printSavedWord(fileBytes: []const u8) usize {
+    var bytePos: usize = 0;
+    const wordIndex = std.mem.readIntSlice(u16, fileBytes, std.builtin.Endian.Little);
+    const word = wordList.items[wordIndex];
+    std.debug.print("{s}", .{word});
+    bytePos += 2;
+    return bytePos;
+}
+
+fn printNewWord(fileBytes: []const u8) !usize {
+    var bytePos: usize = 2;
+    const wordLen = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
+    bytePos += 4;
+    const wordBegin = bytePos;
+    const wordEnd = wordBegin + wordLen;
+    bytePos += wordLen;
+
+    try wordList.append(fileBytes[wordBegin..wordEnd]);
+    std.debug.print("{s}", .{fileBytes[wordBegin..wordEnd]});
+    return bytePos;
+}
+
+fn debugPrinter(fileBytes: []const u8) !void {
+    std.debug.print("\n", .{});
+    for (fileBytes[0..20]) |ch| {
+        std.debug.print("{x} ", .{ch});
+    }
+    std.debug.print("\n", .{});
 }
