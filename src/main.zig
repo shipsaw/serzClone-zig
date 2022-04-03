@@ -5,6 +5,14 @@ const fileError = error{InvalidFile};
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 const allocator = arena.allocator();
 var wordList = std.ArrayList([]const u8).init(allocator);
+var tabs: u8 = 0;
+
+const attrInfoEnum = enum { _bool, _sUInt8, _sInt32 };
+const attrInfo = union(attrInfoEnum) {
+    _bool: u8,
+    _sUInt8: u8,
+    _sInt32: i32,
+};
 
 pub fn main() anyerror!void {
     defer arena.deinit();
@@ -48,6 +56,8 @@ fn parse(fileBytes: []const u8) ![]const u8 {
 }
 
 fn print50(fileBytes: []const u8) !usize {
+    printTabs();
+    std.debug.print("<", .{});
     var bytePos: usize = 2;
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
@@ -60,10 +70,12 @@ fn print50(fileBytes: []const u8) !usize {
 
     std.debug.print(">\n", .{});
     bytePos += 8;
+    tabs += 1;
     return bytePos;
 }
 
 fn print56(fileBytes: []const u8) !usize {
+    printTabs();
     var bytePos: usize = 2;
     bytePos += if (fileBytes[bytePos] == 0xFF)
         try printNewWord(fileBytes[bytePos..])
@@ -84,6 +96,8 @@ fn print56(fileBytes: []const u8) !usize {
 }
 
 fn print70(fileBytes: []const u8) usize {
+    tabs -= 1;
+    printTabs();
     var bytePos: usize = 2;
     std.debug.print("</", .{});
     bytePos = printSavedWord(fileBytes[bytePos..]);
@@ -128,4 +142,12 @@ fn debugPrinter(fileBytes: []const u8) !void {
         std.debug.print("{x} ", .{ch});
     }
     std.debug.print("\n", .{});
+}
+
+fn printTabs() void {
+    var i: u8 = 0;
+    while (i < tabs) : (i += 1) {
+        std.debug.print("\t", .{});
+    }
+    return;
 }
