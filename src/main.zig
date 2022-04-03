@@ -37,15 +37,18 @@ fn verifyPrelude(preludeBytes: []u8) fileError![]const u8 {
 fn parse(fileBytes: []const u8) ![]const u8 {
     var loopPos: usize = 0;
     std.debug.print("fileBytes size: {d}\n", .{fileBytes.len});
-    while (fileBytes.len > loopPos) : (loopPos += 1) {
+    while (fileBytes.len > loopPos) {
         if (fileBytes.len == 0) return fileError.InvalidFile;
         if (fileBytes[loopPos] == 0xFF) {
             loopPos = switch (fileBytes[1 + loopPos]) {
                 0x50 => loopPos + (try print50(fileBytes[loopPos..])),
-                0x56 => loopPos + print56(fileBytes[loopPos..]),
-                else => loopPos,
+                // 0x56 => loopPos + print56(fileBytes[loopPos..]),
+                0x56 => loopPos + 1,
+                else => loopPos + 1,
             };
+            continue;
         }
+        loopPos += 1;
     }
     return "";
 }
