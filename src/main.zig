@@ -49,15 +49,15 @@ fn parse(fileBytes: []const u8) ![]const u8 {
 
 fn print50(fileBytes: []const u8) !usize {
     var bytePos: usize = 2;
-    if (fileBytes[bytePos] == 0xFF) {
-        bytePos += try printNewWord(fileBytes[bytePos..]);
-    } else {
-        bytePos = printSavedWord(fileBytes[bytePos..]);
-    }
+    bytePos += if (fileBytes[bytePos] == 0xFF)
+        try printNewWord(fileBytes[bytePos..])
+    else
+        printSavedWord(fileBytes[bytePos..]);
     const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
     if (idVal != 0) {
         std.debug.print(" id=\"{d}\"", .{idVal});
     }
+
     std.debug.print(">\n", .{});
     bytePos += 8;
     return bytePos;
@@ -65,18 +65,18 @@ fn print50(fileBytes: []const u8) !usize {
 
 fn print56(fileBytes: []const u8) !usize {
     var bytePos: usize = 2;
-    if (fileBytes[bytePos] == 0xFF) {
-        bytePos += try printNewWord(fileBytes[bytePos..]);
-    } else {
-        bytePos = printSavedWord(fileBytes[bytePos..]);
-    }
+    bytePos += if (fileBytes[bytePos] == 0xFF)
+        try printNewWord(fileBytes[bytePos..])
+    else
+        printSavedWord(fileBytes[bytePos..]);
+
     std.debug.print(" type=\"", .{});
-    if (fileBytes[bytePos] == 0xFF) {
-        bytePos += try printNewWord(fileBytes[bytePos..]);
-    } else {
-        bytePos += printSavedWord(fileBytes[bytePos..]);
-    }
+    bytePos += if (fileBytes[bytePos] == 0xFF)
+        try printNewWord(fileBytes[bytePos..])
+    else
+        printSavedWord(fileBytes[bytePos..]);
     std.debug.print("\"", .{});
+
     // TEMP HACK
     while (fileBytes[bytePos] != 0xFF) : (bytePos += 1) {}
     std.debug.print(">\n", .{});
