@@ -13,7 +13,8 @@ var tabs: u8 = 0;
 //     _sInt32: i32,
 // };
 
-const attrTypes = [_]u8{ "bool", "sUInt8", "sInt32" };
+const attrTypes = [_][]const u8{ "bool", "sUInt8", "sInt32" };
+const attrTypesSlice = attrTypes[0..3];
 
 pub fn main() anyerror!void {
     defer arena.deinit();
@@ -95,6 +96,7 @@ fn print56(fileBytes: []const u8) !usize {
     else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{savedWord});
+        getAttrValueLen(savedWord);
         break :blk 2;
     };
     std.debug.print("\"", .{});
@@ -118,12 +120,13 @@ fn print70(fileBytes: []const u8) usize {
 }
 
 // Attempt this first by only sending attribute length
-fn getAttrValueLen(attrVal: []const u8) u8 {
-    switch (attrVal[0]) {
-        'b' => return 1,
-        's' => if (attrVal[4] == '3') 4 else 1,
-        else => return 0,
+fn getAttrValueLen(attrVal: []const u8) void {
+    for (attrTypes) |availType| {
+        if (std.mem.eql(u8, availType, attrVal)) {
+            std.debug.print("   ****The type appears to be {s}***  ", .{availType});
+        }
     }
+    return;
 }
 
 fn getSavedWord(fileBytes: []const u8) []const u8 {
