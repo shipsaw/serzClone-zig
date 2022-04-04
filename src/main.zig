@@ -142,7 +142,7 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
         },
         attrType._sFloat32 => {
             const fVal = @bitCast(f32, std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little));
-            print("{d}", .{fVal});
+            print("{d:.3}", .{fVal});
             return 4;
         },
         attrType._cDeltaString => {
