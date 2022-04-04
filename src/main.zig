@@ -65,7 +65,7 @@ fn print50(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{newWord});
-        break :blk newWord.len + 2;
+        break :blk newWord.len + 6;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{savedWord});
@@ -87,7 +87,8 @@ fn print56(fileBytes: []const u8) !usize {
     var bytePos: usize = 2;
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
-        break :blk newWord.len + 2;
+        std.debug.print("{s}", .{newWord});
+        break :blk newWord.len + 6;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{savedWord});
