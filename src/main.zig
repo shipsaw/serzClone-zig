@@ -11,14 +11,14 @@ var tabs: u8 = 0;
 const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString" };
 
 const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString };
-const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 } };
+const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 }, .{ "cDeltaString", attrType._cDeltaString } };
 const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
 
 pub fn main() anyerror!void {
     defer arena.deinit();
     defer wordList.deinit();
-    // var file = try std.fs.cwd().openFile("testFiles/scenario.bin", .{});
-    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    var file = try std.fs.cwd().openFile("testFiles/scenario.bin", .{});
+    // var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
     const fileBegin = try verifyPrelude(fileResult[0..]);
     _ = try parse(fileBegin[4..]);
@@ -100,13 +100,13 @@ fn print56(fileBytes: []const u8) !usize {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
         print(">", .{});
-        const dataSize = getAttrValueType(newWord, fileBytes[newWord.len + 2 ..]);
+        const dataSize = try getAttrValueType(newWord, fileBytes[bytePos + newWord.len + 6 ..]);
         break :blk newWord.len + dataSize + 2;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         print("{s}", .{savedWord});
         print("\">", .{});
-        break :blk 2 + getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
+        break :blk 2 + try getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
     print("</{s}>\n", .{nodeName});
     return bytePos;
@@ -125,9 +125,8 @@ fn print70(fileBytes: []const u8) usize {
 }
 
 // Attempt this first by only sending attribute length
-fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) u8 {
+fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
     const tpe = stringMap.get(attrTypeParam).?;
-    _ = attrVal;
     switch (tpe) {
         attrType._bool => {
             print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
@@ -141,7 +140,17 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) u8 {
             print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
             return 4;
         },
-        else => return 0,
+        attrType._cDeltaString => {
+            return if (attrVal[0] == 0xFF) blk: {
+                const attrValString = try printNewWord(attrVal);
+                print("{s}", .{attrValString});
+                break :blk attrValString.len + 6;
+            } else blk: {
+                const attrValString = getSavedWord(attrVal);
+                print("{s}", .{attrValString});
+                break :blk 2;
+            };
+        },
     }
 }
 
