@@ -13,8 +13,9 @@ var tabs: u8 = 0;
 //     _sInt32: i32,
 // };
 
-const attrTypes = [_][]const u8{ "bool", "sUInt8", "sInt32" };
-const attrTypesSlice = attrTypes[0..3];
+const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32" };
+const attrType = enum { _bool, _sUInt8, _sInt32 };
+const stringMap = std.ComptimeStringMap(attrType, .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType.size_limit } });
 
 pub fn main() anyerror!void {
     defer arena.deinit();
@@ -91,13 +92,14 @@ fn print56(fileBytes: []const u8) !usize {
     };
 
     std.debug.print(" type=\"", .{});
-    bytePos += if (fileBytes[bytePos] == 0xFF)
-        try printNewWord(fileBytes[bytePos..])
-    else blk: {
+    var dataType: type = undefined;
+    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
+        dataType = getAttrValueType(fileBytes[bytePos..]);
+        break :blk try printNewWord(fileBytes[bytePos..]);
+    } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{savedWord});
-        getAttrValueLen(savedWord);
-        break :blk 2;
+        break :blk 2 + getAttrValueType(savedWord);
     };
     std.debug.print("\"", .{});
 
@@ -120,13 +122,22 @@ fn print70(fileBytes: []const u8) usize {
 }
 
 // Attempt this first by only sending attribute length
-fn getAttrValueLen(attrVal: []const u8) void {
-    for (attrTypes) |availType| {
-        if (std.mem.eql(u8, availType, attrVal)) {
-            std.debug.print("   ****The type appears to be {s}***  ", .{availType});
+fn getAttrValueType(attrType: []const u8, attrVal: []const u8) u8 {
+    const tpe = stringMap.get(attrType);
+    switch (tpe) {
+        attrType._bool => {
+            std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});;
+            return 1;
         }
-    }
-    return;
+        attrType._sUInt8 => {
+            std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
+            return 1;
+        }
+        attrType._sInt32 => {
+            std.debug.print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
+            return 4;
+        }
+    };
 }
 
 fn getSavedWord(fileBytes: []const u8) []const u8 {
