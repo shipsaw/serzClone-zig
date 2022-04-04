@@ -16,7 +16,7 @@ const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
 pub fn main() anyerror!void {
     defer arena.deinit();
     defer wordList.deinit();
-    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    var file = try std.fs.cwd().openFile("testFiles/scenario.bin", .{});
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
     const fileBegin = try verifyPrelude(fileResult[0..]);
     _ = try parse(fileBegin[4..]);
