@@ -10,8 +10,8 @@ var tabs: u8 = 0;
 
 const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString" };
 
-const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString };
-const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 }, .{ "cDeltaString", attrType._cDeltaString } };
+const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString, _sFloat32 };
+const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 }, .{ "cDeltaString", attrType._cDeltaString }, .{ "sFloat32", attrType._sFloat32 } };
 const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
 
 pub fn main() anyerror!void {
@@ -99,7 +99,7 @@ fn print56(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
-        print(">", .{});
+        print("\">", .{});
         const dataSize = try getAttrValueType(newWord, fileBytes[bytePos + newWord.len + 6 ..]);
         break :blk newWord.len + dataSize + 2;
     } else blk: {
@@ -138,6 +138,11 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
         },
         attrType._sInt32 => {
             print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
+            return 4;
+        },
+        attrType._sFloat32 => {
+            const fVal = @bitCast(f32, std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little));
+            print("{d}", .{fVal});
             return 4;
         },
         attrType._cDeltaString => {
