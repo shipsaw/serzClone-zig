@@ -15,7 +15,7 @@ var tabs: u8 = 0;
 
 const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32" };
 const attrType = enum { _bool, _sUInt8, _sInt32 };
-const stringMap = std.ComptimeStringMap(attrType, .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType.size_limit } });
+const stringMap = std.ComptimeStringMap(attrType, .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 } });
 
 pub fn main() anyerror!void {
     defer arena.deinit();
@@ -62,12 +62,14 @@ fn print50(fileBytes: []const u8) !usize {
     printTabs();
     std.debug.print("<", .{});
     var bytePos: usize = 2;
-    bytePos += if (fileBytes[bytePos] == 0xFF)
-        try printNewWord(fileBytes[bytePos..])
-    else {
+    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
+        const newWord = try printNewWord(fileBytes[bytePos..]);
+        std.debug.print("{s}", .{newWord});
+        break :blk newWord.len + 2;
+    } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{savedWord});
-        return savedWord.len;
+        break :blk 2;
     };
     const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
     if (idVal != 0) {
@@ -83,23 +85,24 @@ fn print50(fileBytes: []const u8) !usize {
 fn print56(fileBytes: []const u8) !usize {
     printTabs();
     var bytePos: usize = 2;
-    bytePos += if (fileBytes[bytePos] == 0xFF)
-        try printNewWord(fileBytes[bytePos..])
-    else blk: {
+    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
+        const newWord = try printNewWord(fileBytes[bytePos..]);
+        break :blk newWord.len + 2;
+    } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{savedWord});
         break :blk 2;
     };
 
     std.debug.print(" type=\"", .{});
-    var dataType: type = undefined;
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
-        dataType = getAttrValueType(fileBytes[bytePos..]);
-        break :blk try printNewWord(fileBytes[bytePos..]);
+        const newWord = try printNewWord(fileBytes[bytePos..]);
+        const dataSize = getAttrValueType(newWord, fileBytes[newWord.len + 2 ..]);
+        break :blk newWord.len + dataSize + 2;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         std.debug.print("{s}", .{savedWord});
-        break :blk 2 + getAttrValueType(savedWord);
+        break :blk 2 + getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
     std.debug.print("\"", .{});
 
@@ -122,22 +125,22 @@ fn print70(fileBytes: []const u8) usize {
 }
 
 // Attempt this first by only sending attribute length
-fn getAttrValueType(attrType: []const u8, attrVal: []const u8) u8 {
-    const tpe = stringMap.get(attrType);
+fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) u8 {
+    const tpe = stringMap.get(attrTypeParam).?;
     switch (tpe) {
         attrType._bool => {
-            std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});;
+            std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
-        }
+        },
         attrType._sUInt8 => {
             std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
-        }
+        },
         attrType._sInt32 => {
             std.debug.print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
             return 4;
-        }
-    };
+        },
+    }
 }
 
 fn getSavedWord(fileBytes: []const u8) []const u8 {
@@ -145,7 +148,7 @@ fn getSavedWord(fileBytes: []const u8) []const u8 {
     return wordList.items[wordIndex];
 }
 
-fn printNewWord(fileBytes: []const u8) !usize {
+fn printNewWord(fileBytes: []const u8) ![]const u8 {
     var bytePos: usize = 2;
     const wordLen = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
     bytePos += 4;
@@ -154,8 +157,7 @@ fn printNewWord(fileBytes: []const u8) !usize {
     bytePos += wordLen;
 
     try wordList.append(fileBytes[wordBegin..wordEnd]);
-    std.debug.print("{s}", .{fileBytes[wordBegin..wordEnd]});
-    return bytePos;
+    return fileBytes[wordBegin..wordEnd];
 }
 
 fn debugPrinter(fileBytes: []const u8) !void {
