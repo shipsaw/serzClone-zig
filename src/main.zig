@@ -7,15 +7,11 @@ const allocator = arena.allocator();
 var wordList = std.ArrayList([]const u8).init(allocator);
 var tabs: u8 = 0;
 
-// const attrInfo = union(attrInfoEnum) {
-//     _bool: u8,
-//     _sUInt8: u8,
-//     _sInt32: i32,
-// };
-
 const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32" };
+
 const attrType = enum { _bool, _sUInt8, _sInt32 };
-const stringMap = std.ComptimeStringMap(attrType, .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 } });
+const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 } };
+const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
 
 pub fn main() anyerror!void {
     defer arena.deinit();
@@ -24,7 +20,7 @@ pub fn main() anyerror!void {
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
     const fileBegin = try verifyPrelude(fileResult[0..]);
     _ = try parse(fileBegin[4..]);
-    std.debug.print("List of saved words = ", .{});
+    std.debug.print("\nList of saved words = ", .{});
     for (wordList.items) |word, idx| {
         std.debug.print(" {d}:{s},", .{ idx, word });
     }
@@ -42,7 +38,7 @@ fn verifyPrelude(preludeBytes: []u8) ![]const u8 {
 // Base parsing function, calls all others for node types
 fn parse(fileBytes: []const u8) ![]const u8 {
     var loopPos: usize = 0;
-    std.debug.print("fileBytes size: {d}\n", .{fileBytes.len});
+    std.debug.print("fileBytes size: {d}\n\n", .{fileBytes.len});
     while (fileBytes.len > loopPos) {
         if (fileBytes[loopPos] == 0xFF) {
             loopPos = switch (fileBytes[1 + loopPos]) {
@@ -98,6 +94,7 @@ fn print56(fileBytes: []const u8) !usize {
     std.debug.print(" type=\"", .{});
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
+        std.debug.print("{s}", .{newWord});
         const dataSize = getAttrValueType(newWord, fileBytes[newWord.len + 2 ..]);
         break :blk newWord.len + dataSize + 2;
     } else blk: {
@@ -106,9 +103,6 @@ fn print56(fileBytes: []const u8) !usize {
         break :blk 2 + getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
     std.debug.print("\"", .{});
-
-    // TEMP HACK
-    while (fileBytes[bytePos] != 0xFF) : (bytePos += 1) {}
     std.debug.print(">\n", .{});
     return bytePos;
 }
@@ -128,17 +122,18 @@ fn print70(fileBytes: []const u8) usize {
 // Attempt this first by only sending attribute length
 fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) u8 {
     const tpe = stringMap.get(attrTypeParam).?;
+    _ = attrVal;
     switch (tpe) {
         attrType._bool => {
-            std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
+            // std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
         },
         attrType._sUInt8 => {
-            std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
+            // std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
         },
         attrType._sInt32 => {
-            std.debug.print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
+            // std.debug.print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
             return 4;
         },
     }
