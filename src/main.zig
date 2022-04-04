@@ -1,5 +1,6 @@
 const std = @import("std");
 const size_limit = std.math.maxInt(u32);
+const print = std.debug.print;
 
 const fileError = error{InvalidFile};
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
@@ -7,22 +8,23 @@ const allocator = arena.allocator();
 var wordList = std.ArrayList([]const u8).init(allocator);
 var tabs: u8 = 0;
 
-const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32" };
+const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString" };
 
-const attrType = enum { _bool, _sUInt8, _sInt32 };
+const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString };
 const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 } };
 const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
 
 pub fn main() anyerror!void {
     defer arena.deinit();
     defer wordList.deinit();
-    var file = try std.fs.cwd().openFile("testFiles/scenario.bin", .{});
+    // var file = try std.fs.cwd().openFile("testFiles/scenario.bin", .{});
+    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
     const fileBegin = try verifyPrelude(fileResult[0..]);
     _ = try parse(fileBegin[4..]);
-    std.debug.print("\nList of saved words = ", .{});
+    print("\nList of saved words = ", .{});
     for (wordList.items) |word, idx| {
-        std.debug.print(" {d}:{s},", .{ idx, word });
+        print(" {d}:{s},", .{ idx, word });
     }
 }
 
@@ -38,7 +40,7 @@ fn verifyPrelude(preludeBytes: []u8) ![]const u8 {
 // Base parsing function, calls all others for node types
 fn parse(fileBytes: []const u8) ![]const u8 {
     var loopPos: usize = 0;
-    std.debug.print("fileBytes size: {d}\n\n", .{fileBytes.len});
+    print("fileBytes size: {d}\n\n", .{fileBytes.len});
     while (fileBytes.len > loopPos) {
         if (fileBytes[loopPos] == 0xFF) {
             loopPos = switch (fileBytes[1 + loopPos]) {
@@ -56,54 +58,57 @@ fn parse(fileBytes: []const u8) ![]const u8 {
 
 fn print50(fileBytes: []const u8) !usize {
     printTabs();
-    std.debug.print("<", .{});
+    print("<", .{});
     var bytePos: usize = 2;
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
-        std.debug.print("{s}", .{newWord});
+        print("{s}", .{newWord});
         break :blk newWord.len + 6;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
-        std.debug.print("{s}", .{savedWord});
+        print("{s}", .{savedWord});
         break :blk 2;
     };
     const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
     if (idVal != 0) {
-        std.debug.print(" id=\"{d}\"", .{idVal});
+        print(" id=\"{d}\"", .{idVal});
     }
 
-    std.debug.print(">\n", .{});
+    print(">\n", .{});
     bytePos += 8;
     tabs += 1;
     return bytePos;
 }
 
 fn print56(fileBytes: []const u8) !usize {
+    var nodeName: []const u8 = undefined;
     printTabs();
+    print("<", .{});
     var bytePos: usize = 2;
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
-        const newWord = try printNewWord(fileBytes[bytePos..]);
-        std.debug.print("{s}", .{newWord});
-        break :blk newWord.len + 6;
+        nodeName = try printNewWord(fileBytes[bytePos..]);
+        print("{s}", .{nodeName});
+        break :blk nodeName.len + 6;
     } else blk: {
-        const savedWord = getSavedWord(fileBytes[bytePos..]);
-        std.debug.print("{s}", .{savedWord});
+        nodeName = getSavedWord(fileBytes[bytePos..]);
+        print("{s}", .{nodeName});
         break :blk 2;
     };
 
-    std.debug.print(" type=\"", .{});
+    print(" type=\"", .{});
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
-        std.debug.print("{s}", .{newWord});
+        print("{s}", .{newWord});
+        print(">", .{});
         const dataSize = getAttrValueType(newWord, fileBytes[newWord.len + 2 ..]);
         break :blk newWord.len + dataSize + 2;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
-        std.debug.print("{s}", .{savedWord});
+        print("{s}", .{savedWord});
+        print("\">", .{});
         break :blk 2 + getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
-    std.debug.print("\"", .{});
-    std.debug.print(">\n", .{});
+    print("</{s}>\n", .{nodeName});
     return bytePos;
 }
 
@@ -111,11 +116,11 @@ fn print70(fileBytes: []const u8) usize {
     tabs -= 1;
     printTabs();
     var bytePos: usize = 2;
-    std.debug.print("</", .{});
+    print("</", .{});
     const savedWord = getSavedWord(fileBytes[bytePos..]);
-    std.debug.print("{s}", .{savedWord});
+    print("{s}", .{savedWord});
     bytePos += 2;
-    std.debug.print(">\n", .{});
+    print(">\n", .{});
     return bytePos;
 }
 
@@ -125,17 +130,18 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) u8 {
     _ = attrVal;
     switch (tpe) {
         attrType._bool => {
-            // std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
+            print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
         },
         attrType._sUInt8 => {
-            // std.debug.print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
+            print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
         },
         attrType._sInt32 => {
-            // std.debug.print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
+            print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
             return 4;
         },
+        else => return 0,
     }
 }
 
@@ -157,17 +163,17 @@ fn printNewWord(fileBytes: []const u8) ![]const u8 {
 }
 
 fn debugPrinter(fileBytes: []const u8) !void {
-    std.debug.print("\n", .{});
+    print("\n", .{});
     for (fileBytes[0..20]) |ch| {
-        std.debug.print("{x} ", .{ch});
+        print("{x} ", .{ch});
     }
-    std.debug.print("\n", .{});
+    print("\n", .{});
 }
 
 fn printTabs() void {
     var i: u8 = 0;
     while (i < tabs) : (i += 1) {
-        std.debug.print("\t", .{});
+        print("\t", .{});
     }
     return;
 }
