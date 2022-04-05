@@ -99,13 +99,11 @@ fn print56(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
-        print("\">", .{});
         const dataSize = try getAttrValueType(newWord, fileBytes[bytePos + newWord.len + 6 ..]);
         break :blk newWord.len + dataSize + 2;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         print("{s}", .{savedWord});
-        print("\">", .{});
         break :blk 2 + try getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
     print("</{s}>\n", .{nodeName});
@@ -129,20 +127,26 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
     const tpe = stringMap.get(attrTypeParam).?;
     switch (tpe) {
         attrType._bool => {
-            print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
+            print("\">{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
         },
         attrType._sUInt8 => {
-            print("{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
+            print("\">{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
             return 1;
         },
         attrType._sInt32 => {
-            print("{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
+            print("\">{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
             return 4;
         },
         attrType._sFloat32 => {
             const fVal = @bitCast(f32, std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little));
-            print("{d:.3}", .{fVal});
+            const text: f64 = fVal;
+            const text2: [8]u8 = @bitCast([8]u8, text);
+            print(" alt_encoding=\"", .{});
+            for (text2) |c| {
+                print("{X:0>2}", .{c});
+            }
+            print("\">{d:.3}", .{fVal});
             return 4;
         },
         attrType._cDeltaString => {
