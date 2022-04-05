@@ -143,25 +143,46 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
 
             const text: f64 = fVal;
             const text2: [8]u8 = @bitCast([8]u8, text);
-            print(" alt_encoding=\"", .{});
+            print("\" alt_encoding=\"", .{});
             for (text2) |c| {
                 print("{X:0>2}", .{c});
             }
-            print("\">{d:6}", .{fVal});
+            print("\">", .{});
+            try printStringPrecision(fVal);
             return 4;
         },
         attrType._cDeltaString => {
             return if (attrVal[0] == 0xFF) blk: {
                 const attrValString = try printNewWord(attrVal);
-                print("{s}", .{attrValString});
+                print("\">{s}", .{attrValString});
                 break :blk attrValString.len + 6;
             } else blk: {
                 const attrValString = getSavedWord(attrVal);
-                print("{s}", .{attrValString});
+                print("\">{s}", .{attrValString});
                 break :blk 2;
             };
         },
     }
+}
+
+fn printStringPrecision(fVal: f32) !void {
+    var buf: [20]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buf);
+    try std.fmt.formatFloatDecimal(fVal, std.fmt.FormatOptions{}, fbs.writer());
+    var prec: u8 = 6;
+    if (fVal < 0) print("-", .{});
+    for (buf) |c| {
+        if (c >= '0' and c <= '9' and prec > 0) {
+            print("{c}", .{c});
+            prec -= 1;
+        } else if (c == '.') {
+            print(".", .{});
+            continue;
+        } else {
+            break;
+        }
+    }
+    return;
 }
 
 fn getSavedWord(fileBytes: []const u8) []const u8 {
