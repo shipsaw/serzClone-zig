@@ -140,13 +140,14 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
         },
         attrType._sFloat32 => {
             const fVal = @bitCast(f32, std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little));
+
             const text: f64 = fVal;
             const text2: [8]u8 = @bitCast([8]u8, text);
             print(" alt_encoding=\"", .{});
             for (text2) |c| {
                 print("{X:0>2}", .{c});
             }
-            print("\">{d:.3}", .{fVal});
+            print("\">{d:6}", .{fVal});
             return 4;
         },
         attrType._cDeltaString => {
