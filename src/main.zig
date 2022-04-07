@@ -8,10 +8,10 @@ const allocator = arena.allocator();
 var wordList = std.ArrayList([]const u8).init(allocator);
 var tabs: u8 = 0;
 
-const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString" };
+const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString", "sUInt64" };
 
-const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString, _sFloat32 };
-const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 }, .{ "cDeltaString", attrType._cDeltaString }, .{ "sFloat32", attrType._sFloat32 } };
+const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString, _sFloat32, _sUInt64 };
+const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 }, .{ "cDeltaString", attrType._cDeltaString }, .{ "sFloat32", attrType._sFloat32 }, .{ "sUInt64", attrType._sUInt64 } };
 const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
 
 pub fn main() anyerror!void {
@@ -150,6 +150,10 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
             print("\">", .{});
             try printStringPrecision(fVal);
             return 4;
+        },
+        attrType._sUInt64 => {
+            print("\">{d}", .{std.mem.readIntSlice(u64, attrVal, std.builtin.Endian.Little)});
+            return 8;
         },
         attrType._cDeltaString => {
             return if (attrVal[0] == 0xFF) blk: {
