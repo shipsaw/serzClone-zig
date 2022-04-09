@@ -6,6 +6,7 @@ const fileError = error{InvalidFile};
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 const allocator = arena.allocator();
 var wordList = std.ArrayList([]const u8).init(allocator);
+var savedLines = std.ArrayList([]const u8).init(allocator);
 var tabs: u8 = 0;
 
 const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString", "sUInt64" };
@@ -22,9 +23,11 @@ pub fn main() anyerror!void {
     const fileResult = try file.readToEndAlloc(allocator, size_limit);
     const fileBegin = try verifyPrelude(fileResult[0..]);
     _ = try parse(fileBegin[4..]);
-    print("\nList of saved words = ", .{});
-    for (wordList.items) |word, idx| {
-        print(" {d}:{s},", .{ idx, word });
+    errdefer {
+        print("\nList of saved words = ", .{});
+        for (wordList.items) |word, idx| {
+            print(" {d}:{s},", .{ idx, word });
+        }
     }
 }
 
@@ -40,20 +43,32 @@ fn verifyPrelude(preludeBytes: []u8) ![]const u8 {
 // Base parsing function, calls all others for node types
 fn parse(fileBytes: []const u8) ![]const u8 {
     var loopPos: usize = 0;
-    print("fileBytes size: {d}\n\n", .{fileBytes.len});
     while (fileBytes.len > loopPos) {
         if (fileBytes[loopPos] == 0xFF) {
             loopPos = switch (fileBytes[1 + loopPos]) {
                 0x50 => loopPos + (try print50(fileBytes[loopPos..])),
                 0x56 => loopPos + (try print56(fileBytes[loopPos..])),
-                0x70 => loopPos + print70(fileBytes[loopPos..]),
-                else => loopPos + 1,
+                0x70 => loopPos + (try print70(fileBytes[loopPos..])),
+                else => loopPos + (try parseSaved(fileBytes[loopPos..])),
             };
             continue;
         }
         loopPos += 1;
     }
     return "";
+}
+
+fn parseSaved(fileBytes: []const u8) !usize {
+    var splicedBytes = std.ArrayList(u8).init(allocator);
+    try splicedBytes.appendSlice(savedLines.items[fileBytes[0]]);
+    try splicedBytes.appendSlice(fileBytes);
+    _ = switch (splicedBytes.items[1]) {
+        0x50 => try print50(splicedBytes.items),
+        0x56 => try print56(splicedBytes.items),
+        0x70 => try print70(splicedBytes.items),
+        else => unreachable,
+    };
+    return splicedBytes.items.len;
 }
 
 fn print50(fileBytes: []const u8) !usize {
@@ -63,10 +78,12 @@ fn print50(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
+        try savedLines.append(fileBytes[0 .. bytePos + newWord.len + 6]);
         break :blk newWord.len + 6;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         print("{s}", .{savedWord});
+        try savedLines.append(fileBytes[0 .. bytePos + 2]);
         break :blk 2;
     };
     const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
@@ -99,18 +116,20 @@ fn print56(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
+        try savedLines.append(fileBytes[0 .. newWord.len + 6]);
         const dataSize = try getAttrValueType(newWord, fileBytes[bytePos + newWord.len + 6 ..]);
         break :blk newWord.len + dataSize + 2;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         print("{s}", .{savedWord});
+        try savedLines.append(fileBytes[0 .. bytePos + 2]);
         break :blk 2 + try getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
     print("</{s}>\n", .{nodeName});
     return bytePos;
 }
 
-fn print70(fileBytes: []const u8) usize {
+fn print70(fileBytes: []const u8) !usize {
     tabs -= 1;
     printTabs();
     var bytePos: usize = 2;
@@ -119,6 +138,7 @@ fn print70(fileBytes: []const u8) usize {
     print("{s}", .{savedWord});
     bytePos += 2;
     print(">\n", .{});
+    try savedLines.append(fileBytes[0..bytePos]);
     return bytePos;
 }
 
