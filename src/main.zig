@@ -78,12 +78,10 @@ fn print50(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
-        try savedLines.append(fileBytes[0 .. bytePos + newWord.len + 6]);
         break :blk newWord.len + 6;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         print("{s}", .{savedWord});
-        try savedLines.append(fileBytes[0 .. bytePos + 2]);
         break :blk 2;
     };
     const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
@@ -94,6 +92,8 @@ fn print50(fileBytes: []const u8) !usize {
     print(">\n", .{});
     bytePos += 8;
     tabs += 1;
+    try debugPrinter(fileBytes[0..bytePos]);
+    try savedLines.append(fileBytes[0..bytePos]);
     return bytePos;
 }
 
@@ -116,16 +116,17 @@ fn print56(fileBytes: []const u8) !usize {
     bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
-        try savedLines.append(fileBytes[0 .. newWord.len + 6]);
         const dataSize = try getAttrValueType(newWord, fileBytes[bytePos + newWord.len + 6 ..]);
+        try savedLines.append(fileBytes[0 .. bytePos + newWord.len + 2]);
         break :blk newWord.len + dataSize + 2;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         print("{s}", .{savedWord});
-        try savedLines.append(fileBytes[0 .. bytePos + 2]);
+        try savedLines.append(fileBytes[0..bytePos]);
         break :blk 2 + try getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
     print("</{s}>\n", .{nodeName});
+    try debugPrinter(fileBytes[0..bytePos]);
     return bytePos;
 }
 
@@ -227,9 +228,9 @@ fn printNewWord(fileBytes: []const u8) ![]const u8 {
 }
 
 fn debugPrinter(fileBytes: []const u8) !void {
-    print("\n", .{});
-    for (fileBytes[0..20]) |ch| {
-        print("{x} ", .{ch});
+    print("\nDEBUG PRINT\n", .{});
+    for (fileBytes) |ch| {
+        print("{X:0>2} ", .{ch});
     }
     print("\n", .{});
 }
