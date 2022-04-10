@@ -44,16 +44,17 @@ fn verifyPrelude(preludeBytes: []u8) ![]const u8 {
 fn parse(fileBytes: []const u8) ![]const u8 {
     var loopPos: usize = 0;
     while (fileBytes.len > loopPos) {
+        print("LoopPos char: {x}", .{fileBytes[loopPos]});
         if (fileBytes[loopPos] == 0xFF) {
             loopPos = switch (fileBytes[1 + loopPos]) {
                 0x50 => loopPos + (try print50(fileBytes[loopPos..])),
                 0x56 => loopPos + (try print56(fileBytes[loopPos..])),
                 0x70 => loopPos + (try print70(fileBytes[loopPos..])),
-                else => loopPos + (try parseSaved(fileBytes[loopPos..])),
+                else => unreachable,
             };
-            continue;
+        } else {
+            loopPos = loopPos + (try parseSaved(fileBytes[loopPos..]));
         }
-        loopPos += 1;
     }
     return "";
 }
@@ -61,14 +62,16 @@ fn parse(fileBytes: []const u8) ![]const u8 {
 fn parseSaved(fileBytes: []const u8) !usize {
     var splicedBytes = std.ArrayList(u8).init(allocator);
     try splicedBytes.appendSlice(savedLines.items[fileBytes[0]]);
+    const splicedBytesLength = splicedBytes.items.len;
     try splicedBytes.appendSlice(fileBytes);
-    _ = switch (splicedBytes.items[1]) {
+    var bytePos = switch (splicedBytes.items[1]) {
         0x50 => try print50(splicedBytes.items),
         0x56 => try print56(splicedBytes.items),
         0x70 => try print70(splicedBytes.items),
         else => unreachable,
     };
-    return splicedBytes.items.len;
+    // print("ADVANCED: {d}\n", .{bytePos - splicedBytesLength + 1});
+    return bytePos - splicedBytesLength + 1;
 }
 
 fn print50(fileBytes: []const u8) !usize {
@@ -88,12 +91,11 @@ fn print50(fileBytes: []const u8) !usize {
     if (idVal != 0) {
         print(" id=\"{d}\"", .{idVal});
     }
+    try savedLines.append(fileBytes[0..bytePos]);
 
     print(">\n", .{});
     bytePos += 8;
     tabs += 1;
-    try debugPrinter(fileBytes[0..bytePos]);
-    try savedLines.append(fileBytes[0..bytePos]);
     return bytePos;
 }
 
@@ -117,16 +119,17 @@ fn print56(fileBytes: []const u8) !usize {
         const newWord = try printNewWord(fileBytes[bytePos..]);
         print("{s}", .{newWord});
         const dataSize = try getAttrValueType(newWord, fileBytes[bytePos + newWord.len + 6 ..]);
-        try savedLines.append(fileBytes[0 .. bytePos + newWord.len + 2]);
-        break :blk newWord.len + dataSize + 2;
+        // try debugPrinter(fileBytes[0 .. bytePos + newWord.len + 6]);
+        try savedLines.append(fileBytes[0 .. bytePos + newWord.len + 6]);
+        break :blk newWord.len + dataSize + 6;
     } else blk: {
         const savedWord = getSavedWord(fileBytes[bytePos..]);
         print("{s}", .{savedWord});
-        try savedLines.append(fileBytes[0..bytePos]);
+        // try debugPrinter(fileBytes[0 .. bytePos + 2]);
+        try savedLines.append(fileBytes[0 .. bytePos + 2]);
         break :blk 2 + try getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
     print("</{s}>\n", .{nodeName});
-    try debugPrinter(fileBytes[0..bytePos]);
     return bytePos;
 }
 
