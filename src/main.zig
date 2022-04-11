@@ -145,7 +145,6 @@ fn print56(fileBytes: []const u8, newLine: bool) !usize {
 fn print41(fileBytes: []const u8, newLine: bool) !usize {
     var nodeName: []const u8 = undefined;
     var elementType: []const u8 = undefined;
-    _ = numElements;
     printTabs();
     print("<", .{});
     var bytePos: usize = 2;
@@ -172,9 +171,11 @@ fn print41(fileBytes: []const u8, newLine: bool) !usize {
         }
         break :blk 2;
     };
-    const numElements = std.mem.readIntSlice(u8, fileBytes[bytePos], std.builtin.Endian.Little);
+    var numElements: u8 = std.mem.readIntSlice(u8, fileBytes[bytePos..], std.builtin.Endian.Little);
     bytePos += 1;
-    for numElements {
+    while (numElements > 0) : (numElements -= 1) {
+        bytePos += try getAttrValueType(elementType, fileBytes[bytePos..]);
+        print(" ", .{});
     }
     // const dataSize = try getAttrValueType(elementType, fileBytes[bytePos + elementType.len + 6 ..]);
     print(" elementType=\"{s}\"", .{elementType});
@@ -216,13 +217,12 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
         attrType._sFloat32 => {
             const fVal = @bitCast(f32, std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little));
 
-            const text: f64 = fVal;
-            const text2: [8]u8 = @bitCast([8]u8, text);
-            print("\" alt_encoding=\"", .{});
-            for (text2) |c| {
-                print("{X:0>2}", .{c});
-            }
-            print("\">", .{});
+            // const text: f64 = fVal;
+            // const text2: [8]u8 = @bitCast([8]u8, text);
+            // print("\" alt_encoding=\"", .{});
+            // for (text2) |c| {
+            //     print("{X:0>2}", .{c});
+            // }
             try printStringPrecision(fVal);
             return 4;
         },
@@ -245,7 +245,7 @@ fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
 }
 
 fn printStringPrecision(fVal: f32) !void {
-    var buf: [20]u8 = undefined;
+    var buf: [200]u8 = undefined;
     var fbs = std.io.fixedBufferStream(&buf);
     try std.fmt.formatFloatDecimal(fVal, std.fmt.FormatOptions{}, fbs.writer());
     var prec: u8 = 6;
