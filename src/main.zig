@@ -50,7 +50,7 @@ fn parse(fileBytes: []const u8) ![]const u8 {
                 0x50 => loopPos + (try print50(fileBytes[loopPos..], true)),
                 0x56 => loopPos + (try print56(fileBytes[loopPos..], true)),
                 0x70 => loopPos + (try print70(fileBytes[loopPos..], true)),
-                // NEXT: 0x41
+                0x41 => loopPos + (try print41(fileBytes[loopPos..], true)),
                 else => unreachable,
             };
         } else {
@@ -138,6 +138,46 @@ fn print56(fileBytes: []const u8, newLine: bool) !usize {
         }
         break :blk 2 + try getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
     };
+    print("</{s}>\n", .{nodeName});
+    return bytePos;
+}
+
+fn print41(fileBytes: []const u8, newLine: bool) !usize {
+    var nodeName: []const u8 = undefined;
+    var elementType: []const u8 = undefined;
+    _ = numElements;
+    printTabs();
+    print("<", .{});
+    var bytePos: usize = 2;
+    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
+        nodeName = try printNewWord(fileBytes[bytePos..], newLine);
+        print("{s}", .{nodeName});
+        break :blk nodeName.len + 6;
+    } else blk: {
+        nodeName = getSavedWord(fileBytes[bytePos..]);
+        print("{s}", .{nodeName});
+        break :blk 2;
+    };
+
+    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
+        elementType = try printNewWord(fileBytes[bytePos..], newLine);
+        if (newLine) {
+            try savedLines.append(fileBytes[0 .. bytePos + elementType.len + 6]);
+        }
+        break :blk elementType.len + 6;
+    } else blk: {
+        elementType = getSavedWord(fileBytes[bytePos..]);
+        if (newLine) {
+            try savedLines.append(fileBytes[0 .. bytePos + 2]);
+        }
+        break :blk 2;
+    };
+    const numElements = std.mem.readIntSlice(u8, fileBytes[bytePos], std.builtin.Endian.Little);
+    bytePos += 1;
+    for numElements {
+    }
+    // const dataSize = try getAttrValueType(elementType, fileBytes[bytePos + elementType.len + 6 ..]);
+    print(" elementType=\"{s}\"", .{elementType});
     print("</{s}>\n", .{nodeName});
     return bytePos;
 }
