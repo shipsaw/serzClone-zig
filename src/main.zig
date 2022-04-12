@@ -9,10 +9,17 @@ var wordList = std.ArrayList([]const u8).init(allocator);
 var savedLines = std.ArrayList([]const u8).init(allocator);
 var tabs: u8 = 0;
 
-const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString", "sUInt64" };
-
+// const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString", "sUInt64" };
 const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString, _sFloat32, _sUInt64 };
 const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 }, .{ "cDeltaString", attrType._cDeltaString }, .{ "sFloat32", attrType._sFloat32 }, .{ "sUInt64", attrType._sUInt64 } };
+const attrValue = union {
+    bool: bool,
+    sUInt8: u8,
+    sInt32: i32,
+    sFloat32: f32,
+    sUInt64: u64,
+    cDeltaString: []const u8,
+};
 const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
 
 pub fn main() anyerror!void {
@@ -199,46 +206,38 @@ fn print70(fileBytes: []const u8, newLine: bool) !usize {
 }
 
 // Attempt this first by only sending attribute length
-fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
+fn getAttrValueType(attrTypeParam: []const u8, valBits: []const u8) !attrValue {
     const tpe = stringMap.get(attrTypeParam).?;
     switch (tpe) {
         attrType._bool => {
-            print("\">{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
-            return 1;
+            return attrValue{ .sUInt8 = std.mem.readIntSlice(u8, valBits, std.builtin.Endian.Little) };
         },
         attrType._sUInt8 => {
-            print("\">{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
-            return 1;
+            return attrValue{ .sUInt8 = std.mem.readIntSlice(u8, valBits, std.builtin.Endian.Little) };
         },
         attrType._sInt32 => {
-            print("\">{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
-            return 4;
+            return attrValue{ .sInt32 = std.mem.readIntSlice(i32, valBits, std.builtin.Endian.Little) };
         },
         attrType._sFloat32 => {
-            const fVal = @bitCast(f32, std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little));
-
+            return attrValue{ .sFloat32 = @bitCast(f32, std.mem.readIntSlice(i32, valBits, std.builtin.Endian.Little)) };
             // const text: f64 = fVal;
             // const text2: [8]u8 = @bitCast([8]u8, text);
             // print("\" alt_encoding=\"", .{});
             // for (text2) |c| {
             //     print("{X:0>2}", .{c});
             // }
-            try printStringPrecision(fVal);
-            return 4;
+            // try printStringPrecision(fVal);
         },
         attrType._sUInt64 => {
-            print("\">{d}", .{std.mem.readIntSlice(u64, attrVal, std.builtin.Endian.Little)});
-            return 8;
+            return attrValue{ .sUInt64 = std.mem.readIntSlice(u64, valBits, std.builtin.Endian.Little) };
         },
         attrType._cDeltaString => {
-            return if (attrVal[0] == 0xFF) blk: {
-                const attrValString = try printNewWord(attrVal, true);
-                print("\">{s}", .{attrValString});
-                break :blk attrValString.len + 6;
+            return if (valBits[0] == 0xFF) blk: {
+                const attrValString = try printNewWord(valBits, true);
+                break :blk attrValue{ .cDeltaString = attrValString };
             } else blk: {
-                const attrValString = getSavedWord(attrVal);
-                print("\">{s}", .{attrValString});
-                break :blk 2;
+                const attrValString = getSavedWord(valBits);
+                break :blk attrValue{ .cDeltaString = attrValString };
             };
         },
     }
