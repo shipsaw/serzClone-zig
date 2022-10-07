@@ -46,7 +46,7 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
 
 const tokenType = enum {
     SERZ,
-    FF40,
+    FF50,
     FF56,
     FF70,
     NEW_STRING,
@@ -68,9 +68,11 @@ const dataUnion = union(dataType) {
     _cDeltaString: []const u8,
 };
 
-const token = struct {
+const ff50token = struct {
+    name: []const u8,
+    id: u32,
     tokenType: tokenType,
-    value: dataUnion,
+    children: u32,
 };
 
 fn identifier(s: *status) ![]const u8 {
@@ -137,6 +139,23 @@ fn processSFloat32(s: *status) dataUnion {
 fn processCDeltaString(s: *status) !dataUnion {
     const str = try identifier(s);
     return dataUnion{ ._cDeltaString = str };
+}
+
+fn processU32(s: *status) u32 {
+    defer s.current += 4;
+    return std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
+}
+
+fn processFF50(s: *status) !ff50token {
+    const tokenName = try identifier(s);
+    const id = processU32(s);
+    const children = processU32(s);
+    return ff50token{
+        .name = tokenName,
+        .id = id,
+        .tokenType = tokenType.FF50,
+        .children = children,
+    };
 }
 
 fn isAlpha(c: u8) bool {
@@ -280,16 +299,22 @@ test "cDeltaString data" {
     try std.testing.expect(statusStructHello.peek() == 0); // current is left at correct position
 }
 
-pub fn main() !void {
+test "ff50 parsing" {
     // Arrange
-    var statusStruct_3200 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x80, 0xf3, 255, 255 }); // -3200
-    var statusStruct3210 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x8a, 0x0c, 0, 0 }); // 3210
+    var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
+    const expected = ff50token{ .name = "food", .id = 375192228, .tokenType = tokenType.FF50, .children = 1 };
 
     // Act
-    const data_3200 = try processData(&statusStruct_3200);
-    const data3210 = try processData(&statusStruct3210);
+    const ff50 = try processFF50(&statusStruct);
 
     // Assert
-    std.debug.print("{any}\n", .{data_3200._sInt32});
-    std.debug.print("{any}\n", .{data3210._sInt32});
+    try std.testing.expect(ff50.id == expected.id);
+    try std.testing.expectEqualStrings(ff50.name, expected.name);
+    try std.testing.expect(ff50.tokenType == expected.tokenType);
+    try std.testing.expect(ff50.children == expected.children);
+}
+pub fn main() !void {
+    var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
+    const tok = processFF50(&statusStruct);
+    std.debug.print("{any}", .{tok});
 }
