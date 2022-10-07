@@ -62,7 +62,7 @@ const dataType = enum {
 
 const dataUnion = union(dataType) {
     _bool: bool,
-    _sUInt8: i8,
+    _sUInt8: u8,
     _sInt32: i32,
     _sFloat32: f32,
     _cDeltaString: []const u8,
@@ -72,11 +72,6 @@ const token = struct {
     tokenType: tokenType,
     value: dataUnion,
 };
-
-//pub fn parse(source: []const u8) void {
-//    const dictionary = std.StringHashMap(tokenType).init(allocator);
-//    defer dictionary.deinit();
-//}
 
 fn identifier(s: *status) ![]const u8 {
     if (s.source[s.current] == 255) // New string
@@ -113,18 +108,24 @@ fn processData(s: *status) !dataUnion {
 }
 
 fn processBool(s: *status) dataUnion {
-    _ = s;
-    return dataUnion{ ._bool = true };
+    defer s.current += 1;
+    return switch (s.source[s.current]) {
+        1 => dataUnion{ ._bool = true },
+        0 => dataUnion{ ._bool = false },
+        else => unreachable,
+    };
 }
 
 fn processSUInt8(s: *status) dataUnion {
-    _ = s;
-    return dataUnion{ ._sUInt8 = 1 };
+    defer s.current += 1;
+    const val = std.mem.readIntSlice(u8, s.source[s.current..], std.builtin.Endian.Little);
+    return dataUnion{ ._sUInt8 = val };
 }
 
 fn processSInt32(s: *status) dataUnion {
-    _ = s;
-    return dataUnion{ ._sInt32 = 1 };
+    defer s.current += 4;
+    const val = std.mem.readIntSlice(i32, s.source[s.current..], std.builtin.Endian.Little);
+    return dataUnion{ ._sInt32 = val };
 }
 
 fn processSFloat32(s: *status) dataUnion {
@@ -184,28 +185,73 @@ test "identifier test, in map" {
 
     // Assert
     try std.testing.expectEqualStrings(actual, "Hello");
-    try std.testing.expect(statusStruct.peek() == 0);
+    try std.testing.expect(statusStruct.peek() == 0); // current is left at correct position
 }
 
-test "process data, keyword" {
+test "bool data" {
     // Arrange
-    var statusStruct = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l' });
+    var statusStructTrue = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
+    var statusStructFalse = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 0 });
 
     // Act
-    const data = try processData(&statusStruct);
+    const dataTrue = try processData(&statusStructTrue);
+    const dataFalse = try processData(&statusStructFalse);
 
     // Assert
-    try std.testing.expect(@as(dataType, data) == dataType._bool);
-    try std.testing.expect(data._bool == true);
+    try std.testing.expect(@as(dataType, dataTrue) == dataType._bool);
+
+    try std.testing.expect(dataTrue._bool == true);
+    try std.testing.expect(dataFalse._bool == false);
+
+    try std.testing.expect(statusStructTrue.peek() == 0); // current is left at correct position
+}
+
+test "sUInt8 data" {
+    // Arrange
+    var statusStruct11 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 11 });
+    var statusStruct0 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 0 });
+
+    // Act
+    const data11 = try processData(&statusStruct11);
+    const data0 = try processData(&statusStruct0);
+
+    // Assert
+    try std.testing.expect(@as(dataType, data11) == dataType._sUInt8);
+
+    try std.testing.expect(data11._sUInt8 == 11);
+    try std.testing.expect(data0._sUInt8 == 0);
+
+    try std.testing.expect(statusStruct11.peek() == 0); // current is left at correct position
+}
+
+test "sInt32 data" {
+    // Arrange
+    var statusStruct_3200 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x80, 0xf3, 0xff, 0xff }); // -3200
+    var statusStruct3210 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x8a, 0x0c, 0x00, 0x00 }); // 3210
+
+    // Act
+    const data_3200 = try processData(&statusStruct_3200);
+    const data3210 = try processData(&statusStruct3210);
+
+    // Assert
+    try std.testing.expect(@as(dataType, data_3200) == dataType._sInt32);
+
+    try std.testing.expect(data_3200._sInt32 == -3200);
+    try std.testing.expect(data3210._sInt32 == 3210);
+
+    try std.testing.expect(statusStruct_3200.peek() == 0); // current is left at correct position
 }
 
 pub fn main() !void {
     // Arrange
-    var statusStruct = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l' });
+    var statusStruct_3200 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x80, 0xf3, 255, 255 }); // -3200
+    var statusStruct3210 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x8a, 0x0c, 0, 0 }); // 3210
 
     // Act
-    std.debug.print("Returned data union: {any}", .{try processData(&statusStruct)});
+    const data_3200 = try processData(&statusStruct_3200);
+    const data3210 = try processData(&statusStruct3210);
 
     // Assert
-    return;
+    std.debug.print("{any}\n", .{data_3200._sInt32});
+    std.debug.print("{any}\n", .{data3210._sInt32});
 }
