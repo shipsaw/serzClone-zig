@@ -76,6 +76,12 @@ const ff50token = struct {
     children: u32,
 };
 
+const ff56token = struct {
+    name: []const u8,
+    value: dataUnion,
+    tokenType: tokenType,
+};
+
 fn identifier(s: *status) ![]const u8 {
     if (s.source[s.current] == 255) // New string
     {
@@ -154,6 +160,16 @@ fn processFF50(s: *status) !ff50token {
         .id = id,
         .tokenType = tokenType.FF50,
         .children = children,
+    };
+}
+
+fn processFF56(s: *status) !ff56token {
+    const tokenName = try identifier(s);
+    const data = try processData(s);
+    return ff56token{
+        .name = tokenName,
+        .value = data,
+        .tokenType = tokenType.FF56,
     };
 }
 
@@ -316,6 +332,21 @@ test "ff50 parsing" {
     try expect(ff50.tokenType == expected.tokenType);
     try expect(ff50.children == expected.children);
 }
+
+test "ff56 parsing" {
+    // Arrange
+    var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
+    const expected = ff56token{ .name = "food", .value = dataUnion{ ._bool = true }, .tokenType = tokenType.FF56 };
+
+    // Act
+    const ff56 = try processFF56(&statusStruct);
+
+    // Assert
+    try expectEqualStrings(ff56.name, expected.name);
+    try expect(ff56.tokenType == expected.tokenType);
+    try expect(ff56.value._bool == expected.value._bool);
+}
+
 pub fn main() !void {
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
     const tok = processFF50(&statusStruct);
