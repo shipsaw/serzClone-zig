@@ -134,9 +134,9 @@ fn processSFloat32(s: *status) dataUnion {
     return dataUnion{ ._sFloat32 = val };
 }
 
-fn processCDeltaString(s: *status) dataUnion {
-    _ = s;
-    return dataUnion{ ._cDeltaString = "" };
+fn processCDeltaString(s: *status) !dataUnion {
+    const str = try identifier(s);
+    return dataUnion{ ._cDeltaString = str };
 }
 
 fn isAlpha(c: u8) bool {
@@ -243,7 +243,7 @@ test "sInt32 data" {
     try std.testing.expect(statusStruct_3200.peek() == 0); // current is left at correct position
 }
 
-test "sInt32 data" {
+test "sFloat32 data" {
     // Arrange
     var statusStruct12345 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x66, 0xe6, 0xf6, 0x42 }); // 123.45
     var statusStruct_1234 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xa4, 0x70, 0x45, 0xc1 }); // -1234
@@ -259,6 +259,25 @@ test "sInt32 data" {
     try std.testing.expect(data_1234._sFloat32 == -12.34);
 
     try std.testing.expect(statusStruct12345.peek() == 0); // current is left at correct position
+}
+
+test "cDeltaString data" {
+    // Arrange
+    var statusStructHello = status.init(&[_]u8{ 255, 255, 12, 0, 0, 0, 'c', 'D', 'e', 'l', 't', 'a', 'S', 't', 'r', 'i', 'n', 'g', 255, 255, 5, 0, 0, 0, 'H', 'e', 'l', 'l', 'o' });
+    var statusStructExisting = status.init(&[_]u8{ 255, 255, 12, 0, 0, 0, 'c', 'D', 'e', 'l', 't', 'a', 'S', 't', 'r', 'i', 'n', 'g', 0, 0 });
+    try statusStructExisting.stringMap.append("iExist");
+
+    // Act
+    const dataHello = try processData(&statusStructHello);
+    const dataExisting = try processData(&statusStructExisting);
+
+    // Assert
+    try std.testing.expect(@as(dataType, dataHello) == dataType._cDeltaString);
+
+    try std.testing.expectEqualStrings(dataHello._cDeltaString, "Hello");
+    try std.testing.expectEqualStrings(dataExisting._cDeltaString, "iExist");
+
+    try std.testing.expect(statusStructHello.peek() == 0); // current is left at correct position
 }
 
 pub fn main() !void {
