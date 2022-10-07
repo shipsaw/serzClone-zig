@@ -129,8 +129,9 @@ fn processSInt32(s: *status) dataUnion {
 }
 
 fn processSFloat32(s: *status) dataUnion {
-    _ = s;
-    return dataUnion{ ._sFloat32 = 1.0 };
+    defer s.current += 4;
+    const val = @bitCast(f32, std.mem.readIntSlice(i32, s.source[s.current..], std.builtin.Endian.Little));
+    return dataUnion{ ._sFloat32 = val };
 }
 
 fn processCDeltaString(s: *status) dataUnion {
@@ -240,6 +241,24 @@ test "sInt32 data" {
     try std.testing.expect(data3210._sInt32 == 3210);
 
     try std.testing.expect(statusStruct_3200.peek() == 0); // current is left at correct position
+}
+
+test "sInt32 data" {
+    // Arrange
+    var statusStruct12345 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x66, 0xe6, 0xf6, 0x42 }); // 123.45
+    var statusStruct_1234 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xa4, 0x70, 0x45, 0xc1 }); // -1234
+
+    // Act
+    const data12345 = try processData(&statusStruct12345);
+    const data_1234 = try processData(&statusStruct_1234);
+
+    // Assert
+    try std.testing.expect(@as(dataType, data12345) == dataType._sFloat32);
+
+    try std.testing.expect(data12345._sFloat32 == 123.45);
+    try std.testing.expect(data_1234._sFloat32 == -12.34);
+
+    try std.testing.expect(statusStruct12345.peek() == 0); // current is left at correct position
 }
 
 pub fn main() !void {
