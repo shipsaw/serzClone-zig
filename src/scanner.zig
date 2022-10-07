@@ -100,19 +100,16 @@ fn identifier(s: *status) ![]const u8 {
     return s.stringMap.items[strIdx];
 }
 
-fn processData(s: *status) !void {
+fn processData(s: *status) !dataUnion {
     const nodeName = try identifier(s);
-    std.debug.print("Node name: {s}", .{nodeName});
-    if (dataTypeMap.has(nodeName)) {
-        const val = switch (dataTypeMap.get(nodeName).?) {
-            dataType._bool => processBool(s),
-            dataType._sUInt8 => processSUInt8(s),
-            dataType._sInt32 => processSInt32(s),
-            dataType._sFloat32 => processSFloat32(s),
-            dataType._cDeltaString => processCDeltaString(s),
-        };
-        std.debug.print("{any}", .{val});
-    }
+
+    return switch (dataTypeMap.get(nodeName).?) {
+        dataType._bool => processBool(s),
+        dataType._sUInt8 => processSUInt8(s),
+        dataType._sInt32 => processSInt32(s),
+        dataType._sFloat32 => processSFloat32(s),
+        dataType._cDeltaString => processCDeltaString(s),
+    };
 }
 
 fn processBool(s: *status) dataUnion {
@@ -191,8 +188,15 @@ test "identifier test, in map" {
 }
 
 test "process data, keyword" {
+    // Arrange
     var statusStruct = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l' });
-    try processData(&statusStruct);
+
+    // Act
+    const data = try processData(&statusStruct);
+
+    // Assert
+    try std.testing.expect(@as(dataType, data) == dataType._bool);
+    try std.testing.expect(data._bool == true);
 }
 
 pub fn main() !void {
@@ -200,7 +204,7 @@ pub fn main() !void {
     var statusStruct = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l' });
 
     // Act
-    try processData(&statusStruct);
+    std.debug.print("Returned data union: {any}", .{try processData(&statusStruct)});
 
     // Assert
     return;
