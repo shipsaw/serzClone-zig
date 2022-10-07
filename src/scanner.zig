@@ -1,6 +1,7 @@
 const std = @import("std");
 const print = std.debug.print;
 const expect = std.testing.expect;
+const expectEqualStrings = std.testing.expectEqualStrings;
 
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
@@ -82,7 +83,6 @@ fn identifier(s: *status) ![]const u8 {
 
         const strLen = std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
         s.current += 4;
-        // std.debug.print("String Length: {d}", .{strLen});
 
         var str = s.source[s.current..(s.current + strLen)];
         try s.stringMap.append(str);
@@ -90,7 +90,6 @@ fn identifier(s: *status) ![]const u8 {
 
         return str;
     }
-    // std.debug.print("EXISTING WORD", .{});
     const strIdx = std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
     s.current += 2;
 
@@ -170,6 +169,10 @@ fn isAlphaNumeric(c: u8) bool {
     return isAlpha(c) or isDecimal(c);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////  Test Area ////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 test "status struct advance works correctly" {
     // Arrange
     var testStatus = status{ .start = 0, .current = 0, .line = 1, .source = "Hello", .tokens = undefined, .stringMap = std.ArrayList([]const u8).init(allocator) };
@@ -190,9 +193,9 @@ test "identifier test, not in map" {
     const actual = try identifier(&statusStruct);
 
     // Assert
-    try std.testing.expectEqualStrings(actual, "Hello");
-    try std.testing.expectEqualStrings(statusStruct.stringMap.items[0], "Hello");
-    try std.testing.expect(statusStruct.peek() == 0);
+    try expectEqualStrings(actual, "Hello");
+    try expectEqualStrings(statusStruct.stringMap.items[0], "Hello");
+    try expect(statusStruct.peek() == 0);
 }
 
 test "identifier test, in map" {
@@ -204,8 +207,8 @@ test "identifier test, in map" {
     const actual = try identifier(&statusStruct);
 
     // Assert
-    try std.testing.expectEqualStrings(actual, "Hello");
-    try std.testing.expect(statusStruct.peek() == 0); // current is left at correct position
+    try expectEqualStrings(actual, "Hello");
+    try expect(statusStruct.peek() == 0); // current is left at correct position
 }
 
 test "bool data" {
@@ -218,12 +221,12 @@ test "bool data" {
     const dataFalse = try processData(&statusStructFalse);
 
     // Assert
-    try std.testing.expect(@as(dataType, dataTrue) == dataType._bool);
+    try expect(@as(dataType, dataTrue) == dataType._bool);
 
-    try std.testing.expect(dataTrue._bool == true);
-    try std.testing.expect(dataFalse._bool == false);
+    try expect(dataTrue._bool == true);
+    try expect(dataFalse._bool == false);
 
-    try std.testing.expect(statusStructTrue.peek() == 0); // current is left at correct position
+    try expect(statusStructTrue.peek() == 0); // current is left at correct position
 }
 
 test "sUInt8 data" {
@@ -236,12 +239,12 @@ test "sUInt8 data" {
     const data0 = try processData(&statusStruct0);
 
     // Assert
-    try std.testing.expect(@as(dataType, data11) == dataType._sUInt8);
+    try expect(@as(dataType, data11) == dataType._sUInt8);
 
-    try std.testing.expect(data11._sUInt8 == 11);
-    try std.testing.expect(data0._sUInt8 == 0);
+    try expect(data11._sUInt8 == 11);
+    try expect(data0._sUInt8 == 0);
 
-    try std.testing.expect(statusStruct11.peek() == 0); // current is left at correct position
+    try expect(statusStruct11.peek() == 0); // current is left at correct position
 }
 
 test "sInt32 data" {
@@ -254,12 +257,12 @@ test "sInt32 data" {
     const data3210 = try processData(&statusStruct3210);
 
     // Assert
-    try std.testing.expect(@as(dataType, data_3200) == dataType._sInt32);
+    try expect(@as(dataType, data_3200) == dataType._sInt32);
 
-    try std.testing.expect(data_3200._sInt32 == -3200);
-    try std.testing.expect(data3210._sInt32 == 3210);
+    try expect(data_3200._sInt32 == -3200);
+    try expect(data3210._sInt32 == 3210);
 
-    try std.testing.expect(statusStruct_3200.peek() == 0); // current is left at correct position
+    try expect(statusStruct_3200.peek() == 0); // current is left at correct position
 }
 
 test "sFloat32 data" {
@@ -274,10 +277,10 @@ test "sFloat32 data" {
     // Assert
     try std.testing.expect(@as(dataType, data12345) == dataType._sFloat32);
 
-    try std.testing.expect(data12345._sFloat32 == 123.45);
-    try std.testing.expect(data_1234._sFloat32 == -12.34);
+    try expect(data12345._sFloat32 == 123.45);
+    try expect(data_1234._sFloat32 == -12.34);
 
-    try std.testing.expect(statusStruct12345.peek() == 0); // current is left at correct position
+    try expect(statusStruct12345.peek() == 0); // current is left at correct position
 }
 
 test "cDeltaString data" {
@@ -291,12 +294,12 @@ test "cDeltaString data" {
     const dataExisting = try processData(&statusStructExisting);
 
     // Assert
-    try std.testing.expect(@as(dataType, dataHello) == dataType._cDeltaString);
+    try expect(@as(dataType, dataHello) == dataType._cDeltaString);
 
-    try std.testing.expectEqualStrings(dataHello._cDeltaString, "Hello");
-    try std.testing.expectEqualStrings(dataExisting._cDeltaString, "iExist");
+    try expectEqualStrings(dataHello._cDeltaString, "Hello");
+    try expectEqualStrings(dataExisting._cDeltaString, "iExist");
 
-    try std.testing.expect(statusStructHello.peek() == 0); // current is left at correct position
+    try expect(statusStructHello.peek() == 0); // current is left at correct position
 }
 
 test "ff50 parsing" {
@@ -308,10 +311,10 @@ test "ff50 parsing" {
     const ff50 = try processFF50(&statusStruct);
 
     // Assert
-    try std.testing.expect(ff50.id == expected.id);
-    try std.testing.expectEqualStrings(ff50.name, expected.name);
-    try std.testing.expect(ff50.tokenType == expected.tokenType);
-    try std.testing.expect(ff50.children == expected.children);
+    try expect(ff50.id == expected.id);
+    try expectEqualStrings(ff50.name, expected.name);
+    try expect(ff50.tokenType == expected.tokenType);
+    try expect(ff50.children == expected.children);
 }
 pub fn main() !void {
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
