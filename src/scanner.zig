@@ -11,12 +11,11 @@ const status = struct {
     current: usize,
     line: usize,
     source: []const u8,
-    tokens: []tokenType,
     stringMap: std.ArrayList([]const u8),
     nodeNameStack: std.ArrayList([]const u8),
 
     pub fn init(src: []const u8) status {
-        return status{ .start = 0, .current = 0, .line = 1, .source = src, .tokens = undefined, .stringMap = std.ArrayList([]const u8).init(allocator), .nodeNameStack = std.ArrayList([]const u8).init(allocator) };
+        return status{ .start = 0, .current = 0, .line = 1, .source = src, .stringMap = std.ArrayList([]const u8).init(allocator), .nodeNameStack = std.ArrayList([]const u8).init(allocator) };
     }
 
     pub fn advance(self: *status) u8 {
@@ -46,14 +45,6 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "cDeltaString", ._cDeltaString },
 });
 
-const tokenType = enum {
-    SERZ,
-    FF50,
-    FF56,
-    FF70,
-    NEW_STRING,
-};
-
 const dataType = enum {
     _bool,
     _sUInt8,
@@ -73,22 +64,19 @@ const dataUnion = union(dataType) {
 const ff50token = struct {
     name: []const u8,
     id: u32,
-    tokenType: tokenType,
     children: u32,
 };
 
 const ff56token = struct {
     name: []const u8,
     value: dataUnion,
-    tokenType: tokenType,
 };
 
 const ff70token = struct {
     name: []const u8,
-    tokenType: tokenType,
 };
 
-const token = union {
+const token = union(enum) {
     ff50token: ff50token,
     ff56token: ff56token,
     ff70token: ff70token,
@@ -198,7 +186,6 @@ fn processFF50(s: *status) !ff50token {
     return ff50token{
         .name = tokenName,
         .id = id,
-        .tokenType = tokenType.FF50,
         .children = children,
     };
 }
@@ -212,7 +199,6 @@ fn processFF56(s: *status) !ff56token {
     return ff56token{
         .name = tokenName,
         .value = data,
-        .tokenType = tokenType.FF56,
     };
 }
 
@@ -220,7 +206,6 @@ fn processFF70(s: *status) !ff70token {
     const tokenName = s.nodeNameStack.pop();
     return ff70token{
         .name = tokenName,
-        .tokenType = tokenType.FF70,
     };
 }
 
@@ -372,7 +357,7 @@ test "cDeltaString data" {
 test "ff50 parsing" {
     // Arrange
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
-    const expected = ff50token{ .name = "food", .id = 375192228, .tokenType = tokenType.FF50, .children = 1 };
+    const expected = ff50token{ .name = "food", .id = 375192228, .children = 1 };
 
     // Act
     const ff50 = try processFF50(&statusStruct);
@@ -380,21 +365,19 @@ test "ff50 parsing" {
     // Assert
     try expect(ff50.id == expected.id);
     try expectEqualStrings(ff50.name, expected.name);
-    try expect(ff50.tokenType == expected.tokenType);
     try expect(ff50.children == expected.children);
 }
 
 test "ff56 parsing" {
     // Arrange
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
-    const expected = ff56token{ .name = "food", .value = dataUnion{ ._bool = true }, .tokenType = tokenType.FF56 };
+    const expected = ff56token{ .name = "food", .value = dataUnion{ ._bool = true } };
 
     // Act
     const ff56 = try processFF56(&statusStruct);
 
     // Assert
     try expectEqualStrings(ff56.name, expected.name);
-    try expect(ff56.tokenType == expected.tokenType);
     try expect(ff56.value._bool == expected.value._bool);
 }
 
@@ -406,10 +389,10 @@ test "ff70 parsing" {
     var testBytes = status.init(ff50bytes ++ ff56bytes ++ ff70bytes);
 
     const expected = &[_]token{
-        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .tokenType = tokenType.FF50, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true }, .tokenType = tokenType.FF56 } },
-        token{ .ff70token = ff70token{ .name = "snd", .tokenType = tokenType.FF70 } },
-        token{ .ff70token = ff70token{ .name = "first", .tokenType = tokenType.FF70 } },
+        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
+        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
+        token{ .ff70token = ff70token{ .name = "snd" } },
+        token{ .ff70token = ff70token{ .name = "first" } },
     };
 
     // Act
@@ -417,10 +400,7 @@ test "ff70 parsing" {
 
     // Assert
     try expectEqualStrings(result.items[2].ff70token.name, expected[2].ff70token.name);
-    try expect(result.items[2].ff70token.tokenType == expected[2].ff70token.tokenType);
-
     try expectEqualStrings(result.items[3].ff70token.name, expected[3].ff70token.name);
-    try expect(result.items[3].ff70token.tokenType == expected[3].ff70token.tokenType);
 }
 
 test "parse function" {
@@ -430,8 +410,8 @@ test "parse function" {
     var testBytes = status.init(ff50bytes ++ ff56bytes);
 
     const expected = &[_]token{
-        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .tokenType = tokenType.FF50, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true }, .tokenType = tokenType.FF56 } },
+        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
+        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
     };
 
     // Act
@@ -439,12 +419,10 @@ test "parse function" {
 
     // Assert
     try expectEqualStrings(result.items[0].ff50token.name, expected[0].ff50token.name);
-    try expect(result.items[0].ff50token.tokenType == expected[0].ff50token.tokenType);
     try expect(result.items[0].ff50token.id == expected[0].ff50token.id);
     try expect(result.items[0].ff50token.children == expected[0].ff50token.children);
 
     try expectEqualStrings(result.items[1].ff56token.name, expected[1].ff56token.name);
-    try expect(result.items[1].ff56token.tokenType == expected[1].ff56token.tokenType);
     try expect(result.items[1].ff56token.value._bool == expected[1].ff56token.value._bool);
 }
 
@@ -455,8 +433,8 @@ pub fn main() !void {
     var testBytes = status.init(ff50bytes ++ ff56bytes);
 
     const expected = &[_]token{
-        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .tokenType = tokenType.FF50, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true }, .tokenType = tokenType.FF56 } },
+        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
+        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
     };
 
     // Act
@@ -465,11 +443,4 @@ pub fn main() !void {
     // Assert
     std.debug.print("{any}\n", .{result.items[0].ff50token.name});
     std.debug.print("{any}\n", .{expected[0].ff50token.name});
-    // try expect(result.items[0].tokenType == expected.items[0].tokenType);
-    // try expect(result.items[0].id == expected.items[0].id);
-    // try expect(result.items[0].children == expected.items[0].children);
-
-    // try expectEqualStrings(result.items[1].name, expected.items[1].name);
-    // try expect(result.items[1].tokenType == expected.items[1].tokenType);
-    // try expect(result.items[0].value._bool == expected.items[0].value._bool);
 }
