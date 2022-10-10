@@ -1,219 +1,456 @@
 const std = @import("std");
-const size_limit = std.math.maxInt(u32);
 const print = std.debug.print;
+const expect = std.testing.expect;
+const expectEqualStrings = std.testing.expectEqualStrings;
 
-const fileError = error{InvalidFile};
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-const allocator = arena.allocator();
-var wordList = std.ArrayList([]const u8).init(allocator);
-var tabs: u8 = 0;
+var allocator = arena.allocator();
 
-const attrTypeStrings = [_][]const u8{ "bool", "sUInt8", "sInt32", "cDeltaString" };
+const status = struct {
+    start: usize,
+    current: usize,
+    line: usize,
+    source: []const u8,
+    stringMap: std.ArrayList([]const u8),
 
-const attrType = enum { _bool, _sUInt8, _sInt32, _cDeltaString, _sFloat32 };
-const attrTypePairs = .{ .{ "bool", attrType._bool }, .{ "sUInt8", attrType._sUInt8 }, .{ "sInt32", attrType._sInt32 }, .{ "cDeltaString", attrType._cDeltaString }, .{ "sFloat32", attrType._sFloat32 } };
-const stringMap = std.ComptimeStringMap(attrType, attrTypePairs);
-
-pub fn main() anyerror!void {
-    defer arena.deinit();
-    defer wordList.deinit();
-    var file = try std.fs.cwd().openFile("testFiles/scenario.bin", .{});
-    // var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
-    const fileResult = try file.readToEndAlloc(allocator, size_limit);
-    const fileBegin = try verifyPrelude(fileResult[0..]);
-    _ = try parse(fileBegin[4..]);
-    print("\nList of saved words = ", .{});
-    for (wordList.items) |word, idx| {
-        print(" {d}:{s},", .{ idx, word });
-    }
-}
-
-// Verify File begins with the prelude "SERZ"
-fn verifyPrelude(preludeBytes: []u8) ![]const u8 {
-    const correctPrelude = "SERZ";
-    for (correctPrelude) |char, i| {
-        if (char != preludeBytes[i]) return fileError.InvalidFile;
-    }
-    return preludeBytes[4..];
-}
-
-// Base parsing function, calls all others for node types
-fn parse(fileBytes: []const u8) ![]const u8 {
-    var loopPos: usize = 0;
-    print("fileBytes size: {d}\n\n", .{fileBytes.len});
-    while (fileBytes.len > loopPos) {
-        if (fileBytes[loopPos] == 0xFF) {
-            loopPos = switch (fileBytes[1 + loopPos]) {
-                0x50 => loopPos + (try print50(fileBytes[loopPos..])),
-                0x56 => loopPos + (try print56(fileBytes[loopPos..])),
-                0x70 => loopPos + print70(fileBytes[loopPos..]),
-                else => loopPos + 1,
-            };
-            continue;
-        }
-        loopPos += 1;
-    }
-    return "";
-}
-
-fn print50(fileBytes: []const u8) !usize {
-    printTabs();
-    print("<", .{});
-    var bytePos: usize = 2;
-    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
-        const newWord = try printNewWord(fileBytes[bytePos..]);
-        print("{s}", .{newWord});
-        break :blk newWord.len + 6;
-    } else blk: {
-        const savedWord = getSavedWord(fileBytes[bytePos..]);
-        print("{s}", .{savedWord});
-        break :blk 2;
-    };
-    const idVal = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
-    if (idVal != 0) {
-        print(" id=\"{d}\"", .{idVal});
+    pub fn init(src: []const u8) status {
+        return status{ .start = 0, .current = 0, .line = 1, .source = src, .stringMap = std.ArrayList([]const u8).init(allocator) };
     }
 
-    print(">\n", .{});
-    bytePos += 8;
-    tabs += 1;
-    return bytePos;
-}
+    pub fn advance(self: *status) u8 {
+        defer self.current += 1;
+        return self.source[self.current];
+    }
 
-fn print56(fileBytes: []const u8) !usize {
-    var nodeName: []const u8 = undefined;
-    printTabs();
-    print("<", .{});
-    var bytePos: usize = 2;
-    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
-        nodeName = try printNewWord(fileBytes[bytePos..]);
-        print("{s}", .{nodeName});
-        break :blk nodeName.len + 6;
-    } else blk: {
-        nodeName = getSavedWord(fileBytes[bytePos..]);
-        print("{s}", .{nodeName});
-        break :blk 2;
-    };
+    pub fn peek(self: *status) u8 {
+        return if (self.isAtEnd()) 0 else self.source[self.current];
+    }
 
-    print(" type=\"", .{});
-    bytePos += if (fileBytes[bytePos] == 0xFF) blk: {
-        const newWord = try printNewWord(fileBytes[bytePos..]);
-        print("{s}", .{newWord});
-        const dataSize = try getAttrValueType(newWord, fileBytes[bytePos + newWord.len + 6 ..]);
-        break :blk newWord.len + dataSize + 2;
-    } else blk: {
-        const savedWord = getSavedWord(fileBytes[bytePos..]);
-        print("{s}", .{savedWord});
-        break :blk 2 + try getAttrValueType(savedWord, fileBytes[bytePos + 2 ..]);
-    };
-    print("</{s}>\n", .{nodeName});
-    return bytePos;
-}
+    pub fn peekNext(self: *status) u8 {
+        return if (self.current + 1 >= self.source.len) 0 else self.source[self.current + 1];
+    }
 
-fn print70(fileBytes: []const u8) usize {
-    tabs -= 1;
-    printTabs();
-    var bytePos: usize = 2;
-    print("</", .{});
-    const savedWord = getSavedWord(fileBytes[bytePos..]);
-    print("{s}", .{savedWord});
-    bytePos += 2;
-    print(">\n", .{});
-    return bytePos;
-}
+    pub fn isAtEnd(self: *status) bool {
+        return self.current >= self.source.len;
+    }
+};
 
-// Attempt this first by only sending attribute length
-fn getAttrValueType(attrTypeParam: []const u8, attrVal: []const u8) !usize {
-    const tpe = stringMap.get(attrTypeParam).?;
-    switch (tpe) {
-        attrType._bool => {
-            print("\">{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
-            return 1;
-        },
-        attrType._sUInt8 => {
-            print("\">{d}", .{std.mem.readIntSlice(u8, attrVal, std.builtin.Endian.Little)});
-            return 1;
-        },
-        attrType._sInt32 => {
-            print("\">{d}", .{std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little)});
-            return 4;
-        },
-        attrType._sFloat32 => {
-            const fVal = @bitCast(f32, std.mem.readIntSlice(i32, attrVal, std.builtin.Endian.Little));
+const errors = error{
+    InvalidFileError,
+};
 
-            const text: f64 = fVal;
-            const text2: [8]u8 = @bitCast([8]u8, text);
-            print("\" alt_encoding=\"", .{});
-            for (text2) |c| {
-                print("{X:0>2}", .{c});
+const keywords = std.StringHashMap(dataType).init(allocator);
+const dataTypeMap = std.ComptimeStringMap(dataType, .{
+    .{ "bool", ._bool },
+    .{ "sUInt8", ._sUInt8 },
+    .{ "sInt32", ._sInt32 },
+    .{ "sFloat32", ._sFloat32 },
+    .{ "cDeltaString", ._cDeltaString },
+});
+
+const dataType = enum {
+    _bool,
+    _sUInt8,
+    _sInt32,
+    _sFloat32,
+    _cDeltaString,
+};
+
+const dataUnion = union(dataType) {
+    _bool: bool,
+    _sUInt8: u8,
+    _sInt32: i32,
+    _sFloat32: f32,
+    _cDeltaString: []const u8,
+};
+
+const ff50token = struct {
+    name: []const u8,
+    id: u32,
+    children: u32,
+};
+
+const ff56token = struct {
+    name: []const u8,
+    value: dataUnion,
+};
+
+const ff70token = struct {
+    name: []const u8,
+};
+
+const token = union(enum) {
+    ff50token: ff50token,
+    ff56token: ff56token,
+    ff70token: ff70token,
+};
+
+pub fn parse(s: *status) !std.ArrayList(token) {
+    var tokenList = std.ArrayList(token).init(allocator);
+
+    try expectEqualStrings("SERZ", s.source[0..4]);
+    s.current += 4;
+    _ = processU32(s);
+
+    while (!s.isAtEnd()) {
+        if (s.source[s.current] == 0xff) {
+            s.current += 1;
+            switch (s.source[s.current]) {
+                0x50 => {
+                    s.current += 1;
+                    try tokenList.append(token{ .ff50token = try processFF50(s) });
+                },
+                0x56 => {
+                    s.current += 1;
+                    try tokenList.append(token{ .ff56token = try processFF56(s) });
+                },
+                0x70 => {
+                    s.current += 1;
+                    try tokenList.append(token{ .ff70token = try processFF70(s) });
+                },
+                else => unreachable,
             }
-            print("\">", .{});
-            try printStringPrecision(fVal);
-            return 4;
-        },
-        attrType._cDeltaString => {
-            return if (attrVal[0] == 0xFF) blk: {
-                const attrValString = try printNewWord(attrVal);
-                print("\">{s}", .{attrValString});
-                break :blk attrValString.len + 6;
-            } else blk: {
-                const attrValString = getSavedWord(attrVal);
-                print("\">{s}", .{attrValString});
-                break :blk 2;
-            };
-        },
-    }
-}
-
-fn printStringPrecision(fVal: f32) !void {
-    var buf: [20]u8 = undefined;
-    var fbs = std.io.fixedBufferStream(&buf);
-    try std.fmt.formatFloatDecimal(fVal, std.fmt.FormatOptions{}, fbs.writer());
-    var prec: u8 = 6;
-    if (fVal < 0) print("-", .{});
-    for (buf) |c| {
-        if (c >= '0' and c <= '9' and prec > 0) {
-            print("{c}", .{c});
-            prec -= 1;
-        } else if (c == '.') {
-            print(".", .{});
-            continue;
-        } else {
-            break;
         }
     }
-    return;
+    return tokenList;
 }
 
-fn getSavedWord(fileBytes: []const u8) []const u8 {
-    const wordIndex = std.mem.readIntSlice(u16, fileBytes, std.builtin.Endian.Little);
-    return wordList.items[wordIndex];
-}
+fn identifier(s: *status) ![]const u8 {
+    if (s.source[s.current] == 255) // New string
+    {
+        s.current += 2;
 
-fn printNewWord(fileBytes: []const u8) ![]const u8 {
-    var bytePos: usize = 2;
-    const wordLen = std.mem.readIntSlice(u32, fileBytes[bytePos..], std.builtin.Endian.Little);
-    bytePos += 4;
-    const wordBegin = bytePos;
-    const wordEnd = wordBegin + wordLen;
-    bytePos += wordLen;
+        const strLen = std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
+        s.current += 4;
 
-    try wordList.append(fileBytes[wordBegin..wordEnd]);
-    return fileBytes[wordBegin..wordEnd];
-}
+        var str = s.source[s.current..(s.current + strLen)];
+        try s.stringMap.append(str);
+        defer s.current += strLen;
 
-fn debugPrinter(fileBytes: []const u8) !void {
-    print("\n", .{});
-    for (fileBytes[0..20]) |ch| {
-        print("{x} ", .{ch});
+        return str;
     }
-    print("\n", .{});
+    const strIdx = std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
+    s.current += 2;
+
+    return s.stringMap.items[strIdx];
 }
 
-fn printTabs() void {
-    var i: u8 = 0;
-    while (i < tabs) : (i += 1) {
-        print("\t", .{});
+fn processData(s: *status) !dataUnion {
+    const nodeName = try identifier(s);
+
+    return switch (dataTypeMap.get(nodeName).?) {
+        dataType._bool => processBool(s),
+        dataType._sUInt8 => processSUInt8(s),
+        dataType._sInt32 => processSInt32(s),
+        dataType._sFloat32 => processSFloat32(s),
+        dataType._cDeltaString => processCDeltaString(s),
+    };
+}
+
+fn processBool(s: *status) dataUnion {
+    defer s.current += 1;
+    return switch (s.source[s.current]) {
+        1 => dataUnion{ ._bool = true },
+        0 => dataUnion{ ._bool = false },
+        else => unreachable,
+    };
+}
+
+fn processSUInt8(s: *status) dataUnion {
+    defer s.current += 1;
+    const val = std.mem.readIntSlice(u8, s.source[s.current..], std.builtin.Endian.Little);
+    return dataUnion{ ._sUInt8 = val };
+}
+
+fn processSInt32(s: *status) dataUnion {
+    defer s.current += 4;
+    const val = std.mem.readIntSlice(i32, s.source[s.current..], std.builtin.Endian.Little);
+    return dataUnion{ ._sInt32 = val };
+}
+
+fn processSFloat32(s: *status) dataUnion {
+    defer s.current += 4;
+    const val = @bitCast(f32, std.mem.readIntSlice(i32, s.source[s.current..], std.builtin.Endian.Little));
+    return dataUnion{ ._sFloat32 = val };
+}
+
+fn processCDeltaString(s: *status) !dataUnion {
+    const str = try identifier(s);
+    return dataUnion{ ._cDeltaString = str };
+}
+
+fn processFF50(s: *status) !ff50token {
+    const tokenName = try identifier(s);
+    const id = processU32(s);
+    const children = processU32(s);
+
+    return ff50token{
+        .name = tokenName,
+        .id = id,
+        .children = children,
+    };
+}
+
+fn processFF56(s: *status) !ff56token {
+    const tokenName = try identifier(s);
+    const data = try processData(s);
+
+    return ff56token{
+        .name = tokenName,
+        .value = data,
+    };
+}
+
+fn processFF70(s: *status) !ff70token {
+    const tokenStr = processU16(s);
+    const tokenName = s.stringMap.items[tokenStr];
+    return ff70token{
+        .name = tokenName,
+    };
+}
+
+fn processU32(s: *status) u32 {
+    defer s.current += 4;
+    return std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
+}
+
+fn processU16(s: *status) u16 {
+    defer s.current += 2;
+    return std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
+}
+
+fn isAlpha(c: u8) bool {
+    return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z');
+}
+
+fn isDecimal(c: u8) bool {
+    return c >= '0' and c <= '9';
+}
+
+fn isAlphaNumeric(c: u8) bool {
+    return isAlpha(c) or isDecimal(c);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////  Test Area ////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+test "status struct advance works correctly" {
+    // Arrange
+    var testStatus = status.init("Hello");
+
+    // Act
+    const actualChar = testStatus.advance();
+
+    // Assert
+    try expect(testStatus.current == 1);
+    try expect(actualChar == 'H');
+}
+
+test "identifier test, not in map" {
+    // Arrange
+    var statusStruct = status.init(&[_]u8{ 255, 255, 5, 0, 0, 0, 72, 101, 108, 108, 111 });
+
+    // Act
+    const actual = try identifier(&statusStruct);
+
+    // Assert
+    try expectEqualStrings(actual, "Hello");
+    try expectEqualStrings(statusStruct.stringMap.items[0], "Hello");
+    try expect(statusStruct.peek() == 0);
+}
+
+test "identifier test, in map" {
+    // Arrange
+    var statusStruct = status.init(&[_]u8{ 0, 0 });
+    try statusStruct.stringMap.append("Hello");
+
+    // Act
+    const actual = try identifier(&statusStruct);
+
+    // Assert
+    try expectEqualStrings(actual, "Hello");
+    try expect(statusStruct.peek() == 0); // current is left at correct position
+}
+
+test "bool data" {
+    // Arrange
+    var statusStructTrue = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
+    var statusStructFalse = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 0 });
+
+    // Act
+    const dataTrue = try processData(&statusStructTrue);
+    const dataFalse = try processData(&statusStructFalse);
+
+    // Assert
+    try expect(@as(dataType, dataTrue) == dataType._bool);
+
+    try expect(dataTrue._bool == true);
+    try expect(dataFalse._bool == false);
+
+    try expect(statusStructTrue.peek() == 0); // current is left at correct position
+}
+
+test "sUInt8 data" {
+    // Arrange
+    var statusStruct11 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 11 });
+    var statusStruct0 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 0 });
+
+    // Act
+    const data11 = try processData(&statusStruct11);
+    const data0 = try processData(&statusStruct0);
+
+    // Assert
+    try expect(@as(dataType, data11) == dataType._sUInt8);
+
+    try expect(data11._sUInt8 == 11);
+    try expect(data0._sUInt8 == 0);
+
+    try expect(statusStruct11.peek() == 0); // current is left at correct position
+}
+
+test "sInt32 data" {
+    // Arrange
+    var statusStruct_3200 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x80, 0xf3, 0xff, 0xff }); // -3200
+    var statusStruct3210 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x8a, 0x0c, 0x00, 0x00 }); // 3210
+
+    // Act
+    const data_3200 = try processData(&statusStruct_3200);
+    const data3210 = try processData(&statusStruct3210);
+
+    // Assert
+    try expect(@as(dataType, data_3200) == dataType._sInt32);
+
+    try expect(data_3200._sInt32 == -3200);
+    try expect(data3210._sInt32 == 3210);
+
+    try expect(statusStruct_3200.peek() == 0); // current is left at correct position
+}
+
+test "sFloat32 data" {
+    // Arrange
+    var statusStruct12345 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x66, 0xe6, 0xf6, 0x42 }); // 123.45
+    var statusStruct_1234 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xa4, 0x70, 0x45, 0xc1 }); // -1234
+
+    // Act
+    const data12345 = try processData(&statusStruct12345);
+    const data_1234 = try processData(&statusStruct_1234);
+
+    // Assert
+    try std.testing.expect(@as(dataType, data12345) == dataType._sFloat32);
+
+    try expect(data12345._sFloat32 == 123.45);
+    try expect(data_1234._sFloat32 == -12.34);
+
+    try expect(statusStruct12345.peek() == 0); // current is left at correct position
+}
+
+test "cDeltaString data" {
+    // Arrange
+    var statusStructHello = status.init(&[_]u8{ 255, 255, 12, 0, 0, 0, 'c', 'D', 'e', 'l', 't', 'a', 'S', 't', 'r', 'i', 'n', 'g', 255, 255, 5, 0, 0, 0, 'H', 'e', 'l', 'l', 'o' });
+    var statusStructExisting = status.init(&[_]u8{ 255, 255, 12, 0, 0, 0, 'c', 'D', 'e', 'l', 't', 'a', 'S', 't', 'r', 'i', 'n', 'g', 0, 0 });
+    try statusStructExisting.stringMap.append("iExist");
+
+    // Act
+    const dataHello = try processData(&statusStructHello);
+    const dataExisting = try processData(&statusStructExisting);
+
+    // Assert
+    try expect(@as(dataType, dataHello) == dataType._cDeltaString);
+
+    try expectEqualStrings(dataHello._cDeltaString, "Hello");
+    try expectEqualStrings(dataExisting._cDeltaString, "iExist");
+
+    try expect(statusStructHello.peek() == 0); // current is left at correct position
+}
+
+test "ff50 parsing" {
+    // Arrange
+    var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
+    const expected = ff50token{ .name = "food", .id = 375192228, .children = 1 };
+
+    // Act
+    const ff50 = try processFF50(&statusStruct);
+
+    // Assert
+    try expect(ff50.id == expected.id);
+    try expectEqualStrings(ff50.name, expected.name);
+    try expect(ff50.children == expected.children);
+}
+
+test "ff56 parsing" {
+    // Arrange
+    var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
+    const expected = ff56token{ .name = "food", .value = dataUnion{ ._bool = true } };
+
+    // Act
+    const ff56 = try processFF56(&statusStruct);
+
+    // Assert
+    try expectEqualStrings(ff56.name, expected.name);
+    try expect(ff56.value._bool == expected.value._bool);
+}
+
+test "ff70 parsing" {
+    // Arrange
+    const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
+    const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
+    const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
+    const ff70bytes = &[_]u8{ 0xff, 0x70, 0, 0 };
+    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
+
+    const expected = &[_]token{
+        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
+        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
+        token{ .ff70token = ff70token{ .name = "first" } },
+    };
+
+    // Act
+    const result = try parse(&testBytes);
+
+    // Assert
+    try expectEqualStrings(result.items[2].ff70token.name, expected[2].ff70token.name);
+}
+
+test "parse function" {
+    // Arrange
+    const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
+    const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
+    const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
+    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes);
+
+    const expected = &[_]token{
+        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
+        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
+    };
+
+    // Act
+    const result = try parse(&testBytes);
+
+    // Assert
+    try expectEqualStrings(result.items[0].ff50token.name, expected[0].ff50token.name);
+    try expect(result.items[0].ff50token.id == expected[0].ff50token.id);
+    try expect(result.items[0].ff50token.children == expected[0].ff50token.children);
+
+    try expectEqualStrings(result.items[1].ff56token.name, expected[1].ff56token.name);
+    try expect(result.items[1].ff56token.value._bool == expected[1].ff56token.value._bool);
+}
+
+pub fn main() !void {
+    // const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    // const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
+    // const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
+    // const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
+    // const ff70bytes = &[_]u8{ 0xff, 0x70, 0, 0 };
+    // var testStatus = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
+    const size_limit = std.math.maxInt(u32);
+    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+
+    const testBytes = try file.readToEndAlloc(allocator, size_limit);
+    var testStatus = status.init(testBytes);
+    for ((try parse(&testStatus)).items) |node| {
+        std.debug.print("{any}\n", .{node});
     }
-    return;
 }
