@@ -194,8 +194,6 @@ fn processFF56(s: *status) !ff56token {
     const tokenName = try identifier(s);
     const data = try processData(s);
 
-    try s.nodeNameStack.append(tokenName);
-
     return ff56token{
         .name = tokenName,
         .value = data,
@@ -385,13 +383,12 @@ test "ff70 parsing" {
     // Arrange
     const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    const ff70bytes = &[_]u8{ 0xff, 0x70, 0xff, 0x70 };
+    const ff70bytes = &[_]u8{ 0xff, 0x70 };
     var testBytes = status.init(ff50bytes ++ ff56bytes ++ ff70bytes);
 
     const expected = &[_]token{
         token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
         token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
-        token{ .ff70token = ff70token{ .name = "snd" } },
         token{ .ff70token = ff70token{ .name = "first" } },
     };
 
@@ -400,7 +397,6 @@ test "ff70 parsing" {
 
     // Assert
     try expectEqualStrings(result.items[2].ff70token.name, expected[2].ff70token.name);
-    try expectEqualStrings(result.items[3].ff70token.name, expected[3].ff70token.name);
 }
 
 test "parse function" {
