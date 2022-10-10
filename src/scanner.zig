@@ -12,10 +12,9 @@ const status = struct {
     line: usize,
     source: []const u8,
     stringMap: std.ArrayList([]const u8),
-    nodeNameStack: std.ArrayList([]const u8),
 
     pub fn init(src: []const u8) status {
-        return status{ .start = 0, .current = 0, .line = 1, .source = src, .stringMap = std.ArrayList([]const u8).init(allocator), .nodeNameStack = std.ArrayList([]const u8).init(allocator) };
+        return status{ .start = 0, .current = 0, .line = 1, .source = src, .stringMap = std.ArrayList([]const u8).init(allocator) };
     }
 
     pub fn advance(self: *status) u8 {
@@ -34,6 +33,10 @@ const status = struct {
     pub fn isAtEnd(self: *status) bool {
         return self.current >= self.source.len;
     }
+};
+
+const errors = error{
+    InvalidFileError,
 };
 
 const keywords = std.StringHashMap(dataType).init(allocator);
@@ -84,6 +87,11 @@ const token = union(enum) {
 
 pub fn parse(s: *status) !std.ArrayList(token) {
     var tokenList = std.ArrayList(token).init(allocator);
+
+    try expectEqualStrings("SERZ", s.source[0..4]);
+    s.current += 4;
+    _ = processU32(s);
+
     while (!s.isAtEnd()) {
         if (s.source[s.current] == 0xff) {
             s.current += 1;
@@ -171,17 +179,10 @@ fn processCDeltaString(s: *status) !dataUnion {
     return dataUnion{ ._cDeltaString = str };
 }
 
-fn processU32(s: *status) u32 {
-    defer s.current += 4;
-    return std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
-}
-
 fn processFF50(s: *status) !ff50token {
     const tokenName = try identifier(s);
     const id = processU32(s);
     const children = processU32(s);
-
-    try s.nodeNameStack.append(tokenName);
 
     return ff50token{
         .name = tokenName,
@@ -201,10 +202,21 @@ fn processFF56(s: *status) !ff56token {
 }
 
 fn processFF70(s: *status) !ff70token {
-    const tokenName = s.nodeNameStack.pop();
+    const tokenStr = processU16(s);
+    const tokenName = s.stringMap.items[tokenStr];
     return ff70token{
         .name = tokenName,
     };
+}
+
+fn processU32(s: *status) u32 {
+    defer s.current += 4;
+    return std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
+}
+
+fn processU16(s: *status) u16 {
+    defer s.current += 2;
+    return std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
 }
 
 fn isAlpha(c: u8) bool {
@@ -381,10 +393,12 @@ test "ff56 parsing" {
 
 test "ff70 parsing" {
     // Arrange
+    const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
     const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    const ff70bytes = &[_]u8{ 0xff, 0x70 };
-    var testBytes = status.init(ff50bytes ++ ff56bytes ++ ff70bytes);
+    const ff70bytes = &[_]u8{ 0xff, 0x70, 0, 0 };
+    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
 
     const expected = &[_]token{
         token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
@@ -401,9 +415,11 @@ test "ff70 parsing" {
 
 test "parse function" {
     // Arrange
+    const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
     const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    var testBytes = status.init(ff50bytes ++ ff56bytes);
+    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes);
 
     const expected = &[_]token{
         token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
@@ -423,12 +439,18 @@ test "parse function" {
 }
 
 pub fn main() !void {
-    const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
-    const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    const ff70bytes = &[_]u8{ 0xff, 0x70, 0xff, 0x70 };
-    var testBytes = status.init(ff50bytes ++ ff56bytes ++ ff70bytes);
+    // const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    // const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
+    // const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
+    // const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
+    // const ff70bytes = &[_]u8{ 0xff, 0x70, 0, 0 };
+    // var testStatus = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
+    const size_limit = std.math.maxInt(u32);
+    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
 
-    for ((try parse(&testBytes)).items) |node| {
+    const testBytes = try file.readToEndAlloc(allocator, size_limit);
+    var testStatus = status.init(testBytes);
+    for ((try parse(&testStatus)).items) |node| {
         std.debug.print("{any}\n", .{node});
     }
 }
