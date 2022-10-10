@@ -427,20 +427,12 @@ test "parse function" {
 }
 
 pub fn main() !void {
-    // Arrange
     const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    var testBytes = status.init(ff50bytes ++ ff56bytes);
+    const ff70bytes = &[_]u8{ 0xff, 0x70, 0xff, 0x70 };
+    var testBytes = status.init(ff50bytes ++ ff56bytes ++ ff70bytes);
 
-    const expected = &[_]token{
-        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
-    };
-
-    // Act
-    const result = try parse(&testBytes);
-
-    // Assert
-    std.debug.print("{any}\n", .{result.items[0].ff50token.name});
-    std.debug.print("{any}\n", .{expected[0].ff50token.name});
+    for ((try parse(&testBytes)).items) |node| {
+        std.debug.print("{any}\n", .{node});
+    }
 }
