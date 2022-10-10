@@ -44,6 +44,7 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "bool", ._bool },
     .{ "sUInt8", ._sUInt8 },
     .{ "sInt32", ._sInt32 },
+    .{ "sUInt64", ._sUInt64 },
     .{ "sFloat32", ._sFloat32 },
     .{ "cDeltaString", ._cDeltaString },
 });
@@ -52,6 +53,7 @@ const dataType = enum {
     _bool,
     _sUInt8,
     _sInt32,
+    _sUInt64,
     _sFloat32,
     _cDeltaString,
 };
@@ -60,6 +62,7 @@ const dataUnion = union(dataType) {
     _bool: bool,
     _sUInt8: u8,
     _sInt32: i32,
+    _sUInt64: u64,
     _sFloat32: f32,
     _cDeltaString: []const u8,
 };
@@ -142,6 +145,7 @@ fn processData(s: *status) !dataUnion {
         dataType._bool => processBool(s),
         dataType._sUInt8 => processSUInt8(s),
         dataType._sInt32 => processSInt32(s),
+        dataType._sUInt64 => processU64(s),
         dataType._sFloat32 => processSFloat32(s),
         dataType._cDeltaString => processCDeltaString(s),
     };
@@ -166,6 +170,12 @@ fn processSInt32(s: *status) dataUnion {
     defer s.current += 4;
     const val = std.mem.readIntSlice(i32, s.source[s.current..], std.builtin.Endian.Little);
     return dataUnion{ ._sInt32 = val };
+}
+
+fn processU64(s: *status) dataUnion {
+    defer s.current += 8;
+    const val = std.mem.readIntSlice(u64, s.source[s.current..], std.builtin.Endian.Little);
+    return dataUnion{ ._sUInt64 = val };
 }
 
 fn processSFloat32(s: *status) dataUnion {
@@ -209,14 +219,14 @@ fn processFF70(s: *status) !ff70token {
     };
 }
 
-fn processU32(s: *status) u32 {
-    defer s.current += 4;
-    return std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
-}
-
 fn processU16(s: *status) u16 {
     defer s.current += 2;
     return std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
+}
+
+fn processU32(s: *status) u32 {
+    defer s.current += 4;
+    return std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
 }
 
 fn isAlpha(c: u8) bool {
@@ -343,6 +353,23 @@ test "sFloat32 data" {
     try expect(data_1234._sFloat32 == -12.34);
 
     try expect(statusStruct12345.peek() == 0); // current is left at correct position
+}
+
+test "sUInt64 data" {
+    // Arrange
+    const u64Name = &[_]u8{ 0xff, 0xff, 7, 0, 0, 0, 's', 'U', 'I', 'n', 't', '6', '4' };
+    const u64Value = &[_]u8{ 0x8d, 0x9d, 0x04, 0x65, 0x35, 0xcf, 0x73, 0x4a };
+    var statusStruct = status.init(u64Name ++ u64Value);
+
+    // Act
+    const data = try processData(&statusStruct);
+
+    // Assert
+    try std.testing.expect(@as(dataType, data) == dataType._sUInt64);
+
+    try expect(data._sUInt64 == 5364859409363410317);
+
+    try expect(statusStruct.peek() == 0); // current is left at correct position
 }
 
 test "cDeltaString data" {
