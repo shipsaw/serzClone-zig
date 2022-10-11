@@ -439,6 +439,15 @@ test "cDeltaString data" {
     try expect(statusStructHello.peek() == 0); // current is left at correct position
 }
 
+test "ff41 parsing" {
+    const ff41bytes = &[_]u8{ 0xff, 0x41, 0xff, 0xff, 0x06, 0x00, 0x00, 0x00, 0x52, 0x58, 0x41, 0x78, 0x69, 0x73, 0x00, 0x00, 0x04, 0xe4, 0x65, 0xfd, 0x3e, 0x6f, 0xe6, 0xa1, 0x37, 0xd7, 0x72, 0x5e, 0xbf, 0x00, 0x00, 0x00, 0x00 };
+    var statusStruct = status.init(ff41bytes);
+    try statusStruct.stringMap.append("sFloat32");
+
+    const dType = try identifier(&statusStruct);
+    std.debug.print("{any}", .{try processData(&statusStruct, dType)});
+}
+
 test "ff50 parsing" {
     // Arrange
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
@@ -514,18 +523,17 @@ test "parse function" {
 }
 
 pub fn main() !void {
-    // const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
-    // const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
-    // const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
-    // const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    // const ff70bytes = &[_]u8{ 0xff, 0x70, 0, 0 };
-    // var testStatus = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
-    const size_limit = std.math.maxInt(u32);
-    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    // const size_limit = std.math.maxInt(u32);
+    // var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
 
-    const testBytes = try file.readToEndAlloc(allocator, size_limit);
-    var testStatus = status.init(testBytes);
-    for ((try parse(&testStatus)).items) |node| {
-        std.debug.print("{any}\n", .{node});
-    }
+    // const testBytes = try file.readToEndAlloc(allocator, size_limit);
+    // var testStatus = status.init(testBytes);
+    // for ((try parse(&testStatus)).items) |node| {
+    //     std.debug.print("{any}\n", .{node});
+    // }
+    const ff41bytes = &[_]u8{ 0x41, 0xff, 0xff, 0x06, 0x00, 0x00, 0x00, 0x52, 0x58, 0x41, 0x78, 0x69, 0x73, 0x00, 0x00, 0x04, 0xe4, 0x65, 0xfd, 0x3e, 0x6f, 0xe6, 0xa1, 0x37, 0xd7, 0x72, 0x5e, 0xbf, 0x00, 0x00, 0x00, 0x00 };
+    var statusStruct = status.init(ff41bytes);
+    try statusStruct.stringMap.append("sFloat32");
+
+    std.debug.print("{any}", .{try processFF41(&statusStruct)});
 }
