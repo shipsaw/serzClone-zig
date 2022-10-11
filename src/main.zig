@@ -440,12 +440,28 @@ test "cDeltaString data" {
 }
 
 test "ff41 parsing" {
-    const ff41bytes = &[_]u8{ 0xff, 0x41, 0xff, 0xff, 0x06, 0x00, 0x00, 0x00, 0x52, 0x58, 0x41, 0x78, 0x69, 0x73, 0x00, 0x00, 0x04, 0xe4, 0x65, 0xfd, 0x3e, 0x6f, 0xe6, 0xa1, 0x37, 0xd7, 0x72, 0x5e, 0xbf, 0x00, 0x00, 0x00, 0x00 };
+    // Arrange
+    const ff41bytes = &[_]u8{ 0xff, 0xff, 0x06, 0x00, 0x00, 0x00, 0x52, 0x58, 0x41, 0x78, 0x69, 0x73, 0x00, 0x00, 0x04, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0 };
     var statusStruct = status.init(ff41bytes);
-    try statusStruct.stringMap.append("sFloat32");
+    try statusStruct.stringMap.append("sInt32");
 
-    const dType = try identifier(&statusStruct);
-    std.debug.print("{any}", .{try processData(&statusStruct, dType)});
+    var expectedValues = std.ArrayList(dataUnion).init(allocator);
+    try expectedValues.append(dataUnion{ ._sInt32 = 1 });
+    try expectedValues.append(dataUnion{ ._sInt32 = 2 });
+    try expectedValues.append(dataUnion{ ._sInt32 = 3 });
+    try expectedValues.append(dataUnion{ ._sInt32 = 4 });
+
+    const expected = ff41token{ .name = "RXAxis", .numElements = 4, .elementType = dataType._sInt32, .values = expectedValues };
+
+    // Act
+    const result = try processFF41(&statusStruct);
+
+    // Assert
+    try expectEqualStrings(result.name, expected.name);
+    try expect(result.numElements == expected.numElements);
+    for (result.values.items) |value, i| {
+        try expect(value._sInt32 == expected.values.items[i]._sInt32);
+    }
 }
 
 test "ff50 parsing" {
@@ -531,9 +547,9 @@ pub fn main() !void {
     // for ((try parse(&testStatus)).items) |node| {
     //     std.debug.print("{any}\n", .{node});
     // }
-    const ff41bytes = &[_]u8{ 0x41, 0xff, 0xff, 0x06, 0x00, 0x00, 0x00, 0x52, 0x58, 0x41, 0x78, 0x69, 0x73, 0x00, 0x00, 0x04, 0xe4, 0x65, 0xfd, 0x3e, 0x6f, 0xe6, 0xa1, 0x37, 0xd7, 0x72, 0x5e, 0xbf, 0x00, 0x00, 0x00, 0x00 };
+    const ff41bytes = &[_]u8{ 0xff, 0xff, 0x06, 0x00, 0x00, 0x00, 0x52, 0x58, 0x41, 0x78, 0x69, 0x73, 0x00, 0x00, 0x04, 0xe4, 0x65, 0xfd, 0x3e, 0x6f, 0xe6, 0xa1, 0x37, 0xd7, 0x72, 0x5e, 0xbf, 0x00, 0x00, 0x00, 0x00 };
     var statusStruct = status.init(ff41bytes);
     try statusStruct.stringMap.append("sFloat32");
 
-    std.debug.print("{any}", .{try processFF41(&statusStruct)});
+    std.debug.print("{any}", .{(try processFF41(&statusStruct)).values});
 }
