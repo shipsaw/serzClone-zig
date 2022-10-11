@@ -71,7 +71,7 @@ const ff41token = struct {
     name: []const u8,
     numElements: u8,
     elementType: dataType,
-    // values: []dataUnion,
+    values: std.ArrayList(dataUnion),
 };
 
 const ff50token = struct {
@@ -161,19 +161,6 @@ fn processData(s: *status, dataTypeStr: []const u8) !dataUnion {
     };
 }
 
-// fn processDataList(s: *status, dType: dataType, cnt: u8) ![]dataUnion {
-//     for (cnt) {
-//         return switch (dataTypeMap.get(nodeName).?) {
-//             dataType._bool => processBool(s),
-//             dataType._sUInt8 => processSUInt8(s),
-//             dataType._sInt32 => processSInt32(s),
-//             dataType._sUInt64 => processU64(s),
-//             dataType._sFloat32 => processSFloat32(s),
-//             dataType._cDeltaString => processCDeltaString(s),
-//         };
-//     }
-// }
-
 fn processBool(s: *status) dataUnion {
     defer s.current += 1;
     return switch (s.source[s.current]) {
@@ -214,14 +201,22 @@ fn processCDeltaString(s: *status) !dataUnion {
 
 fn processFF41(s: *status) !ff41token {
     const tokenName = try identifier(s);
-    const numElements = std.mem.readIntSlice(u8, s.source[s.current..], std.builtin.Endian.Little);
-    const elementType = dataType._sFloat32;
-    // const elementValues = &[_]f32{ 1.1, 1.2, 1.3, 1.4 };
+    const elemTypeStr = try identifier(s);
+    const elemType = dataTypeMap.get(elemTypeStr).?;
+    const numElements = s.source[s.current];
+    s.current += 1;
+
+    var elemValues = std.ArrayList(dataUnion).init(allocator);
+    var i: u8 = 0;
+    while (i < numElements) : (i += 1) {
+        try elemValues.append(try processData(s, elemTypeStr));
+    }
+
     return ff41token{
         .name = tokenName,
-        .elementType = elementType,
+        .elementType = elemType,
         .numElements = numElements,
-        //.values = elementValues,
+        .values = elemValues,
     };
 }
 
