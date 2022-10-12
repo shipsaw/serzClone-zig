@@ -150,7 +150,6 @@ pub fn parse(s: *status) !std.ArrayList(token) {
             }
         } else {
             try s.result.append(try processSavedLine(s));
-            return s.result;
         }
         if (s.line < 255) s.line += 1;
     }
@@ -177,8 +176,8 @@ fn identifier(s: *status) ![]const u8 {
     return s.stringMap.items[strIdx];
 }
 
-fn processData(s: *status, dataTypeStr: []const u8) !dataUnion {
-    return switch (dataTypeMap.get(dataTypeStr).?) {
+fn processData(s: *status, dType: dataType) !dataUnion {
+    return switch (dType) {
         dataType._bool => processBool(s),
         dataType._sUInt8 => processSUInt8(s),
         dataType._sInt32 => processSInt32(s),
@@ -228,15 +227,14 @@ fn processCDeltaString(s: *status) !dataUnion {
 
 fn processFF41(s: *status) !ff41token {
     const tokenName = try identifier(s);
-    const elemTypeStr = try identifier(s);
-    const elemType = dataTypeMap.get(elemTypeStr).?;
+    const elemType = dataTypeMap.get(try identifier(s)).?;
     const numElements = s.source[s.current];
     s.current += 1;
 
     var elemValues = std.ArrayList(dataUnion).init(allocator);
     var i: u8 = 0;
     while (i < numElements) : (i += 1) {
-        try elemValues.append(try processData(s, elemTypeStr));
+        try elemValues.append(try processData(s, elemType));
     }
 
     return ff41token{
@@ -261,12 +259,12 @@ fn processFF50(s: *status) !ff50token {
 
 fn processFF56(s: *status) !ff56token {
     const tokenName = try identifier(s);
-    const dataTypeStr = try identifier(s);
-    const data = try processData(s, dataTypeStr);
+    const dType = dataTypeMap.get(try identifier(s)).?;
+    const data = try processData(s, dType);
 
     return ff56token{
         .name = tokenName,
-        .dType = dataTypeMap.get(dataTypeStr).?,
+        .dType = dType,
         .value = data,
     };
 }
@@ -281,7 +279,30 @@ fn processFF70(s: *status) !ff70token {
 
 fn processSavedLine(s: *status) !token {
     const savedLine = s.result.items[s.source[s.current]];
-    return savedLine;
+    s.current += 1;
+    switch (savedLine) {
+        .ff56token => {
+            const data = processData(s, savedLine.ff56token.dType);
+            return token{.ff56token{
+                .name = savedLine.ff56token.name,
+                .dType = savedLine.ff56token.dType,
+                .value = data,
+            }};
+        },
+        .ff41token => {
+            var newNode = ff41token{
+                .name = savedLine.ff41token.name,
+                .dType = savedLine.ff41token.dType,
+                .value = std.ArrayList(dataUnion).init(allocator),
+            };
+            var i: u8 = 0;
+            while (i < savedLine.numElements) : (i += 1) {
+                newNode.value.append(processData(s, savedLine.ff41token.dType));
+            }
+            return token{ .ff41token = newNode };
+        },
+        else => unreachable,
+    }
 }
 
 fn processU16(s: *status) u16 {
@@ -354,10 +375,10 @@ test "bool data" {
     var statusStructFalse = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 0 });
 
     // Act
-    const dTypeT = try identifier(&statusStructTrue);
+    const dTypeT = dataTypeMap.get(try identifier(&statusStructTrue)).?;
     const dataTrue = try processData(&statusStructTrue, dTypeT);
 
-    const dTypeF = try identifier(&statusStructFalse);
+    const dTypeF = dataTypeMap.get(try identifier(&statusStructFalse)).?;
     const dataFalse = try processData(&statusStructFalse, dTypeF);
 
     // Assert
@@ -375,10 +396,10 @@ test "sUInt8 data" {
     var statusStruct0 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 0 });
 
     // Act
-    const dType11 = try identifier(&statusStruct11);
+    const dType11 = dataTypeMap.get(try identifier(&statusStruct11)).?;
     const data11 = try processData(&statusStruct11, dType11);
 
-    const dType0 = try identifier(&statusStruct0);
+    const dType0 = dataTypeMap.get(try identifier(&statusStruct0)).?;
     const data0 = try processData(&statusStruct0, dType0);
 
     // Assert
@@ -396,10 +417,10 @@ test "sInt32 data" {
     var statusStruct3210 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x8a, 0x0c, 0x00, 0x00 }); // 3210
 
     // Act
-    const dType_3200 = try identifier(&statusStruct_3200);
+    const dType_3200 = dataTypeMap.get(try identifier(&statusStruct_3200)).?;
     const data_3200 = try processData(&statusStruct_3200, dType_3200);
 
-    const dType3210 = try identifier(&statusStruct3210);
+    const dType3210 = dataTypeMap.get(try identifier(&statusStruct3210)).?;
     const data3210 = try processData(&statusStruct3210, dType3210);
 
     // Assert
@@ -417,10 +438,10 @@ test "sFloat32 data" {
     var statusStruct_1234 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xa4, 0x70, 0x45, 0xc1 }); // -1234
 
     // Act
-    const dType12345 = try identifier(&statusStruct12345);
+    const dType12345 = dataTypeMap.get(try identifier(&statusStruct12345)).?;
     const data12345 = try processData(&statusStruct12345, dType12345);
 
-    const dType_1234 = try identifier(&statusStruct_1234);
+    const dType_1234 = dataTypeMap.get(try identifier(&statusStruct_1234)).?;
     const data_1234 = try processData(&statusStruct_1234, dType_1234);
 
     // Assert
@@ -439,7 +460,7 @@ test "sUInt64 data" {
     var statusStruct = status.init(u64Name ++ u64Value);
 
     // Act
-    const dType = try identifier(&statusStruct);
+    const dType = dataTypeMap.get(try identifier(&statusStruct)).?;
     const data = try processData(&statusStruct, dType);
 
     // Assert
@@ -457,10 +478,10 @@ test "cDeltaString data" {
     try statusStructExisting.stringMap.append("iExist");
 
     // Act
-    const dTypeHello = try identifier(&statusStructHello);
+    const dTypeHello = dataTypeMap.get(try identifier(&statusStructHello)).?;
     const dataHello = try processData(&statusStructHello, dTypeHello);
 
-    const dTypeExisting = try identifier(&statusStructExisting);
+    const dTypeExisting = dataTypeMap.get(try identifier(&statusStructExisting)).?;
     const dataExisting = try processData(&statusStructExisting, dTypeExisting);
 
     // Assert
