@@ -78,7 +78,7 @@ const dataUnion = union(dataType) {
 const ff41token = struct {
     name: []const u8,
     numElements: u8,
-    elementType: dataType,
+    dType: dataType,
     values: std.ArrayList(dataUnion),
 };
 
@@ -90,6 +90,7 @@ const ff50token = struct {
 
 const ff56token = struct {
     name: []const u8,
+    dType: dataType,
     value: dataUnion,
 };
 
@@ -240,7 +241,7 @@ fn processFF41(s: *status) !ff41token {
 
     return ff41token{
         .name = tokenName,
-        .elementType = elemType,
+        .dType = elemType,
         .numElements = numElements,
         .values = elemValues,
     };
@@ -265,6 +266,7 @@ fn processFF56(s: *status) !ff56token {
 
     return ff56token{
         .name = tokenName,
+        .dType = dataTypeMap.get(dataTypeStr).?,
         .value = data,
     };
 }
@@ -482,7 +484,7 @@ test "ff41 parsing" {
     try expectedValues.append(dataUnion{ ._sInt32 = 3 });
     try expectedValues.append(dataUnion{ ._sInt32 = 4 });
 
-    const expected = ff41token{ .name = "RXAxis", .numElements = 4, .elementType = dataType._sInt32, .values = expectedValues };
+    const expected = ff41token{ .name = "RXAxis", .numElements = 4, .dType = dataType._sInt32, .values = expectedValues };
 
     // Act
     const result = try processFF41(&statusStruct);
@@ -512,7 +514,7 @@ test "ff50 parsing" {
 test "ff56 parsing" {
     // Arrange
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
-    const expected = ff56token{ .name = "food", .value = dataUnion{ ._bool = true } };
+    const expected = ff56token{ .name = "food", .dType = dataType._bool, .value = dataUnion{ ._bool = true } };
 
     // Act
     const ff56 = try processFF56(&statusStruct);
@@ -533,7 +535,7 @@ test "ff70 parsing" {
 
     const expected = &[_]token{
         token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
+        token{ .ff56token = ff56token{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
         token{ .ff70token = ff70token{ .name = "first" } },
     };
 
@@ -554,7 +556,7 @@ test "parse function" {
 
     const expected = &[_]token{
         token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } },
+        token{ .ff56token = ff56token{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
     };
 
     // Act
@@ -578,7 +580,7 @@ test "saved line retrieval" {
     const savedBytes = &[_]u8{0x01};
     var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ savedBytes);
 
-    const expected = token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } };
+    const expected = token{ .ff56token = ff56token{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } };
 
     // Act
     const result = try parse(&testBytes);
