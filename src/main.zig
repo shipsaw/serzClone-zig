@@ -14,7 +14,7 @@ const status = struct {
     stringMap: std.ArrayList([]const u8),
 
     pub fn init(src: []const u8) status {
-        return status{ .start = 0, .current = 0, .line = 1, .source = src, .stringMap = std.ArrayList([]const u8).init(allocator) };
+        return status{ .start = 0, .current = 0, .line = 0, .source = src, .stringMap = std.ArrayList([]const u8).init(allocator) };
     }
 
     pub fn advance(self: *status) u8 {
@@ -98,6 +98,21 @@ const token = union(enum) {
 
 pub fn parse(s: *status) !std.ArrayList(token) {
     var tokenList = std.ArrayList(token).init(allocator);
+    errdefer {
+        std.debug.print("ERROR ON LINE: {any}, CHARACTER: {any}\n", .{ s.line, s.current });
+
+        std.debug.print("Error at: \n", .{});
+        var i: u8 = 20;
+        while (i > 0) : (i -= 1) {
+            std.debug.print("{x}, ", .{s.source[s.current - i]});
+        }
+        std.debug.print("|{x}|", .{s.source[s.current]});
+        i = 1;
+        while (i < 20) : (i += 1) {
+            std.debug.print(", {x}", .{s.source[s.current - i]});
+        }
+        std.debug.print("\n", .{});
+    }
 
     try expectEqualStrings("SERZ", s.source[0..4]);
     s.current += 4;
@@ -123,9 +138,12 @@ pub fn parse(s: *status) !std.ArrayList(token) {
                     s.current += 1;
                     try tokenList.append(token{ .ff70token = try processFF70(s) });
                 },
-                else => unreachable,
+                else => return errors.InvalidFileError,
             }
+        } else {
+            return errors.InvalidFileError;
         }
+        if (s.line < 255) s.line += 1;
     }
     return tokenList;
 }
@@ -539,17 +557,12 @@ test "parse function" {
 }
 
 pub fn main() !void {
-    // const size_limit = std.math.maxInt(u32);
-    // var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    const size_limit = std.math.maxInt(u32);
+    var file = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
 
-    // const testBytes = try file.readToEndAlloc(allocator, size_limit);
-    // var testStatus = status.init(testBytes);
-    // for ((try parse(&testStatus)).items) |node| {
-    //     std.debug.print("{any}\n", .{node});
-    // }
-    const ff41bytes = &[_]u8{ 0xff, 0xff, 0x06, 0x00, 0x00, 0x00, 0x52, 0x58, 0x41, 0x78, 0x69, 0x73, 0x00, 0x00, 0x04, 0xe4, 0x65, 0xfd, 0x3e, 0x6f, 0xe6, 0xa1, 0x37, 0xd7, 0x72, 0x5e, 0xbf, 0x00, 0x00, 0x00, 0x00 };
-    var statusStruct = status.init(ff41bytes);
-    try statusStruct.stringMap.append("sFloat32");
-
-    std.debug.print("{any}", .{(try processFF41(&statusStruct)).values});
+    const testBytes = try file.readToEndAlloc(allocator, size_limit);
+    var testStatus = status.init(testBytes);
+    for ((try parse(&testStatus)).items) |node| {
+        std.debug.print("{any}\n", .{node});
+    }
 }
