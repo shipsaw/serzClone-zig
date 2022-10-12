@@ -12,9 +12,17 @@ const status = struct {
     line: usize,
     source: []const u8,
     stringMap: std.ArrayList([]const u8),
+    result: std.ArrayList(token),
 
     pub fn init(src: []const u8) status {
-        return status{ .start = 0, .current = 0, .line = 0, .source = src, .stringMap = std.ArrayList([]const u8).init(allocator) };
+        return status{
+            .start = 0,
+            .current = 0,
+            .line = 0,
+            .source = src,
+            .stringMap = std.ArrayList([]const u8).init(allocator),
+            .result = std.ArrayList(token).init(allocator),
+        };
     }
 
     pub fn advance(self: *status) u8 {
@@ -97,7 +105,6 @@ const token = union(enum) {
 };
 
 pub fn parse(s: *status) !std.ArrayList(token) {
-    var tokenList = std.ArrayList(token).init(allocator);
     errdefer {
         std.debug.print("ERROR ON LINE: {any}, CHARACTER: {any}\n", .{ s.line, s.current });
 
@@ -124,28 +131,29 @@ pub fn parse(s: *status) !std.ArrayList(token) {
             switch (s.source[s.current]) {
                 0x41 => {
                     s.current += 1;
-                    try tokenList.append(token{ .ff41token = try processFF41(s) });
+                    try s.result.append(token{ .ff41token = try processFF41(s) });
                 },
                 0x50 => {
                     s.current += 1;
-                    try tokenList.append(token{ .ff50token = try processFF50(s) });
+                    try s.result.append(token{ .ff50token = try processFF50(s) });
                 },
                 0x56 => {
                     s.current += 1;
-                    try tokenList.append(token{ .ff56token = try processFF56(s) });
+                    try s.result.append(token{ .ff56token = try processFF56(s) });
                 },
                 0x70 => {
                     s.current += 1;
-                    try tokenList.append(token{ .ff70token = try processFF70(s) });
+                    try s.result.append(token{ .ff70token = try processFF70(s) });
                 },
                 else => return errors.InvalidFileError,
             }
         } else {
-            return errors.InvalidFileError;
+            try s.result.append(try processSavedLine(s));
+            return s.result;
         }
         if (s.line < 255) s.line += 1;
     }
-    return tokenList;
+    return s.result;
 }
 
 fn identifier(s: *status) ![]const u8 {
@@ -267,6 +275,11 @@ fn processFF70(s: *status) !ff70token {
     return ff70token{
         .name = tokenName,
     };
+}
+
+fn processSavedLine(s: *status) !token {
+    const savedLine = s.result.items[s.source[s.current]];
+    return savedLine;
 }
 
 fn processU16(s: *status) u16 {
@@ -554,6 +567,24 @@ test "parse function" {
 
     try expectEqualStrings(result.items[1].ff56token.name, expected[1].ff56token.name);
     try expect(result.items[1].ff56token.value._bool == expected[1].ff56token.value._bool);
+}
+
+test "saved line retrieval" {
+    // Arrange
+    const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
+    const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
+    const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
+    const savedBytes = &[_]u8{0x01};
+    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ savedBytes);
+
+    const expected = token{ .ff56token = ff56token{ .name = "snd", .value = dataUnion{ ._bool = true } } };
+
+    // Act
+    const result = try parse(&testBytes);
+
+    // Assert
+    try expectEqualStrings(result.items[2].ff56token.name, expected.ff56token.name);
 }
 
 pub fn main() !void {
