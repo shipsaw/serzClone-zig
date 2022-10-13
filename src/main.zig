@@ -198,7 +198,8 @@ fn processBool(s: *status) dataUnion {
 
 fn processSUInt8(s: *status) dataUnion {
     defer s.current += 1;
-    const val = std.mem.readIntSlice(u8, s.source[s.current..], std.builtin.Endian.Little);
+    // const val = std.mem.readIntSlice(u8, s.source[s.current..], std.builtin.Endian.Little);
+    const val = s.source[s.current];
     return dataUnion{ ._sUInt8 = val };
 }
 
@@ -282,22 +283,23 @@ fn processSavedLine(s: *status) !token {
     s.current += 1;
     switch (savedLine) {
         .ff56token => {
-            const data = processData(s, savedLine.ff56token.dType);
-            return token{.ff56token{
+            const data = try processData(s, savedLine.ff56token.dType);
+            return token{ .ff56token = ff56token{
                 .name = savedLine.ff56token.name,
                 .dType = savedLine.ff56token.dType,
                 .value = data,
-            }};
+            } };
         },
         .ff41token => {
             var newNode = ff41token{
                 .name = savedLine.ff41token.name,
                 .dType = savedLine.ff41token.dType,
-                .value = std.ArrayList(dataUnion).init(allocator),
+                .numElements = savedLine.ff41token.numElements,
+                .values = std.ArrayList(dataUnion).init(allocator),
             };
             var i: u8 = 0;
-            while (i < savedLine.numElements) : (i += 1) {
-                newNode.value.append(processData(s, savedLine.ff41token.dType));
+            while (i < savedLine.ff41token.numElements) : (i += 1) {
+                try newNode.values.append(try processData(s, savedLine.ff41token.dType));
             }
             return token{ .ff41token = newNode };
         },
@@ -592,16 +594,16 @@ test "parse function" {
     try expect(result.items[1].ff56token.value._bool == expected[1].ff56token.value._bool);
 }
 
-test "saved line retrieval" {
+test "saved line retrieval ff56" {
     // Arrange
     const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
     const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
     const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    const savedBytes = &[_]u8{0x01};
+    const savedBytes = &[_]u8{ 0x01, 0x00 };
     var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ savedBytes);
 
-    const expected = token{ .ff56token = ff56token{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } };
+    const expected = token{ .ff56token = ff56token{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = false } } };
 
     // Act
     const result = try parse(&testBytes);
@@ -610,6 +612,40 @@ test "saved line retrieval" {
     try expectEqualStrings(result.items[2].ff56token.name, expected.ff56token.name);
 }
 
+test "saved line retrieval ff41" {
+    // Arrange
+    const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
+    const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
+    const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
+    const ff41bytes = &[_]u8{ 0xff, 0x41, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 4 };
+    const ff41Data = &[_]u8{ 1, 2, 3, 4 };
+    const savedBytes = &[_]u8{ 0x01, 5, 6, 7, 8 };
+    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff41bytes ++ ff41Data ++ savedBytes);
+
+    var expected = token{ .ff41token = ff41token{
+        .name = "snd",
+        .dType = dataType._sUInt8,
+        .numElements = 4,
+        .values = std.ArrayList(dataUnion).init(allocator),
+    } };
+    try expected.ff41token.values.append(dataUnion{ ._sUInt8 = 5 });
+    try expected.ff41token.values.append(dataUnion{ ._sUInt8 = 6 });
+    try expected.ff41token.values.append(dataUnion{ ._sUInt8 = 7 });
+    try expected.ff41token.values.append(dataUnion{ ._sUInt8 = 8 });
+
+    // Act
+    const result = try parse(&testBytes);
+
+    // Assert
+    try expectEqualStrings(result.items[2].ff41token.name, expected.ff41token.name);
+    try expect(result.items[2].ff41token.dType == expected.ff41token.dType);
+    try expect(result.items[2].ff41token.numElements == expected.ff41token.numElements);
+
+    var i: u8 = 0;
+    while (i < expected.ff41token.numElements) : (i += 1) {
+        try expect(result.items[2].ff41token.values.items[i]._sUInt8 == expected.ff41token.values.items[i]._sUInt8);
+    }
+}
 pub fn main() !void {
     const size_limit = std.math.maxInt(u32);
     var file = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
