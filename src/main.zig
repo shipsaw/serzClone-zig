@@ -12,6 +12,7 @@ const status = struct {
     line: usize,
     source: []const u8,
     stringMap: std.ArrayList([]const u8),
+    savedTokenList: std.ArrayList(token),
     result: std.ArrayList(token),
 
     pub fn init(src: []const u8) status {
@@ -21,6 +22,7 @@ const status = struct {
             .line = 0,
             .source = src,
             .stringMap = std.ArrayList([]const u8).init(allocator),
+            .savedTokenList = std.ArrayList(token).init(allocator),
             .result = std.ArrayList(token).init(allocator),
         };
     }
@@ -44,7 +46,8 @@ const status = struct {
 };
 
 const errors = error{
-    InvalidFileError,
+    InvalidNodeType,
+    TooManyChildren,
 };
 
 const keywords = std.StringHashMap(dataType).init(allocator);
@@ -107,19 +110,7 @@ const token = union(enum) {
 
 pub fn parse(s: *status) !std.ArrayList(token) {
     errdefer {
-        std.debug.print("ERROR ON LINE: {any}, CHARACTER: {any}\n", .{ s.line, s.current });
-
-        std.debug.print("Error at: \n", .{});
-        var i: u8 = 20;
-        while (i > 0) : (i -= 1) {
-            std.debug.print("{x}, ", .{s.source[s.current - i]});
-        }
-        std.debug.print("|{x}|", .{s.source[s.current]});
-        i = 1;
-        while (i < 20) : (i += 1) {
-            std.debug.print(", {x}", .{s.source[s.current - i]});
-        }
-        std.debug.print("\n", .{});
+        errorInfo(s);
     }
 
     try expectEqualStrings("SERZ", s.source[0..4]);
@@ -132,21 +123,29 @@ pub fn parse(s: *status) !std.ArrayList(token) {
             switch (s.source[s.current]) {
                 0x41 => {
                     s.current += 1;
-                    try s.result.append(token{ .ff41token = try processFF41(s) });
+                    const tok = try processFF41(s);
+                    try s.result.append(token{ .ff41token = tok });
+                    try s.savedTokenList.append(token{ .ff41token = tok });
                 },
                 0x50 => {
                     s.current += 1;
-                    try s.result.append(token{ .ff50token = try processFF50(s) });
+                    const tok = try processFF50(s);
+                    try s.result.append(token{ .ff50token = tok });
+                    try s.savedTokenList.append(token{ .ff50token = tok });
                 },
                 0x56 => {
                     s.current += 1;
-                    try s.result.append(token{ .ff56token = try processFF56(s) });
+                    const tok = try processFF56(s);
+                    try s.result.append(token{ .ff56token = tok });
+                    try s.savedTokenList.append(token{ .ff56token = tok });
                 },
                 0x70 => {
                     s.current += 1;
-                    try s.result.append(token{ .ff70token = try processFF70(s) });
+                    const tok = try processFF70(s);
+                    try s.result.append(token{ .ff70token = tok });
+                    try s.savedTokenList.append(token{ .ff70token = tok });
                 },
-                else => return errors.InvalidFileError,
+                else => return errors.InvalidNodeType,
             }
         } else {
             try s.result.append(try processSavedLine(s));
@@ -279,7 +278,10 @@ fn processFF70(s: *status) !ff70token {
 }
 
 fn processSavedLine(s: *status) !token {
-    const savedLine = s.result.items[s.source[s.current]];
+    if (s.source[s.current] > s.savedTokenList.items.len) {
+        return error.InvalidFileError;
+    }
+    const savedLine = s.savedTokenList.items[s.source[s.current]];
     s.current += 1;
     switch (savedLine) {
         .ff56token => {
@@ -294,16 +296,33 @@ fn processSavedLine(s: *status) !token {
             var newNode = ff41token{
                 .name = savedLine.ff41token.name,
                 .dType = savedLine.ff41token.dType,
-                .numElements = savedLine.ff41token.numElements,
+                .numElements = s.source[s.current],
                 .values = std.ArrayList(dataUnion).init(allocator),
             };
+            s.current += 1;
             var i: u8 = 0;
             while (i < savedLine.ff41token.numElements) : (i += 1) {
                 try newNode.values.append(try processData(s, savedLine.ff41token.dType));
             }
             return token{ .ff41token = newNode };
         },
-        else => unreachable,
+        .ff50token => {
+            // return errors.InvalidNodeType;
+            const id = processU32(s);
+            const children = processU32(s);
+            if (children > 100) {
+                s.current -= 8;
+                return errors.TooManyChildren;
+            }
+            return token{ .ff50token = ff50token{
+                .name = savedLine.ff50token.name,
+                .id = id,
+                .children = children,
+            } };
+        },
+        .ff70token => {
+            return token{ .ff70token = ff70token{ .name = savedLine.ff70token.name } };
+        },
     }
 }
 
@@ -329,6 +348,26 @@ fn isAlphaNumeric(c: u8) bool {
     return isAlpha(c) or isDecimal(c);
 }
 
+fn errorInfo(s: *status) void {
+    const dumpLine: usize = s.current / 16;
+    std.debug.print("ERROR ON LINE: {any} (0x{x}), CHARACTER: {any}\n", .{ s.line, dumpLine, s.current });
+
+    std.debug.print("Error at: \n", .{});
+    var i: u8 = 20;
+    while (i > 0) : (i -= 1) {
+        std.debug.print("{x}, ", .{s.source[s.current - i]});
+    }
+    std.debug.print("|{x}|", .{s.source[s.current]});
+    i = 1;
+    while (i < 20) : (i += 1) {
+        std.debug.print(", {x}", .{s.source[s.current + i]});
+    }
+    std.debug.print("\n", .{});
+    std.debug.print("ELEMENT STACK:\n", .{});
+    for (s.result.items) |node| {
+        std.debug.print("{any}\n", .{node});
+    }
+}
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////  Test Area ////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
