@@ -17,3 +17,8 @@ zig-out/
 /build-*/
 /docgen_tmp/
 /helix
+/kcov-output
+notes.txt
+results.txt
+*test.zig
+zigSerz
