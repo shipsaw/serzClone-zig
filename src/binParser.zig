@@ -2,28 +2,28 @@ const std = @import("std");
 const print = std.debug.print;
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
-const t = @import("token.zig");
+const n = @import("node.zig");
 
-const token = t.token;
-const ff41token = t.ff41token;
-const ff4etoken = t.ff4etoken;
-const ff50token = t.ff50token;
-const ff56token = t.ff56token;
-const ff70token = t.ff70token;
-const dataType = t.dataType;
-const dataUnion = t.dataUnion;
+const node = n.node;
+const ff41node = n.ff41node;
+const ff4enode = n.ff4enode;
+const ff50node = n.ff50node;
+const ff56node = n.ff56node;
+const ff70node = n.ff70node;
+const dataType = n.dataType;
+const dataUnion = n.dataUnion;
 
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 
-const status = struct {
+pub const status = struct {
     start: usize,
     current: usize,
     line: usize,
     source: []const u8,
     stringMap: std.ArrayList([]const u8),
-    savedTokenList: std.ArrayList(token),
-    result: std.ArrayList(token),
+    savedTokenList: std.ArrayList(node),
+    result: std.ArrayList(node),
 
     pub fn init(src: []const u8) status {
         return status{
@@ -32,8 +32,8 @@ const status = struct {
             .line = 0,
             .source = src,
             .stringMap = std.ArrayList([]const u8).init(allocator),
-            .savedTokenList = std.ArrayList(token).init(allocator),
-            .result = std.ArrayList(token).init(allocator),
+            .savedTokenList = std.ArrayList(node).init(allocator),
+            .result = std.ArrayList(node).init(allocator),
         };
     }
 
@@ -68,7 +68,7 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "sFloat32", ._sFloat32 },
     .{ "cDeltaString", ._cDeltaString },
 });
-pub fn parse(s: *status) !std.ArrayList(token) {
+pub fn parse(s: *status) !std.ArrayList(node) {
     errdefer {
         errorInfo(s);
     }
@@ -84,31 +84,31 @@ pub fn parse(s: *status) !std.ArrayList(token) {
                 0x41 => {
                     s.current += 1;
                     const tok = try processFF41(s);
-                    try s.result.append(token{ .ff41token = tok });
-                    try s.savedTokenList.append(token{ .ff41token = tok });
+                    try s.result.append(node{ .ff41node = tok });
+                    try s.savedTokenList.append(node{ .ff41node = tok });
                 },
                 0x4e => {
                     s.current += 1;
-                    try s.result.append(token{ .ff4etoken = ff4etoken{} });
-                    try s.savedTokenList.append(token{ .ff4etoken = ff4etoken{} });
+                    try s.result.append(node{ .ff4enode = ff4enode{} });
+                    try s.savedTokenList.append(node{ .ff4enode = ff4enode{} });
                 },
                 0x50 => {
                     s.current += 1;
                     const tok = try processFF50(s);
-                    try s.result.append(token{ .ff50token = tok });
-                    try s.savedTokenList.append(token{ .ff50token = tok });
+                    try s.result.append(node{ .ff50node = tok });
+                    try s.savedTokenList.append(node{ .ff50node = tok });
                 },
                 0x56 => {
                     s.current += 1;
                     const tok = try processFF56(s);
-                    try s.result.append(token{ .ff56token = tok });
-                    try s.savedTokenList.append(token{ .ff56token = tok });
+                    try s.result.append(node{ .ff56node = tok });
+                    try s.savedTokenList.append(node{ .ff56node = tok });
                 },
                 0x70 => {
                     s.current += 1;
                     const tok = try processFF70(s);
-                    try s.result.append(token{ .ff70token = tok });
-                    try s.savedTokenList.append(token{ .ff70token = tok });
+                    try s.result.append(node{ .ff70node = tok });
+                    try s.savedTokenList.append(node{ .ff70node = tok });
                 },
                 else => return errors.InvalidNodeType,
             }
@@ -190,8 +190,8 @@ fn processCDeltaString(s: *status) !dataUnion {
     return dataUnion{ ._cDeltaString = str };
 }
 
-fn processFF41(s: *status) !ff41token {
-    const tokenName = try identifier(s);
+fn processFF41(s: *status) !ff41node {
+    const nodeName = try identifier(s);
     const elemType = dataTypeMap.get(try identifier(s)).?;
     const numElements = s.source[s.current];
     s.current += 1;
@@ -202,76 +202,76 @@ fn processFF41(s: *status) !ff41token {
         try elemValues.append(try processData(s, elemType));
     }
 
-    return ff41token{
-        .name = tokenName,
+    return ff41node{
+        .name = nodeName,
         .dType = elemType,
         .numElements = numElements,
         .values = elemValues,
     };
 }
 
-fn processFF50(s: *status) !ff50token {
-    const tokenName = try identifier(s);
+fn processFF50(s: *status) !ff50node {
+    const nodeName = try identifier(s);
     const id = processU32(s);
     const children = processU32(s);
 
-    return ff50token{
-        .name = tokenName,
+    return ff50node{
+        .name = nodeName,
         .id = id,
         .children = children,
     };
 }
 
-fn processFF56(s: *status) !ff56token {
-    const tokenName = try identifier(s);
+fn processFF56(s: *status) !ff56node {
+    const nodeName = try identifier(s);
     const dType = dataTypeMap.get(try identifier(s)).?;
     const data = try processData(s, dType);
 
-    return ff56token{
-        .name = tokenName,
+    return ff56node{
+        .name = nodeName,
         .dType = dType,
         .value = data,
     };
 }
 
-fn processFF70(s: *status) !ff70token {
-    const tokenStr = processU16(s);
-    const tokenName = s.stringMap.items[tokenStr];
-    return ff70token{
-        .name = tokenName,
+fn processFF70(s: *status) !ff70node {
+    const nodeStr = processU16(s);
+    const nodeName = s.stringMap.items[nodeStr];
+    return ff70node{
+        .name = nodeName,
     };
 }
 
-fn processSavedLine(s: *status) !token {
+fn processSavedLine(s: *status) !node {
     if (s.source[s.current] > s.savedTokenList.items.len) {
         return error.InvalidFileError;
     }
     const savedLine = s.savedTokenList.items[s.source[s.current]];
     s.current += 1;
     switch (savedLine) {
-        .ff56token => {
-            const data = try processData(s, savedLine.ff56token.dType);
-            return token{ .ff56token = ff56token{
-                .name = savedLine.ff56token.name,
-                .dType = savedLine.ff56token.dType,
+        .ff56node => {
+            const data = try processData(s, savedLine.ff56node.dType);
+            return node{ .ff56node = ff56node{
+                .name = savedLine.ff56node.name,
+                .dType = savedLine.ff56node.dType,
                 .value = data,
             } };
         },
-        .ff41token => {
-            var newNode = ff41token{
-                .name = savedLine.ff41token.name,
-                .dType = savedLine.ff41token.dType,
+        .ff41node => {
+            var newNode = ff41node{
+                .name = savedLine.ff41node.name,
+                .dType = savedLine.ff41node.dType,
                 .numElements = s.source[s.current],
                 .values = std.ArrayList(dataUnion).init(allocator),
             };
             s.current += 1;
             var i: u8 = 0;
-            while (i < savedLine.ff41token.numElements) : (i += 1) {
-                try newNode.values.append(try processData(s, savedLine.ff41token.dType));
+            while (i < savedLine.ff41node.numElements) : (i += 1) {
+                try newNode.values.append(try processData(s, savedLine.ff41node.dType));
             }
-            return token{ .ff41token = newNode };
+            return node{ .ff41node = newNode };
         },
-        .ff50token => {
+        .ff50node => {
             // return errors.InvalidNodeType;
             const id = processU32(s);
             const children = processU32(s);
@@ -279,17 +279,17 @@ fn processSavedLine(s: *status) !token {
                 s.current -= 8;
                 return errors.TooManyChildren;
             }
-            return token{ .ff50token = ff50token{
-                .name = savedLine.ff50token.name,
+            return node{ .ff50node = ff50node{
+                .name = savedLine.ff50node.name,
                 .id = id,
                 .children = children,
             } };
         },
-        .ff70token => {
-            return token{ .ff70token = ff70token{ .name = savedLine.ff70token.name } };
+        .ff70node => {
+            return node{ .ff70node = ff70node{ .name = savedLine.ff70node.name } };
         },
-        .ff4etoken => {
-            return token{ .ff4etoken = ff4etoken{} };
+        .ff4enode => {
+            return node{ .ff4enode = ff4enode{} };
         },
     }
 }
@@ -332,8 +332,8 @@ fn errorInfo(s: *status) void {
     }
     std.debug.print("\n", .{});
     std.debug.print("ELEMENT STACK:\n", .{});
-    for (s.result.items) |node| {
-        std.debug.print("{any}\n", .{node});
+    for (s.result.items) |item| {
+        std.debug.print("{any}\n", .{item});
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -514,7 +514,7 @@ test "ff41 parsing" {
     try expectedValues.append(dataUnion{ ._sInt32 = 3 });
     try expectedValues.append(dataUnion{ ._sInt32 = 4 });
 
-    const expected = ff41token{ .name = "RXAxis", .numElements = 4, .dType = dataType._sInt32, .values = expectedValues };
+    const expected = ff41node{ .name = "RXAxis", .numElements = 4, .dType = dataType._sInt32, .values = expectedValues };
 
     // Act
     const result = try processFF41(&statusStruct);
@@ -530,7 +530,7 @@ test "ff41 parsing" {
 test "ff50 parsing" {
     // Arrange
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
-    const expected = ff50token{ .name = "food", .id = 375192228, .children = 1 };
+    const expected = ff50node{ .name = "food", .id = 375192228, .children = 1 };
 
     // Act
     const ff50 = try processFF50(&statusStruct);
@@ -544,7 +544,7 @@ test "ff50 parsing" {
 test "ff56 parsing" {
     // Arrange
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
-    const expected = ff56token{ .name = "food", .dType = dataType._bool, .value = dataUnion{ ._bool = true } };
+    const expected = ff56node{ .name = "food", .dType = dataType._bool, .value = dataUnion{ ._bool = true } };
 
     // Act
     const ff56 = try processFF56(&statusStruct);
@@ -563,17 +563,17 @@ test "ff70 parsing" {
     const ff70bytes = &[_]u8{ 0xff, 0x70, 0, 0 };
     var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
 
-    const expected = &[_]token{
-        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
-        token{ .ff70token = ff70token{ .name = "first" } },
+    const expected = &[_]node{
+        node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .children = 1 } },
+        node{ .ff56node = ff56node{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
+        node{ .ff70node = ff70node{ .name = "first" } },
     };
 
     // Act
     const result = try parse(&testBytes);
 
     // Assert
-    try expectEqualStrings(result.items[2].ff70token.name, expected[2].ff70token.name);
+    try expectEqualStrings(result.items[2].ff70node.name, expected[2].ff70node.name);
 }
 
 test "parse function" {
@@ -584,21 +584,21 @@ test "parse function" {
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
     var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes);
 
-    const expected = &[_]token{
-        token{ .ff50token = ff50token{ .name = "first", .id = 375192228, .children = 1 } },
-        token{ .ff56token = ff56token{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
+    const expected = &[_]node{
+        node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .children = 1 } },
+        node{ .ff56node = ff56node{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
     };
 
     // Act
     const result = try parse(&testBytes);
 
     // Assert
-    try expectEqualStrings(result.items[0].ff50token.name, expected[0].ff50token.name);
-    try expect(result.items[0].ff50token.id == expected[0].ff50token.id);
-    try expect(result.items[0].ff50token.children == expected[0].ff50token.children);
+    try expectEqualStrings(result.items[0].ff50node.name, expected[0].ff50node.name);
+    try expect(result.items[0].ff50node.id == expected[0].ff50node.id);
+    try expect(result.items[0].ff50node.children == expected[0].ff50node.children);
 
-    try expectEqualStrings(result.items[1].ff56token.name, expected[1].ff56token.name);
-    try expect(result.items[1].ff56token.value._bool == expected[1].ff56token.value._bool);
+    try expectEqualStrings(result.items[1].ff56node.name, expected[1].ff56node.name);
+    try expect(result.items[1].ff56node.value._bool == expected[1].ff56node.value._bool);
 }
 
 pub fn main() !void {

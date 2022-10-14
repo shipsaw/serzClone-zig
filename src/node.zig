@@ -19,35 +19,35 @@ pub const dataUnion = union(dataType) {
     _cDeltaString: []const u8,
 };
 
-pub const ff41token = struct {
+pub const ff41node = struct {
     name: []const u8,
     numElements: u8,
     dType: dataType,
     values: std.ArrayList(dataUnion),
 };
 
-pub const ff4etoken = struct {};
+pub const ff4enode = struct {};
 
-pub const ff50token = struct {
+pub const ff50node = struct {
     name: []const u8,
     id: u32,
     children: u32,
 };
 
-pub const ff56token = struct {
+pub const ff56node = struct {
     name: []const u8,
     dType: dataType,
     value: dataUnion,
 };
 
-pub const ff70token = struct {
+pub const ff70node = struct {
     name: []const u8,
 };
 
-pub const token = union(enum) {
-    ff41token: ff41token,
-    ff4etoken: ff4etoken,
-    ff50token: ff50token,
-    ff56token: ff56token,
-    ff70token: ff70token,
+pub const node = union(enum) {
+    ff41node: ff41node,
+    ff4enode: ff4enode,
+    ff50node: ff50node,
+    ff56node: ff56node,
+    ff70node: ff70node,
 };
