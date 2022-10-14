@@ -2,6 +2,16 @@ const std = @import("std");
 const print = std.debug.print;
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
+const t = @import("token.zig");
+
+const token = t.token;
+const ff41token = t.ff41token;
+const ff4etoken = t.ff4etoken;
+const ff50token = t.ff50token;
+const ff56token = t.ff56token;
+const ff70token = t.ff70token;
+const dataType = t.dataType;
+const dataUnion = t.dataUnion;
 
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
@@ -50,7 +60,6 @@ const errors = error{
     TooManyChildren,
 };
 
-const keywords = std.StringHashMap(dataType).init(allocator);
 const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "bool", ._bool },
     .{ "sUInt8", ._sUInt8 },
@@ -59,58 +68,6 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "sFloat32", ._sFloat32 },
     .{ "cDeltaString", ._cDeltaString },
 });
-
-const dataType = enum {
-    _bool,
-    _sUInt8,
-    _sInt32,
-    _sUInt64,
-    _sFloat32,
-    _cDeltaString,
-};
-
-const dataUnion = union(dataType) {
-    _bool: bool,
-    _sUInt8: u8,
-    _sInt32: i32,
-    _sUInt64: u64,
-    _sFloat32: f32,
-    _cDeltaString: []const u8,
-};
-
-const ff41token = struct {
-    name: []const u8,
-    numElements: u8,
-    dType: dataType,
-    values: std.ArrayList(dataUnion),
-};
-
-const ff4etoken = struct {};
-
-const ff50token = struct {
-    name: []const u8,
-    id: u32,
-    children: u32,
-};
-
-const ff56token = struct {
-    name: []const u8,
-    dType: dataType,
-    value: dataUnion,
-};
-
-const ff70token = struct {
-    name: []const u8,
-};
-
-const token = union(enum) {
-    ff41token: ff41token,
-    ff4etoken: ff4etoken,
-    ff50token: ff50token,
-    ff56token: ff56token,
-    ff70token: ff70token,
-};
-
 pub fn parse(s: *status) !std.ArrayList(token) {
     errdefer {
         errorInfo(s);
