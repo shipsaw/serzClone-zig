@@ -11,19 +11,19 @@ const Place = struct {
     hm: []const u8,
 };
 
-const textNode = union {
-    ff41Node: ff41NodeT,
-    ff4eNode: ff4eNodeT,
-    ff50Node: ff50NodeT,
-    ff56Node: ff56NodeT,
-    // ff70Node: ff70NodeT,
+const textNode = union(enum) {
+    ff41NodeT: ff41NodeT,
+    ff4eNodeT: ff4eNodeT,
+    ff50NodeT: ff50NodeT,
+    ff56NodeT: ff56NodeT,
+    ff70NodeT: ff70NodeT,
 };
 
 const ff41NodeT = struct {
     name: []const u8,
     numElements: u8,
     dType: []const u8,
-    value: []n.dataUnion,
+    value: ?[]n.dataUnion,
 };
 
 const ff4eNodeT = struct {};
@@ -31,7 +31,7 @@ const ff4eNodeT = struct {};
 const ff50NodeT = struct {
     name: []const u8,
     id: ?u32,
-    children: []textNode,
+    children: ?[]textNode,
 };
 
 const ff56NodeT = struct {
@@ -40,9 +40,9 @@ const ff56NodeT = struct {
     value: n.dataUnion,
 };
 
-// const ff70NodeT = struct {
-//     name: []const u8,
-// };
+const ff70NodeT = struct {
+    name: []const u8,
+};
 
 fn sort(nodes: []n.node) []textNode {
     var textNodesList = std.Arraylist(textNode).init(allocator);
@@ -72,10 +72,10 @@ pub fn main() !void {
 
 fn convertNode(node: n.node) textNode {
     return switch (node) {
-        .ff41node => textNode{ .name = node.ff41node.name, .nType = "ff41", .value = null },
-        .ff4enode => textNode{ .name = null, .nType = "ff4e", .value = null },
-        .ff50node => textNode{ .name = node.ff50node.name, .nType = "ff50", .value = n.dataUnion{ ._bool = true } },
-        .ff56node => textNode{ .name = node.ff56node.name, .nType = "ff56", .value = null },
-        .ff70node => textNode{ .name = node.ff70node.name, .nType = "ff70", .value = null },
+        .ff41node => textNode{ .ff41NodeT = ff41NodeT{ .name = node.ff41node.name, .dType = "NO", .numElements = node.ff41node.numElements, .value = null } },
+        .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
+        .ff50node => textNode{ .ff50NodeT = ff50NodeT{ .name = node.ff50node.name, .id = 1, .children = null } },
+        .ff56node => textNode{ .ff56NodeT = ff56NodeT{ .name = node.ff56node.name, .dType = "ff56", .value = n.dataUnion{ ._bool = true } } },
+        .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
     };
 }
