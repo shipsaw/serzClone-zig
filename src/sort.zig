@@ -23,7 +23,7 @@ const ff41NodeT = struct {
     name: []const u8,
     numElements: u8,
     dType: []const u8,
-    value: ?[]n.dataUnion,
+    values: ?[]n.dataUnion,
 };
 
 const ff4eNodeT = struct {};
@@ -44,10 +44,29 @@ const ff70NodeT = struct {
     name: []const u8,
 };
 
-fn sort(nodes: []n.node) []textNode {
-    var textNodesList = std.Arraylist(textNode).init(allocator);
+fn sort(nodes: []n.node) ![]textNode {
+    var dataTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try dataTypeMap.put(n.dataType._bool, "bool");
+    try dataTypeMap.put(n.dataType._sUInt8, "sUInt8");
+    try dataTypeMap.put(n.dataType._sInt32, "sInt32");
+    try dataTypeMap.put(n.dataType._sUInt64, "sUInt64");
+    try dataTypeMap.put(n.dataType._sFloat32, "sFloat32");
+    try dataTypeMap.put(n.dataType._cDeltaString, "cDeltaString");
+
+    var textNodesList = std.ArrayList(textNode).init(allocator);
     for (nodes) |node| {
-        try textNodesList.append(convertNode(node));
+        try textNodesList.append(switch (node) {
+            .ff41node => |ff41| textNode{ .ff41NodeT = ff41NodeT{
+                .name = ff41.name,
+                .dType = dataTypeMap.get(ff41.dType).?,
+                .numElements = ff41.numElements,
+                .values = ff41.values.items,
+            } },
+            .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
+            .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{ .name = node.ff50node.name, .id = ff50.id, .children = null } },
+            .ff56node => textNode{ .ff56NodeT = ff56NodeT{ .name = node.ff56node.name, .dType = "ff56", .value = n.dataUnion{ ._bool = true } } },
+            .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
+        });
     }
     return textNodesList.items;
 }
@@ -59,14 +78,11 @@ pub fn main() !void {
     var testStatus = parser.status.init(testBytes);
 
     const nodes = (try parser.parse(&testStatus)).items;
-    var textNodesList = std.ArrayList(textNode).init(allocator);
 
-    for (nodes) |node| {
-        try textNodesList.append(convertNode(node));
-    }
+    const textNodesList = try sort(nodes);
 
     var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(textNodesList.items, .{}, string.writer());
+    try std.json.stringify(textNodesList, .{}, string.writer());
     std.debug.print("{s}", .{string.items});
 }
 
