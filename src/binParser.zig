@@ -23,7 +23,7 @@ pub const status = struct {
     source: []const u8,
     stringMap: std.ArrayList([]const u8),
     savedTokenList: std.ArrayList(node),
-    result: std.ArrayList(node),
+    result: node,
 
     pub fn init(src: []const u8) status {
         return status{
@@ -68,6 +68,9 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "sFloat32", ._sFloat32 },
     .{ "cDeltaString", ._cDeltaString },
 });
+
+pub fn parseRoot([]const u8) !node {
+}
 pub fn parse(s: *status) !std.ArrayList(node) {
     errdefer {
         errorInfo(s);
@@ -213,12 +216,13 @@ fn processFF41(s: *status) !ff41node {
 fn processFF50(s: *status) !ff50node {
     const nodeName = try identifier(s);
     const id = processU32(s);
-    const children = processU32(s);
+    const numChildren = processU32(s);
 
     return ff50node{
         .name = nodeName,
         .id = id,
-        .children = children,
+        .numChildren = numChildren,
+        .children = null,
     };
 }
 
@@ -274,15 +278,16 @@ fn processSavedLine(s: *status) !node {
         .ff50node => {
             // return errors.InvalidNodeType;
             const id = processU32(s);
-            const children = processU32(s);
-            if (children > 100) {
+            const numChildren = processU32(s);
+            if (numChildren > 100) {
                 s.current -= 8;
                 return errors.TooManyChildren;
             }
             return node{ .ff50node = ff50node{
                 .name = savedLine.ff50node.name,
                 .id = id,
-                .children = children,
+                .numChildren = numChildren,
+                .children = null,
             } };
         },
         .ff70node => {
@@ -530,7 +535,7 @@ test "ff41 parsing" {
 test "ff50 parsing" {
     // Arrange
     var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 4, 0, 0, 0, 'f', 'o', 'o', 'd', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 });
-    const expected = ff50node{ .name = "food", .id = 375192228, .children = 1 };
+    const expected = ff50node{ .name = "food", .id = 375192228, .numChildren = 1 };
 
     // Act
     const ff50 = try processFF50(&statusStruct);
@@ -538,7 +543,7 @@ test "ff50 parsing" {
     // Assert
     try expect(ff50.id == expected.id);
     try expectEqualStrings(ff50.name, expected.name);
-    try expect(ff50.children == expected.children);
+    try expect(ff50.numChildren == expected.numChildren);
 }
 
 test "ff56 parsing" {
@@ -564,7 +569,7 @@ test "ff70 parsing" {
     var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
 
     const expected = &[_]node{
-        node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .children = 1 } },
+        node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .numChildren = 1 } },
         node{ .ff56node = ff56node{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
         node{ .ff70node = ff70node{ .name = "first" } },
     };
@@ -585,7 +590,7 @@ test "parse function" {
     var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes);
 
     const expected = &[_]node{
-        node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .children = 1 } },
+        node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .numChildren = 1 } },
         node{ .ff56node = ff56node{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } },
     };
 
@@ -595,7 +600,7 @@ test "parse function" {
     // Assert
     try expectEqualStrings(result.items[0].ff50node.name, expected[0].ff50node.name);
     try expect(result.items[0].ff50node.id == expected[0].ff50node.id);
-    try expect(result.items[0].ff50node.children == expected[0].ff50node.children);
+    try expect(result.items[0].ff50node.numChildren == expected[0].ff50node.numChildren);
 
     try expectEqualStrings(result.items[1].ff56node.name, expected[1].ff56node.name);
     try expect(result.items[1].ff56node.value._bool == expected[1].ff56node.value._bool);

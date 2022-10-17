@@ -31,7 +31,8 @@ pub const ff4enode = struct {};
 pub const ff50node = struct {
     name: []const u8,
     id: u32,
-    children: u32,
+    numChildren: u32,
+    children: ?std.ArrayList(node),
 };
 
 pub const ff56node = struct {
