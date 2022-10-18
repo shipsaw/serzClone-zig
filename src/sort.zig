@@ -5,12 +5,6 @@ var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 const size_limit = std.math.maxInt(u32);
 
-const Place = struct {
-    lat: f32,
-    long: f32,
-    hm: []const u8,
-};
-
 const textNode = union(enum) {
     ff41NodeT: ff41NodeT,
     ff4eNodeT: ff4eNodeT,
