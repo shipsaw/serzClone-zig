@@ -31,7 +31,7 @@ const ff4eNodeT = struct {};
 const ff50NodeT = struct {
     name: []const u8,
     id: ?u32,
-    children: ?[]textNode,
+    childrenSlice: ?[]textNode,
 };
 
 const ff56NodeT = struct {
@@ -63,8 +63,16 @@ fn sort(nodes: []n.node) ![]textNode {
                 .values = ff41.values.items,
             } },
             .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
-            .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{ .name = node.ff50node.name, .id = ff50.id, .children = null } },
-            .ff56node => textNode{ .ff56NodeT = ff56NodeT{ .name = node.ff56node.name, .dType = "ff56", .value = n.dataUnion{ ._bool = true } } },
+            .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{
+                .name = node.ff50node.name,
+                .id = ff50.id,
+                .childrenSlice = (try std.ArrayList(textNode).initCapacity(allocator, ff50.children)).items,
+            } },
+            .ff56node => textNode{ .ff56NodeT = ff56NodeT{
+                .name = node.ff56node.name,
+                .dType = "ff56",
+                .value = n.dataUnion{ ._bool = true },
+            } },
             .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
         });
     }
@@ -86,12 +94,25 @@ pub fn main() !void {
     std.debug.print("{s}", .{string.items});
 }
 
-fn convertNode(node: n.node) textNode {
-    return switch (node) {
-        .ff41node => textNode{ .ff41NodeT = ff41NodeT{ .name = node.ff41node.name, .dType = "NO", .numElements = node.ff41node.numElements, .value = null } },
-        .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
-        .ff50node => textNode{ .ff50NodeT = ff50NodeT{ .name = node.ff50node.name, .id = 1, .children = null } },
-        .ff56node => textNode{ .ff56NodeT = ff56NodeT{ .name = node.ff56node.name, .dType = "ff56", .value = n.dataUnion{ ._bool = true } } },
-        .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
-    };
-}
+// fn convertNode(node: n.node) textNode {
+//     return (switch (node) {
+//         .ff41node => |ff41| textNode{ .ff41NodeT = ff41NodeT{
+//             .name = ff41.name,
+//             .dType = dataTypeMap.get(ff41.dType).?,
+//             .numElements = ff41.numElements,
+//             .values = ff41.values.items,
+//         } },
+//         .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
+//         .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{
+//             .name = node.ff50node.name,
+//             .id = ff50.id,
+//             .childrenSlice = null,
+//         } },
+//         .ff56node => textNode{ .ff56NodeT = ff56NodeT{
+//             .name = node.ff56node.name,
+//             .dType = "ff56",
+//             .value = n.dataUnion{ ._bool = true },
+//         } },
+//         .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
+//     });
+// }
