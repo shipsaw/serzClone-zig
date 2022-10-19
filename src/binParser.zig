@@ -22,9 +22,9 @@ pub const status = struct {
     line: usize,
     source: []const u8,
     stringMap: std.ArrayList([]const u8),
-    activeParent: std.ArrayList(*ff50node),
+    activeParentList: std.ArrayList(*node),
     savedTokenList: std.ArrayList(node),
-    result: ?ff50node,
+    result: ?node,
     testCount: u32,
 
     pub fn init(src: []const u8) status {
@@ -35,7 +35,7 @@ pub const status = struct {
             .source = src,
             .stringMap = std.ArrayList([]const u8).init(allocator),
             .savedTokenList = std.ArrayList(node).init(allocator),
-            .activeParent = std.ArrayList(*ff50node).init(allocator),
+            .activeParentList = std.ArrayList(*node).init(allocator),
             .result = null,
             .testCount = 0,
         };
@@ -73,7 +73,7 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "cDeltaString", ._cDeltaString },
 });
 
-pub fn parse(s: *status) !ff50node {
+pub fn parse(s: *status) !node {
     errdefer {
         errorInfo(s);
     }
@@ -83,15 +83,15 @@ pub fn parse(s: *status) !ff50node {
     _ = processU32(s);
 
     s.current += 2;
-    var rootNode = try processFF50(s);
+    var rootNode = node{ .ff50node = try processFF50(s) };
     s.result = rootNode;
-    try s.activeParent.append(&rootNode);
-    try s.savedTokenList.append(node{ .ff50node = rootNode });
+    try s.activeParentList.append(&s.result.?);
+    try s.savedTokenList.append(rootNode);
     s.line += 1;
 
     while (!s.isAtEnd()) {
         s.testCount += 1;
-        const currentParent = s.activeParent.items[s.activeParent.items.len - 1];
+        var currentParent = &s.activeParentList.items[s.activeParentList.items.len - 1].ff50node;
         if (s.source[s.current] == 0xff) {
             s.current += 1;
             switch (s.source[s.current]) {
@@ -108,10 +108,10 @@ pub fn parse(s: *status) !ff50node {
                 },
                 0x50 => {
                     s.current += 1;
-                    var tok = try processFF50(s);
-                    try currentParent.children.append(node{ .ff50node = tok });
-                    try s.savedTokenList.append(node{ .ff50node = tok });
-                    try s.activeParent.append(&tok);
+                    var tok = node{ .ff50node = try processFF50(s) };
+                    try currentParent.children.append(tok);
+                    try s.savedTokenList.append(tok);
+                    try s.activeParentList.append(&currentParent.children.items[currentParent.children.items.len - 1]);
                 },
                 0x56 => {
                     s.current += 1;
@@ -610,7 +610,7 @@ test "parse function" {
     try expected.children.append(node{ .ff56node = ff56node{ .name = "snd", .dType = dataType._bool, .value = dataUnion{ ._bool = true } } });
 
     // Act
-    const result = try parse(&testBytes);
+    const result = (try parse(&testBytes)).ff50node;
 
     // Assert
     try expectEqualStrings(result.name, expected.name);
@@ -626,12 +626,14 @@ pub fn main() !void {
     var file = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
 
     const testBytes = try file.readToEndAlloc(allocator, size_limit);
-    var testStatus = try status.init(testBytes);
+    var testStatus = status.init(testBytes);
     const result = try parse(&testStatus);
     std.debug.print("RESULT:\n{any}\n", .{result});
-    std.debug.print("RESULT:\n{any}\n", .{result.ff50node.children.items});
-    std.debug.print("RESULT:\n{any}\n", .{testStatus.testCount});
-    // std.debug.print("Total Nodes: {any}\n", .{(try parse(&testStatus)).items.len});
+    std.debug.print("\tRESULT:\n{any}\n", .{result.ff50node.children.items});
+
+    std.debug.print("RESULT:\n{any},{any}\n", .{ result.ff50node.children.items.len, result.ff50node.numChildren });
+    std.debug.print("RESULT:\n{any},{any}\n", .{ result.ff50node.children.items[0].ff50node.children.items.len, result.ff50node.children.items[0].ff50node.numChildren });
+
     // for ((try parse(&testStatus)).items) |node| {
     //     std.debug.print("{any}\n", .{node});
     // }
