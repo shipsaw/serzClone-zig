@@ -32,7 +32,7 @@ pub const ff50node = struct {
     name: []const u8,
     id: u32,
     numChildren: u32,
-    children: ?std.ArrayList(node),
+    children: std.ArrayList(node),
 };
 
 pub const ff56node = struct {
