@@ -5,43 +5,17 @@ var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 const size_limit = std.math.maxInt(u32);
 
+const textNode = n.textNode;
+const ff41NodeT = n.ff41NodeT;
+const ff4eNodeT = n.ff4eNodeT;
+const ff50NodeT = n.ff50NodeT;
+const ff56NodeT = n.ff56NodeT;
+const ff70NodeT = n.ff70NodeT;
+
 const Place = struct {
     lat: f32,
     long: f32,
     hm: []const u8,
-};
-
-const textNode = union(enum) {
-    ff41NodeT: ff41NodeT,
-    ff4eNodeT: ff4eNodeT,
-    ff50NodeT: ff50NodeT,
-    ff56NodeT: ff56NodeT,
-    ff70NodeT: ff70NodeT,
-};
-
-const ff41NodeT = struct {
-    name: []const u8,
-    numElements: u8,
-    dType: []const u8,
-    values: ?[]n.dataUnion,
-};
-
-const ff4eNodeT = struct {};
-
-const ff50NodeT = struct {
-    name: []const u8,
-    id: ?u32,
-    childrenSlice: ?[]textNode,
-};
-
-const ff56NodeT = struct {
-    name: []const u8,
-    dType: []const u8,
-    value: n.dataUnion,
-};
-
-const ff70NodeT = struct {
-    name: []const u8,
 };
 
 fn sort(nodes: []n.node) ![]textNode {
