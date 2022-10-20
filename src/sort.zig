@@ -52,19 +52,23 @@ pub fn main() !void {
     errdefer {
         std.debug.print("OH NO\n", .{});
     }
-    var file = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
-
-    const testBytes = try file.readToEndAlloc(allocator, size_limit);
+    var inFile = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
+    defer inFile.close();
+    const outFile = try std.fs.cwd().createFile(
+        "results.json",
+        .{ .read = true },
+    );
+    defer outFile.close();
+    const testBytes = try inFile.readToEndAlloc(allocator, size_limit);
     var testStatus = parser.status.init(testBytes);
 
     const nodes = (try parser.parse(&testStatus)).items;
 
     const textNodesList = try sort(nodes);
-    std.debug.print("SORTING COMPLETE\n", .{});
 
     var string = std.ArrayList(u8).init(allocator);
     try std.json.stringify(textNodesList, .{}, string.writer());
-    std.debug.print("{s}", .{string.items});
+    try outFile.writeAll(string.items);
 }
 
 // pub fn panic(_: []const u8, _: ?*std.builtin.StackTrace, _: ?usize) noreturn {

@@ -21,4 +21,5 @@ zig-out/
 notes.txt
 results.txt
 *test.zig
+*.json
 zigSerz
