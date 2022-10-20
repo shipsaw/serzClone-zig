@@ -71,8 +71,8 @@ pub const ff4eNodeT = struct {};
 
 pub const ff50NodeT = struct {
     name: []const u8,
-    id: ?u32,
-    childrenSlice: ?[]textNode,
+    id: u32,
+    childrenSlice: []textNode,
 };
 
 pub const ff56NodeT = struct {

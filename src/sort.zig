@@ -53,7 +53,7 @@ fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
         .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{
             .name = node.ff50node.name,
             .id = ff50.id,
-            .childrenSlice = (try std.ArrayList(textNode).initCapacity(allocator, ff50.children)).items,
+            .childrenSlice = (try std.ArrayList(textNode).initCapacity(allocator, ff50.children)).allocatedSlice(),
         } },
         .ff56node => textNode{ .ff56NodeT = ff56NodeT{
             .name = node.ff56node.name,
@@ -110,8 +110,27 @@ test "Convert ff41 node" {
     try expect(actual.values[1]._sInt32 == expected.values[1]._sInt32);
 }
 
-// test "Convert ff41 node" {
-//     // Arrange
-//     // Act
-//     // Assert
-// }
+test "Convert ff50 node" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+    const numChildren = 4;
+
+    const testNode = n.ff50node{
+        .name = "Node1",
+        .id = 12345,
+        .children = numChildren,
+    };
+
+    const expectedName = "Node1";
+    const expectedId: u32 = 12345;
+    const expectedChildrenSlice = 4;
+
+    // Act
+    var actual = (try convertNode(n.node{ .ff50node = testNode }, &dTypeMap)).ff50NodeT;
+
+    // Assert
+    try expectEqualStrings(actual.name, expectedName);
+    try expect(actual.id == expectedId);
+    try expect(actual.childrenSlice.len == expectedChildrenSlice);
+}
