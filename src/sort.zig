@@ -18,6 +18,7 @@ const parentStatus = struct {
     childPos: u8,
     parentPointer: *ff50NodeT,
 };
+const parentStatusStackType = std.ArrayList(parentStatus);
 
 fn sort(nodes: []n.node) !textNode {
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
@@ -33,6 +34,7 @@ fn sort(nodes: []n.node) !textNode {
         const currentParent = parentStackTop.parentPointer;
 
         currentParent.childrenSlice[currentChildPos] = try convertNode(node, &dTypeMap);
+        try updateParentStack(&parentStatusStack, &currentParent.childrenSlice[currentChildPos]);
     }
     return rootNode;
 }
@@ -83,6 +85,20 @@ fn initDtypeMap(dTypeMap: *dataTypeMap) !void {
     try dTypeMap.put(n.dataType._sFloat32, "sFloat32");
     try dTypeMap.put(n.dataType._cDeltaString, "cDeltaString");
 }
+
+fn updateParentStack(stack: *parentStatusStackType, node: *textNode) !void {
+    var currentTop = &stack.items[stack.items.len - 1];
+    switch (node.*) {
+        .ff41NodeT => currentTop.childPos += 1,
+        .ff4eNodeT => currentTop.childPos += 1,
+        .ff50NodeT => try stack.append(parentStatus{ .childPos = 0, .parentPointer = &node.ff50NodeT }),
+        .ff56NodeT => currentTop.childPos += 1,
+        .ff70NodeT => _ = stack.pop(),
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////  Test Area ////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 test "Convert ff41 node" {
     // Arrange
@@ -272,4 +288,58 @@ test "sort with one child" {
     try expectEqualStrings(actualChildNode.name, childExpectedName);
     try expectEqualStrings(actualChildNode.dType, childExpectedType);
     try expect(actualChildNode.value._bool == childExpectedValue);
+}
+
+test "sort with two children" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    var testInput = [_]n.node{
+        n.node{ .ff50node = n.ff50node{
+            .name = "Node1",
+            .id = 12345,
+            .children = 2,
+        } },
+        n.node{ .ff56node = n.ff56node{
+            .name = "Node2",
+            .dType = n.dataType._bool,
+            .value = n.dataUnion{ ._bool = false },
+        } },
+        n.node{ .ff56node = n.ff56node{
+            .name = "Node3",
+            .dType = n.dataType._bool,
+            .value = n.dataUnion{ ._bool = true },
+        } },
+    };
+
+    const rootExpectedName = "Node1";
+    const rootExpectedId: u32 = 12345;
+    const rootExpectedChildrenSlice = 2;
+
+    const child1ExpectedName = "Node2";
+    const child1ExpectedType = "bool";
+    const child1ExpectedValue = false;
+
+    const child2ExpectedName = "Node3";
+    const child2ExpectedType = "bool";
+    const child2ExpectedValue = true;
+
+    // Act
+    var actualRootNode = (try sort(testInput[0..])).ff50NodeT;
+
+    // Assert
+    try expectEqualStrings(actualRootNode.name, rootExpectedName);
+    try expect(actualRootNode.id == rootExpectedId);
+    try expect(actualRootNode.childrenSlice.len == rootExpectedChildrenSlice);
+
+    const actualChildNode1 = actualRootNode.childrenSlice[0].ff56NodeT;
+    try expectEqualStrings(actualChildNode1.name, child1ExpectedName);
+    try expectEqualStrings(actualChildNode1.dType, child1ExpectedType);
+    try expect(actualChildNode1.value._bool == child1ExpectedValue);
+
+    const actualChildNode2 = actualRootNode.childrenSlice[1].ff56NodeT;
+    try expectEqualStrings(actualChildNode2.name, child2ExpectedName);
+    try expectEqualStrings(actualChildNode2.dType, child2ExpectedType);
+    try expect(actualChildNode2.value._bool == child2ExpectedValue);
 }
