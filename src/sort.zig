@@ -165,6 +165,22 @@ test "Convert ff50 node with children" {
     try expectEqualStrings(actual.childrenSlice[0].ff56NodeT.name, "ChildNode");
 }
 
+test "Convert ff4e node" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    const testNode = n.ff4enode{};
+
+    const expectedNode = ff4eNodeT{};
+
+    // Act
+    var actual = (try convertNode(n.node{ .ff4enode = testNode }, &dTypeMap)).ff4eNodeT;
+
+    // Assert
+    try expect(@TypeOf(actual) == @TypeOf(expectedNode));
+}
+
 test "Convert ff56 node" {
     // Arrange
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
@@ -187,4 +203,22 @@ test "Convert ff56 node" {
     try expectEqualStrings(actual.name, expectedName);
     try expectEqualStrings(actual.dType, expectedDtype);
     try expect(actual.value._sUInt8 == expectedValue);
+}
+
+test "Convert ff70 node" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    const testNode = n.ff70node{
+        .name = "Node1",
+    };
+
+    const expectedName = "Node1";
+
+    // Act
+    var actual = (try convertNode(n.node{ .ff70node = testNode }, &dTypeMap)).ff70NodeT;
+
+    // Assert
+    try expectEqualStrings(actual.name, expectedName);
 }
