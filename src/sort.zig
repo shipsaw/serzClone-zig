@@ -14,16 +14,27 @@ const ff50NodeT = n.ff50NodeT;
 const ff56NodeT = n.ff56NodeT;
 const ff70NodeT = n.ff70NodeT;
 const dataTypeMap = std.AutoHashMap(n.dataType, []const u8);
+const parentStatus = struct {
+    childPos: u8,
+    parentPointer: *ff50NodeT,
+};
 
-fn sort(nodes: []n.node) ![]textNode {
+fn sort(nodes: []n.node) !textNode {
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
     try initDtypeMap(&dTypeMap);
+    var parentStatusStack = std.ArrayList(parentStatus).init(allocator);
 
-    var textNodesList = std.ArrayList(textNode).init(allocator);
-    for (nodes) |node| {
-        try textNodesList.append(try convertNode(node, &dTypeMap));
+    var rootNode = try convertNode(nodes[0], &dTypeMap);
+    try parentStatusStack.append(parentStatus{ .childPos = 0, .parentPointer = &rootNode.ff50NodeT });
+
+    for (nodes[1..]) |node| {
+        const parentStackTop = parentStatusStack.items[parentStatusStack.items.len - 1];
+        const currentChildPos = parentStackTop.childPos;
+        const currentParent = parentStackTop.parentPointer;
+
+        currentParent.childrenSlice[currentChildPos] = try convertNode(node, &dTypeMap);
     }
-    return textNodesList.items;
+    return rootNode;
 }
 
 pub fn main() !void {
@@ -221,4 +232,44 @@ test "Convert ff70 node" {
 
     // Assert
     try expectEqualStrings(actual.name, expectedName);
+}
+
+test "sort with one child" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    var testInput = [_]n.node{
+        n.node{ .ff50node = n.ff50node{
+            .name = "Node1",
+            .id = 12345,
+            .children = 1,
+        } },
+        n.node{ .ff56node = n.ff56node{
+            .name = "Node2",
+            .dType = n.dataType._bool,
+            .value = n.dataUnion{ ._bool = false },
+        } },
+    };
+
+    const rootExpectedName = "Node1";
+    const rootExpectedId: u32 = 12345;
+    const rootExpectedChildrenSlice = 1;
+
+    const childExpectedName = "Node2";
+    const childExpectedType = "bool";
+    const childExpectedValue = false;
+
+    // Act
+    var actualRootNode = (try sort(testInput[0..])).ff50NodeT;
+
+    // Assert
+    try expectEqualStrings(actualRootNode.name, rootExpectedName);
+    try expect(actualRootNode.id == rootExpectedId);
+    try expect(actualRootNode.childrenSlice.len == rootExpectedChildrenSlice);
+
+    const actualChildNode = actualRootNode.childrenSlice[0].ff56NodeT;
+    try expectEqualStrings(actualChildNode.name, childExpectedName);
+    try expectEqualStrings(actualChildNode.dType, childExpectedType);
+    try expect(actualChildNode.value._bool == childExpectedValue);
 }
