@@ -67,7 +67,7 @@ pub const ff41NodeT = struct {
     values: []dataUnion,
 };
 
-pub const ff4eNodeT = struct { value: ?[]const u8 };
+pub const ff4eNodeT = struct {};
 
 pub const ff50NodeT = struct {
     name: []const u8,

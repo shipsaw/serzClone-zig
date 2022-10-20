@@ -33,7 +33,6 @@ fn sort(nodes: []n.node) !textNode {
         const currentChildPos = parentStackTop.childPos;
         const currentParent = parentStackTop.parentPointer;
 
-        // std.debug.print("TYPE: {any}\n", .{node});
         const convertedNode = try convertNode(node, &dTypeMap);
         switch (convertedNode) {
             .ff70NodeT => {
@@ -50,7 +49,10 @@ fn sort(nodes: []n.node) !textNode {
 }
 
 pub fn main() !void {
-    var file = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    errdefer {
+        std.debug.print("OH NO\n", .{});
+    }
+    var file = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
 
     const testBytes = try file.readToEndAlloc(allocator, size_limit);
     var testStatus = parser.status.init(testBytes);
@@ -58,11 +60,17 @@ pub fn main() !void {
     const nodes = (try parser.parse(&testStatus)).items;
 
     const textNodesList = try sort(nodes);
+    std.debug.print("SORTING COMPLETE\n", .{});
 
     var string = std.ArrayList(u8).init(allocator);
     try std.json.stringify(textNodesList, .{}, string.writer());
     std.debug.print("{s}", .{string.items});
 }
+
+// pub fn panic(_: []const u8, _: ?*std.builtin.StackTrace, _: ?usize) noreturn {
+//     std.debug.print("PANIC\n", .{});
+//     std.os.exit(1);
+// }
 
 fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
     return switch (node) {
@@ -72,7 +80,7 @@ fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
             .numElements = ff41.numElements,
             .values = ff41.values.items,
         } },
-        .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{ .value = null } },
+        .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
         .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{
             .name = node.ff50node.name,
             .id = ff50.id,
@@ -103,6 +111,7 @@ fn updateParentStack(stack: *parentStatusStackType, node: *textNode) !void {
         .ff41NodeT => currentTop.childPos += 1,
         .ff4eNodeT => currentTop.childPos += 1,
         .ff50NodeT => {
+            currentTop.childPos += 1;
             try stack.append(parentStatus{ .childPos = 0, .parentPointer = &node.ff50NodeT });
             //std.debug.print("PUSH\n", .{});
         },
@@ -149,6 +158,10 @@ test "Convert ff41 node" {
     try expectEqualStrings(actual.dType, expected.dType);
     try expect(actual.values[0]._sInt32 == expected.values[0]._sInt32);
     try expect(actual.values[1]._sInt32 == expected.values[1]._sInt32);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff50 node" {
@@ -204,6 +217,10 @@ test "Convert ff50 node with children" {
     try expect(actual.id == expectedId);
     try expect(actual.children.len == expectedChildrenSlice);
     try expectEqualStrings(actual.children[0].ff56NodeT.name, "ChildNode");
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff4e node" {
@@ -213,13 +230,17 @@ test "Convert ff4e node" {
 
     const testNode = n.ff4enode{};
 
-    const expectedNode = ff4eNodeT{ .value = null };
+    const expectedNode = ff4eNodeT{};
 
     // Act
     var actual = (try convertNode(n.node{ .ff4enode = testNode }, &dTypeMap)).ff4eNodeT;
 
     // Assert
     try expect(@TypeOf(actual) == @TypeOf(expectedNode));
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff56 node" {
@@ -244,6 +265,10 @@ test "Convert ff56 node" {
     try expectEqualStrings(actual.name, expectedName);
     try expectEqualStrings(actual.dType, expectedDtype);
     try expect(actual.value._sUInt8 == expectedValue);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff70 node" {
@@ -262,6 +287,10 @@ test "Convert ff70 node" {
 
     // Assert
     try expectEqualStrings(actual.name, expectedName);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actual, .{}, string.writer());
 }
 
 test "sort with one child" {
@@ -302,6 +331,10 @@ test "sort with one child" {
     try expectEqualStrings(actualChildNode.name, childExpectedName);
     try expectEqualStrings(actualChildNode.dType, childExpectedType);
     try expect(actualChildNode.value._bool == childExpectedValue);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actualRootNode, .{}, string.writer());
 }
 
 test "sort with two children" {
@@ -356,6 +389,10 @@ test "sort with two children" {
     try expectEqualStrings(actualChildNode2.name, child2ExpectedName);
     try expectEqualStrings(actualChildNode2.dType, child2ExpectedType);
     try expect(actualChildNode2.value._bool == child2ExpectedValue);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actualRootNode, .{}, string.writer());
 }
 
 test "sort 3 nesting layers" {
@@ -410,6 +447,10 @@ test "sort 3 nesting layers" {
     try expectEqualStrings(actualChildNode2.name, child2ExpectedName);
     try expectEqualStrings(actualChildNode2.dType, child2ExpectedType);
     try expect(actualChildNode2.value._bool == child2ExpectedValue);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actualRootNode, .{}, string.writer());
 }
 
 test "sort with closing ff70" {
@@ -467,4 +508,8 @@ test "sort with closing ff70" {
     try expectEqualStrings(actualChildNode2.name, child2ExpectedName);
     try expectEqualStrings(actualChildNode2.dType, child2ExpectedType);
     try expect(actualChildNode2.value._bool == child2ExpectedValue);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actualRootNode, .{}, string.writer());
 }
