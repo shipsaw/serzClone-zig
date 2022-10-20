@@ -64,7 +64,7 @@ pub const ff41NodeT = struct {
     name: []const u8,
     numElements: u8,
     dType: []const u8,
-    values: ?[]dataUnion,
+    values: []dataUnion,
 };
 
 pub const ff4eNodeT = struct {};

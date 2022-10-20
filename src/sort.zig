@@ -1,6 +1,8 @@
 const std = @import("std");
 const parser = @import("binParser.zig");
 const n = @import("node.zig");
+const expect = std.testing.expect;
+const expectEqualStrings = std.testing.expectEqualStrings;
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 const size_limit = std.math.maxInt(u32);
@@ -12,12 +14,6 @@ const ff50NodeT = n.ff50NodeT;
 const ff56NodeT = n.ff56NodeT;
 const ff70NodeT = n.ff70NodeT;
 const dataTypeMap = std.AutoHashMap(n.dataType, []const u8);
-
-const Place = struct {
-    lat: f32,
-    long: f32,
-    hm: []const u8,
-};
 
 fn sort(nodes: []n.node) ![]textNode {
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
@@ -76,25 +72,46 @@ fn initDtypeMap(dTypeMap: *dataTypeMap) !void {
     try dTypeMap.put(n.dataType._sFloat32, "sFloat32");
     try dTypeMap.put(n.dataType._cDeltaString, "cDeltaString");
 }
-// fn convertNode(node: n.node) textNode {
-//     return (switch (node) {
-//         .ff41node => |ff41| textNode{ .ff41NodeT = ff41NodeT{
-//             .name = ff41.name,
-//             .dType = dataTypeMap.get(ff41.dType).?,
-//             .numElements = ff41.numElements,
-//             .values = ff41.values.items,
-//         } },
-//         .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
-//         .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{
-//             .name = node.ff50node.name,
-//             .id = ff50.id,
-//             .childrenSlice = null,
-//         } },
-//         .ff56node => textNode{ .ff56NodeT = ff56NodeT{
-//             .name = node.ff56node.name,
-//             .dType = "ff56",
-//             .value = n.dataUnion{ ._bool = true },
-//         } },
-//         .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
-//     });
+
+test "Convert ff41 node" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    var testValues = std.ArrayList(n.dataUnion).init(allocator);
+    try testValues.append(n.dataUnion{ ._sInt32 = 1001 });
+    try testValues.append(n.dataUnion{ ._sInt32 = 1003 });
+    const testNode = n.ff41node{
+        .name = "Node1",
+        .numElements = 2,
+        .dType = n.dataType._sInt32,
+        .values = testValues,
+    };
+
+    var expectedValues = std.ArrayList(n.dataUnion).init(allocator);
+    try expectedValues.append(n.dataUnion{ ._sInt32 = 1001 });
+    try expectedValues.append(n.dataUnion{ ._sInt32 = 1003 });
+
+    var expected = ff41NodeT{
+        .name = "Node1",
+        .numElements = 2,
+        .dType = "sInt32",
+        .values = expectedValues.items,
+    };
+
+    // Act
+    var actual = (try convertNode(n.node{ .ff41node = testNode }, &dTypeMap)).ff41NodeT;
+
+    // Assert
+    try expectEqualStrings(actual.name, expected.name);
+    try expect(actual.numElements == expected.numElements);
+    try expectEqualStrings(actual.dType, expected.dType);
+    try expect(actual.values[0]._sInt32 == expected.values[0]._sInt32);
+    try expect(actual.values[1]._sInt32 == expected.values[1]._sInt32);
+}
+
+// test "Convert ff41 node" {
+//     // Arrange
+//     // Act
+//     // Assert
 // }
