@@ -445,6 +445,8 @@ test "sFloat32 data" {
     // Arrange
     var statusStruct12345 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x66, 0xe6, 0xf6, 0x42 }); // 123.45
     var statusStruct_1234 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xa4, 0x70, 0x45, 0xc1 }); // -1234
+    var statusStruct_s1 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x4c, 0xc3, 0xc6, 0xc0 }); // -1234
+    var statusStruct_s2 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xe4, 0x65, 0xfd, 0x3e }); // -1234
 
     // Act
     const dType12345 = dataTypeMap.get(try identifier(&statusStruct12345)).?;
@@ -453,11 +455,19 @@ test "sFloat32 data" {
     const dType_1234 = dataTypeMap.get(try identifier(&statusStruct_1234)).?;
     const data_1234 = try processData(&statusStruct_1234, dType_1234);
 
+    const dType_s1 = dataTypeMap.get(try identifier(&statusStruct_s1)).?;
+    const data_s1 = try processData(&statusStruct_s1, dType_s1);
+
+    const dType_s2 = dataTypeMap.get(try identifier(&statusStruct_s2)).?;
+    const data_s2 = try processData(&statusStruct_s2, dType_s2);
+
     // Assert
     try std.testing.expect(@as(dataType, data12345) == dataType._sFloat32);
 
     try expect(data12345._sFloat32 == 123.45);
     try expect(data_1234._sFloat32 == -12.34);
+    try expect(data_s1._sFloat32 == -6.21134);
+    try expect(data_s2._sFloat32 == 0.4949180);
 
     try expect(statusStruct12345.peek() == 0); // current is left at correct position
 }
