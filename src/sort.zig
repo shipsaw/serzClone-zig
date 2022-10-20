@@ -14,13 +14,14 @@ const ff50NodeT = n.ff50NodeT;
 const ff56NodeT = n.ff56NodeT;
 const ff70NodeT = n.ff70NodeT;
 const dataTypeMap = std.AutoHashMap(n.dataType, []const u8);
+
 const parentStatus = struct {
     childPos: u8,
     parentPointer: *ff50NodeT,
 };
 const parentStatusStackType = std.ArrayList(parentStatus);
 
-fn sort(nodes: []n.node) !textNode {
+pub fn sort(nodes: []n.node) !textNode {
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
     try initDtypeMap(&dTypeMap);
     var parentStatusStack = std.ArrayList(parentStatus).init(allocator);
@@ -70,11 +71,6 @@ pub fn main() !void {
     try std.json.stringify(textNodesList, .{}, string.writer());
     try outFile.writeAll(string.items);
 }
-
-// pub fn panic(_: []const u8, _: ?*std.builtin.StackTrace, _: ?usize) noreturn {
-//     std.debug.print("PANIC\n", .{});
-//     std.os.exit(1);
-// }
 
 fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
     return switch (node) {
