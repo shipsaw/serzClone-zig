@@ -55,10 +55,10 @@ fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
             .id = ff50.id,
             .childrenSlice = (try std.ArrayList(textNode).initCapacity(allocator, ff50.children)).allocatedSlice(),
         } },
-        .ff56node => textNode{ .ff56NodeT = ff56NodeT{
-            .name = node.ff56node.name,
-            .dType = "ff56",
-            .value = n.dataUnion{ ._bool = true },
+        .ff56node => |ff56| textNode{ .ff56NodeT = ff56NodeT{
+            .name = ff56.name,
+            .dType = dTypeMap.get(ff56.dType).?,
+            .value = ff56.value,
         } },
         .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
     };
@@ -133,4 +133,58 @@ test "Convert ff50 node" {
     try expectEqualStrings(actual.name, expectedName);
     try expect(actual.id == expectedId);
     try expect(actual.childrenSlice.len == expectedChildrenSlice);
+}
+
+test "Convert ff50 node with children" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+    const numChildren = 4;
+
+    const testNode = n.ff50node{
+        .name = "Node1",
+        .id = 12345,
+        .children = numChildren,
+    };
+
+    const expectedName = "Node1";
+    const expectedId: u32 = 12345;
+    const expectedChildrenSlice = 4;
+
+    // Act
+    var actual = (try convertNode(n.node{ .ff50node = testNode }, &dTypeMap)).ff50NodeT;
+    var i: u8 = 0;
+    while (i < numChildren) : (i += 1) {
+        actual.childrenSlice[i] = textNode{ .ff56NodeT = ff56NodeT{ .name = "ChildNode", .dType = "bool", .value = n.dataUnion{ ._bool = true } } };
+    }
+
+    // Assert
+    try expectEqualStrings(actual.name, expectedName);
+    try expect(actual.id == expectedId);
+    try expect(actual.childrenSlice.len == expectedChildrenSlice);
+    try expectEqualStrings(actual.childrenSlice[0].ff56NodeT.name, "ChildNode");
+}
+
+test "Convert ff56 node" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    const testNode = n.ff56node{
+        .name = "Node1",
+        .dType = n.dataType._sUInt8,
+        .value = n.dataUnion{ ._sUInt8 = 15 },
+    };
+
+    const expectedName = "Node1";
+    const expectedDtype = "sUInt8";
+    const expectedValue = 15;
+
+    // Act
+    var actual = (try convertNode(n.node{ .ff56node = testNode }, &dTypeMap)).ff56NodeT;
+
+    // Assert
+    try expectEqualStrings(actual.name, expectedName);
+    try expectEqualStrings(actual.dType, expectedDtype);
+    try expect(actual.value._sUInt8 == expectedValue);
 }
