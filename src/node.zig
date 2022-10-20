@@ -67,12 +67,12 @@ pub const ff41NodeT = struct {
     values: []dataUnion,
 };
 
-pub const ff4eNodeT = struct {};
+pub const ff4eNodeT = struct { value: ?[]const u8 };
 
 pub const ff50NodeT = struct {
     name: []const u8,
     id: u32,
-    childrenSlice: []textNode,
+    children: []textNode,
 };
 
 pub const ff56NodeT = struct {
