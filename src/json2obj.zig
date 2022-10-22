@@ -88,6 +88,13 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
         .ff4eNodeT => {
             try result.appendSlice(ff4e);
         },
+        .ff50NodeT => |ff50node| {
+            const numChildren = @truncate(u32, @bitCast(u64, ff50node.children.len));
+            try result.appendSlice(ff50);
+            try result.appendSlice(try s.checkStringMap(ff50node.name));
+            try result.appendSlice(&std.mem.toBytes(ff50node.id));
+            try result.appendSlice(&std.mem.toBytes(numChildren));
+        },
         else => {
             unreachable;
         },
@@ -243,6 +250,24 @@ test "ff4e to bin, no compress" {
     // Arrange
     const testNode = n.textNode{ .ff4eNodeT = n.ff4eNodeT{} };
     const expected = &[_]u8{ 0xFF, 0x4E };
+    var s = status.init(testNode);
+
+    // Act
+    const result = try convertTnode(&s, testNode);
+
+    // Assert
+    try expectEqualSlices(u8, expected, result);
+}
+
+test "ff50 to bin, no compress" {
+    // Arrange
+    var testChildren = [_]n.textNode{
+        n.textNode{ .ff4eNodeT = n.ff4eNodeT{} },
+        n.textNode{ .ff4eNodeT = n.ff4eNodeT{} },
+        n.textNode{ .ff4eNodeT = n.ff4eNodeT{} },
+    };
+    const testNode = n.textNode{ .ff50NodeT = n.ff50NodeT{ .name = "Node3", .id = 12345, .children = &testChildren } };
+    const expected = &[_]u8{ 0xFF, 0x50, 0xFF, 0xFF, 0x05, 0x00, 0x00, 0x00, 'N', 'o', 'd', 'e', '3', 0x39, 0x30, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00 };
     var s = status.init(testNode);
 
     // Act
