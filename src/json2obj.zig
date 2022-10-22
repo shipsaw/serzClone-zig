@@ -85,6 +85,9 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
                 try result.appendSlice(try convertDataUnion(s, val));
             }
         },
+        .ff4eNodeT => {
+            try result.appendSlice(ff4e);
+        },
         else => {
             unreachable;
         },
@@ -227,6 +230,19 @@ test "ff41 to bin, no compress" {
     var valuesArray = [4]n.dataUnion{ n.dataUnion{ ._sUInt8 = 1 }, n.dataUnion{ ._sUInt8 = 2 }, n.dataUnion{ ._sUInt8 = 3 }, n.dataUnion{ ._sUInt8 = 4 } };
     const testNode = n.textNode{ .ff41NodeT = n.ff41NodeT{ .name = "Node2", .dType = "sUInt8", .numElements = 4, .values = &valuesArray } };
     const expected = &[_]u8{ 0xFF, 0x41, 0xFF, 0xFF, 0x05, 0x00, 0x00, 0x00, 'N', 'o', 'd', 'e', '2', 0xFF, 0xFF, 0x06, 0x00, 0x00, 0x00, 's', 'U', 'I', 'n', 't', '8', 0x04, 0x01, 0x02, 0x03, 0x04 };
+    var s = status.init(testNode);
+
+    // Act
+    const result = try convertTnode(&s, testNode);
+
+    // Assert
+    try expectEqualSlices(u8, expected, result);
+}
+
+test "ff4e to bin, no compress" {
+    // Arrange
+    const testNode = n.textNode{ .ff4eNodeT = n.ff4eNodeT{} };
+    const expected = &[_]u8{ 0xFF, 0x4E };
     var s = status.init(testNode);
 
     // Act
