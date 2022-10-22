@@ -70,11 +70,20 @@ pub const status = struct {
 fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
     var result = std.ArrayList(u8).init(allocator);
     switch (node) {
-        .ff56NodeT => |ff50| {
+        .ff56NodeT => |ff56node| {
             try result.appendSlice(ff56);
-            try result.appendSlice(try s.checkStringMap(ff50.name));
-            try result.appendSlice(try s.checkStringMap(ff50.dType));
-            try result.appendSlice(try convertDataUnion(s, ff50.value));
+            try result.appendSlice(try s.checkStringMap(ff56node.name));
+            try result.appendSlice(try s.checkStringMap(ff56node.dType));
+            try result.appendSlice(try convertDataUnion(s, ff56node.value));
+        },
+        .ff41NodeT => |ff41node| {
+            try result.appendSlice(ff41);
+            try result.appendSlice(try s.checkStringMap(ff41node.name));
+            try result.appendSlice(try s.checkStringMap(ff41node.dType));
+            try result.append(ff41node.numElements);
+            for (ff41node.values) |val| {
+                try result.appendSlice(try convertDataUnion(s, val));
+            }
         },
         else => {
             unreachable;
@@ -204,6 +213,20 @@ test "ff56 to bin, no compress" {
     // Arrange
     const testNode = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node1", .dType = "sInt32", .value = n.dataUnion{ ._sInt32 = 1003 } } };
     const expected = &[_]u8{ 0xFF, 0x56, 0xFF, 0xFF, 0x05, 0x00, 0x00, 0x00, 'N', 'o', 'd', 'e', '1', 0xFF, 0xFF, 0x06, 0x00, 0x00, 0x00, 's', 'I', 'n', 't', '3', '2', 0xEB, 0x03, 0x00, 0x00 };
+    var s = status.init(testNode);
+
+    // Act
+    const result = try convertTnode(&s, testNode);
+
+    // Assert
+    try expectEqualSlices(u8, expected, result);
+}
+
+test "ff41 to bin, no compress" {
+    // Arrange
+    var valuesArray = [4]n.dataUnion{ n.dataUnion{ ._sUInt8 = 1 }, n.dataUnion{ ._sUInt8 = 2 }, n.dataUnion{ ._sUInt8 = 3 }, n.dataUnion{ ._sUInt8 = 4 } };
+    const testNode = n.textNode{ .ff41NodeT = n.ff41NodeT{ .name = "Node2", .dType = "sUInt8", .numElements = 4, .values = &valuesArray } };
+    const expected = &[_]u8{ 0xFF, 0x41, 0xFF, 0xFF, 0x05, 0x00, 0x00, 0x00, 'N', 'o', 'd', 'e', '2', 0xFF, 0xFF, 0x06, 0x00, 0x00, 0x00, 's', 'U', 'I', 'n', 't', '8', 0x04, 0x01, 0x02, 0x03, 0x04 };
     var s = status.init(testNode);
 
     // Act
