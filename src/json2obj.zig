@@ -74,7 +74,7 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
             try result.appendSlice(ff56);
             try result.appendSlice(try s.checkStringMap(ff50.name));
             try result.appendSlice(try s.checkStringMap(ff50.dType));
-            try result.appendSlice(try convertDataUnion(ff50.value));
+            try result.appendSlice(try convertDataUnion(s, ff50.value));
         },
         else => {
             unreachable;
@@ -83,7 +83,7 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
     return result.items;
 }
 
-fn convertDataUnion(data: n.dataUnion) ![]const u8 {
+fn convertDataUnion(s: *status, data: n.dataUnion) ![]const u8 {
     var returnSlice = std.ArrayList(u8).init(allocator);
     switch (data) {
         ._bool => |val| {
@@ -102,7 +102,8 @@ fn convertDataUnion(data: n.dataUnion) ![]const u8 {
             try returnSlice.appendSlice(&std.mem.toBytes(val));
         },
         ._cDeltaString => |val| {
-            try returnSlice.appendSlice(&std.mem.toBytes(val));
+            //try returnSlice.appendSlice(&std.mem.toBytes(val));
+            try returnSlice.appendSlice(try s.checkStringMap(val));
         },
     }
     return returnSlice.items;
@@ -165,6 +166,38 @@ test "stringMap functionality" {
     try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x06, 0x00, 0x00, 0x00, 'S', 'a', 't', 'u', 'r', 'n' }, result2);
     try expectEqualSlices(u8, &[_]u8{ 0x00, 0x00 }, result3);
     try expectEqualSlices(u8, &[_]u8{ 0x01, 0x00 }, result4);
+}
+
+test "convertDataUnion test" {
+    // Arrange
+    const dummyNode = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "name", .dType = "bool", .value = n.dataUnion{ ._bool = true } } };
+    var s = status.init(dummyNode);
+
+    const boolUnionT = n.dataUnion{ ._bool = true };
+    const boolUnionF = n.dataUnion{ ._bool = false };
+    const sUInt8Union = n.dataUnion{ ._sUInt8 = 129 };
+    const sInt32Union = n.dataUnion{ ._sInt32 = 3002 };
+    const sFloat32Union = n.dataUnion{ ._sFloat32 = 0.12345 };
+    const sUInt64Union = n.dataUnion{ ._sUInt64 = 123_456 };
+    const cDeltaStringUnion = n.dataUnion{ ._cDeltaString = "Hello World" };
+
+    // Act
+    const boolTResult = try convertDataUnion(&s, boolUnionT);
+    const boolFResult = try convertDataUnion(&s, boolUnionF);
+    const sUint8Result = try convertDataUnion(&s, sUInt8Union);
+    const sInt32Result = try convertDataUnion(&s, sInt32Union);
+    const sFloat32Result = try convertDataUnion(&s, sFloat32Union);
+    const sUInt64Result = try convertDataUnion(&s, sUInt64Union);
+    const cDeltaStringResult = try convertDataUnion(&s, cDeltaStringUnion);
+
+    // Assert
+    try expectEqualSlices(u8, &[_]u8{0x01}, boolTResult);
+    try expectEqualSlices(u8, &[_]u8{0x00}, boolFResult);
+    try expectEqualSlices(u8, &[_]u8{0x81}, sUint8Result);
+    try expectEqualSlices(u8, &[_]u8{ 0xBA, 0x0B, 0x00, 0x00 }, sInt32Result);
+    try expectEqualSlices(u8, &[_]u8{ 0x5B, 0xD3, 0xFC, 0x3D }, sFloat32Result);
+    try expectEqualSlices(u8, &[_]u8{ 0x40, 0xE2, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00 }, sUInt64Result);
+    try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x0B, 0x00, 0x00, 0x00, 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd' }, cDeltaStringResult);
 }
 
 test "ff56 to bin, no compress" {
