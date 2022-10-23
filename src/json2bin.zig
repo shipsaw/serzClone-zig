@@ -130,27 +130,29 @@ fn walkNodes(s: *status, parentNode: n.textNode) !void {
 
 fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
     var result = std.ArrayList(u8).init(allocator);
+    var isSavedLine = false;
 
     const savedLine = try s.checkLineMap(node);
     if (savedLine != null) {
         try s.result.append(savedLine.?);
+        isSavedLine = true;
     }
 
     switch (node) {
         .ff56NodeT => |ff56node| {
-            if (std.mem.eql(u8, ff56node.name, "LastPantographControlValue")) {
-                std.debug.print("{any}\n", .{ff56node});
-                std.os.exit(1);
+            if (isSavedLine == false) {
+                try result.appendSlice(ff56);
+                try result.appendSlice(try s.checkStringMap(ff56node.name));
+                try result.appendSlice(try s.checkStringMap(ff56node.dType));
             }
-            try result.appendSlice(ff56);
-            try result.appendSlice(try s.checkStringMap(ff56node.name));
-            try result.appendSlice(try s.checkStringMap(ff56node.dType));
             try result.appendSlice(try convertDataUnion(s, ff56node.value, ff56node.dType));
         },
         .ff41NodeT => |ff41node| {
-            try result.appendSlice(ff41);
-            try result.appendSlice(try s.checkStringMap(ff41node.name));
-            try result.appendSlice(try s.checkStringMap(ff41node.dType));
+            if (isSavedLine == false) {
+                try result.appendSlice(ff41);
+                try result.appendSlice(try s.checkStringMap(ff41node.name));
+                try result.appendSlice(try s.checkStringMap(ff41node.dType));
+            }
             try result.append(ff41node.numElements);
             for (ff41node.values) |val| {
                 try result.appendSlice(try convertDataUnion(s, val, ff41node.dType));
@@ -161,22 +163,27 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
         },
         .ff50NodeT => |ff50node| {
             const numChildren = @truncate(u32, @bitCast(u64, ff50node.children.len));
-            try result.appendSlice(ff50);
-            try result.appendSlice(try s.checkStringMap(ff50node.name));
+            if (isSavedLine == false) {
+                try result.appendSlice(ff50);
+                try result.appendSlice(try s.checkStringMap(ff50node.name));
+            }
             try result.appendSlice(&std.mem.toBytes(ff50node.id));
             try result.appendSlice(&std.mem.toBytes(numChildren));
         },
         .ff70NodeT => |ff70node| {
-            try result.appendSlice(ff70);
-            try result.appendSlice(try s.checkStringMap(ff70node.name));
+            if (isSavedLine == false) {
+                try result.appendSlice(ff70);
+                try result.appendSlice(try s.checkStringMap(ff70node.name));
+            }
         },
     }
     return result.items;
 }
 
-fn convertDataUnion(s: *status, data: n.dataUnion, expectedDtype: []const u8) ![]const u8 {
+fn convertDataUnion(s: *status, data: n.dataUnion, expectedType: []const u8) ![]const u8 {
     var returnSlice = std.ArrayList(u8).init(allocator);
-    switch (data) {
+    const correctedType = try correctType(data, expectedType);
+    switch (correctedType) {
         ._bool => |bVal| {
             try returnSlice.appendSlice(&std.mem.toBytes(bVal));
         },
@@ -188,7 +195,6 @@ fn convertDataUnion(s: *status, data: n.dataUnion, expectedDtype: []const u8) ![
         },
         ._sFloat32 => |fVal| {
             try returnSlice.appendSlice(&std.mem.toBytes(fVal));
-            std.os.exit(1);
         },
         ._sUInt64 => |u64Val| {
             try returnSlice.appendSlice(&std.mem.toBytes(u64Val));
@@ -198,6 +204,71 @@ fn convertDataUnion(s: *status, data: n.dataUnion, expectedDtype: []const u8) ![
         },
     }
     return returnSlice.items;
+}
+
+fn correctType(data: n.dataUnion, expectedType: []const u8) !n.dataUnion {
+    const dataTypeMap = std.ComptimeStringMap(n.dataType, .{
+        .{ "bool", ._bool },
+        .{ "sUInt8", ._sUInt8 },
+        .{ "sInt32", ._sInt32 },
+        .{ "sUInt64", ._sUInt64 },
+        .{ "sFloat32", ._sFloat32 },
+        .{ "cDeltaString", ._cDeltaString },
+    });
+    const expected = dataTypeMap.get(expectedType).?;
+    const actual = switch (data) {
+        ._bool => n.dataType._bool,
+        ._sUInt8 => n.dataType._sUInt8,
+        ._sInt32 => n.dataType._sInt32,
+        ._sFloat32 => n.dataType._sFloat32,
+        ._sUInt64 => n.dataType._sUInt64,
+        ._cDeltaString => n.dataType._cDeltaString,
+    };
+
+    if (expected == actual) return data;
+
+    return switch (data) {
+        ._sUInt8 => try fixSuint8(data, expected),
+        ._sInt32 => try fixSint32(data, expected),
+        ._sUInt64 => try fixSuint64(data, expected),
+        else => unreachable,
+    };
+}
+
+fn fixSuint8(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
+    const boxedData = data._sUInt8;
+    return switch (expectedType) {
+        n.dataType._sInt32 => n.dataUnion{ ._sInt32 = @intCast(i32, boxedData) },
+        n.dataType._sUInt64 => n.dataUnion{ ._sUInt64 = @intCast(u64, boxedData) },
+        n.dataType._sFloat32 => n.dataUnion{ ._sFloat32 = @intToFloat(f32, boxedData) },
+        n.dataType._cDeltaString => {
+            return n.dataUnion{ ._cDeltaString = try std.fmt.allocPrint(allocator, "{any}", .{boxedData}) };
+        },
+        else => unreachable,
+    };
+}
+
+fn fixSint32(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
+    const boxedData = data._sInt32;
+    return switch (expectedType) {
+        n.dataType._sInt32 => n.dataUnion{ ._sInt32 = @intCast(i32, boxedData) },
+        n.dataType._sUInt64 => n.dataUnion{ ._sUInt64 = @intCast(u64, boxedData) },
+        n.dataType._sFloat32 => n.dataUnion{ ._sFloat32 = @intToFloat(f32, boxedData) },
+        n.dataType._cDeltaString => {
+            return n.dataUnion{ ._cDeltaString = try std.fmt.allocPrint(allocator, "{any}", .{boxedData}) };
+        },
+        else => unreachable,
+    };
+}
+
+fn fixSuint64(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
+    const boxedData = data._sUInt64;
+    return switch (expectedType) {
+        n.dataType._cDeltaString => {
+            return n.dataUnion{ ._cDeltaString = try std.fmt.allocPrint(allocator, "{any}", .{boxedData}) };
+        },
+        else => unreachable,
+    };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,13 +312,13 @@ test "convertDataUnion test" {
     const cDeltaStringUnion = n.dataUnion{ ._cDeltaString = "Hello World" };
 
     // Act
-    const boolTResult = try convertDataUnion(&s, boolUnionT);
-    const boolFResult = try convertDataUnion(&s, boolUnionF);
-    const sUint8Result = try convertDataUnion(&s, sUInt8Union);
-    const sInt32Result = try convertDataUnion(&s, sInt32Union);
-    const sFloat32Result = try convertDataUnion(&s, sFloat32Union);
-    const sUInt64Result = try convertDataUnion(&s, sUInt64Union);
-    const cDeltaStringResult = try convertDataUnion(&s, cDeltaStringUnion);
+    const boolTResult = try convertDataUnion(&s, boolUnionT, "bool");
+    const boolFResult = try convertDataUnion(&s, boolUnionF, "bool");
+    const sUint8Result = try convertDataUnion(&s, sUInt8Union, "sUInt8");
+    const sInt32Result = try convertDataUnion(&s, sInt32Union, "sUInt32");
+    const sFloat32Result = try convertDataUnion(&s, sFloat32Union, "sFloat32");
+    const sUInt64Result = try convertDataUnion(&s, sUInt64Union, "sUInt64");
+    const cDeltaStringResult = try convertDataUnion(&s, cDeltaStringUnion, "cDeltaString");
 
     // Assert
     try expectEqualSlices(u8, &[_]u8{0x01}, boolTResult);

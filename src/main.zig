@@ -66,7 +66,7 @@ test "bin -> json -> bin test" {
             std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, binResult[i] });
 
             std.debug.print("EXPECTED:\n", .{});
-            var j: u8 = 20;
+            var j: u8 = 25;
             while (j > 0) : (j -= 1) {
                 std.debug.print("{X} ", .{inputBytes[i - j]});
             }
@@ -74,12 +74,12 @@ test "bin -> json -> bin test" {
             std.debug.print("({X}) ", .{inputBytes[i]});
 
             var k: u8 = 1;
-            while (k < 21) : (k += 1) {
+            while (k < 26) : (k += 1) {
                 std.debug.print("{X} ", .{inputBytes[i + k]});
             }
 
             std.debug.print("\n\nACTUAL:\n", .{});
-            j = 20;
+            j = 25;
             while (j > 0) : (j -= 1) {
                 std.debug.print("{X} ", .{binResult[i - j]});
             }
@@ -87,9 +87,10 @@ test "bin -> json -> bin test" {
             std.debug.print("({X}) ", .{binResult[i]});
 
             k = 1;
-            while (k < 21) : (k += 1) {
+            while (k < 26) : (k += 1) {
                 std.debug.print("{X} ", .{binResult[i + k]});
             }
+            std.debug.print("\n", .{});
             std.os.exit(1);
         }
     }
