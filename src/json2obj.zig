@@ -29,7 +29,7 @@ const lineMapType = struct {
     currentPos: u8,
 };
 
-pub const status = struct {
+const status = struct {
     current: usize,
     source: n.textNode,
     stringMap: strMapType,
@@ -66,7 +66,6 @@ pub const status = struct {
         }
     }
 
-    // TODO: test this method
     fn checkLineMap(self: *status, node: n.textNode) !?u8 {
         var nodeAsStr = std.ArrayList(u8).init(allocator);
         switch (node) {
@@ -105,11 +104,19 @@ pub const status = struct {
     }
 };
 
-fn parse(s: *status, parentNode: n.textNode) !void {
+pub fn parse(inputString: []const u8) []const u8 {
+    var stream = std.json.TokenStream.init(inputString);
+    var rootNode = try std.json.parse(n.textNode, &stream, .{ .allocator = allocator });
+    var parserStatus = status.init(rootNode);
+    try walkNodes(&parserStatus, rootNode);
+    return parserStatus.result.items;
+}
+
+fn walkNodes(s: *status, parentNode: n.textNode) !void {
     try s.result.appendSlice(try convertTnode(s, parentNode));
     for (parentNode.ff50NodeT.children) |child| {
         switch (child) {
-            .ff50NodeT => try parse(s, child),
+            .ff50NodeT => try walkNodes(s, child),
             else => |node| try s.result.appendSlice(try convertTnode(s, node)),
         }
     }
@@ -183,39 +190,6 @@ fn convertDataUnion(s: *status, data: n.dataUnion) ![]const u8 {
         },
     }
     return returnSlice.items;
-}
-
-pub fn main() !void {
-    var inFile = try std.fs.cwd().openFile("testFiles/test.bin", .{});
-    defer inFile.close();
-
-    const outFile = try std.fs.cwd().createFile(
-        "results.txt",
-        .{ .read = true },
-    );
-    defer outFile.close();
-    const inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
-    var testStatus = parser.status.init(inputBytes);
-
-    const nodes = (try parser.parse(&testStatus)).items;
-    const textNodesList = try sorter.sort(nodes);
-
-    var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(textNodesList, .{}, string.writer());
-
-    var jparser = std.json.Parser.init(allocator, false);
-    defer jparser.deinit();
-
-    var stream = std.json.TokenStream.init(string.items);
-    var parsedData = try std.json.parse(n.textNode, &stream, .{ .allocator = allocator });
-    //std.debug.print("{any}\n", .{parsedData});
-    var s = status.init(parsedData);
-    try parse(&s, parsedData);
-    for (s.result.items) |item| {
-        std.debug.print("{X} ", .{item});
-    }
-
-    try outFile.writeAll(string.items);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,4 +307,23 @@ test "ff50 to bin, no compress" {
 
     // Assert
     try expectEqualSlices(u8, expected, result);
+}
+
+test "line saving logic test" {
+    // Arrange
+    var node1 = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node1", .dType = "bool", .value = n.dataUnion{ ._bool = true } } };
+    var node2 = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node2", .dType = "bool", .value = n.dataUnion{ ._bool = false } } };
+    var s = status.init(node1);
+
+    // Act
+    const result1 = s.checkLineMap(node1);
+    const result2 = s.checkLineMap(node2);
+    const result3 = try s.checkLineMap(node1);
+    const result4 = try s.checkLineMap(node2);
+
+    // Assert
+    try expectEqual(result1, null);
+    try expectEqual(result2, null);
+    try expectEqual(result3.?, 0);
+    try expectEqual(result4.?, 1);
 }
