@@ -573,7 +573,7 @@ test "ff70 parsing" {
     const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
     const ff70bytes = &[_]u8{ 0xff, 0x70, 0, 0 };
-    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes);
+    var testBytes = SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes ++ ff70bytes;
 
     const expected = &[_]node{
         node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .children = 1 } },
@@ -582,10 +582,10 @@ test "ff70 parsing" {
     };
 
     // Act
-    const result = try parse(&testBytes);
+    const result = try parse(testBytes);
 
     // Assert
-    try expectEqualStrings(result.items[2].ff70node.name, expected[2].ff70node.name);
+    try expectEqualStrings(result[2].ff70node.name, expected[2].ff70node.name);
 }
 
 test "parse function" {
@@ -594,7 +594,7 @@ test "parse function" {
     const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
     const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
     const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 };
-    var testBytes = status.init(SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes);
+    var testBytes = SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes;
 
     const expected = &[_]node{
         node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .children = 1 } },
@@ -602,13 +602,13 @@ test "parse function" {
     };
 
     // Act
-    const result = try parse(&testBytes);
+    const result = try parse(testBytes);
 
     // Assert
-    try expectEqualStrings(result.items[0].ff50node.name, expected[0].ff50node.name);
-    try expect(result.items[0].ff50node.id == expected[0].ff50node.id);
-    try expect(result.items[0].ff50node.children == expected[0].ff50node.children);
+    try expectEqualStrings(result[0].ff50node.name, expected[0].ff50node.name);
+    try expect(result[0].ff50node.id == expected[0].ff50node.id);
+    try expect(result[0].ff50node.children == expected[0].ff50node.children);
 
-    try expectEqualStrings(result.items[1].ff56node.name, expected[1].ff56node.name);
-    try expect(result.items[1].ff56node.value._bool == expected[1].ff56node.value._bool);
+    try expectEqualStrings(result[1].ff56node.name, expected[1].ff56node.name);
+    try expect(result[1].ff56node.value._bool == expected[1].ff56node.value._bool);
 }

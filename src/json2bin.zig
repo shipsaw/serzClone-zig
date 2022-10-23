@@ -89,7 +89,7 @@ const status = struct {
         }
 
         const result: ?u8 = self.lineMap.map.get(nodeAsStr.items);
-        if (result == null) {
+        if (result == null and self.lineMap.currentPos < 255) {
             try self.lineMap.map.put(nodeAsStr.items, self.lineMap.currentPos);
             self.lineMap.currentPos += 1;
             return null;
@@ -138,10 +138,14 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
 
     switch (node) {
         .ff56NodeT => |ff56node| {
+            if (std.mem.eql(u8, ff56node.name, "LastPantographControlValue")) {
+                std.debug.print("{any}\n", .{ff56node});
+                std.os.exit(1);
+            }
             try result.appendSlice(ff56);
             try result.appendSlice(try s.checkStringMap(ff56node.name));
             try result.appendSlice(try s.checkStringMap(ff56node.dType));
-            try result.appendSlice(try convertDataUnion(s, ff56node.value));
+            try result.appendSlice(try convertDataUnion(s, ff56node.value, ff56node.dType));
         },
         .ff41NodeT => |ff41node| {
             try result.appendSlice(ff41);
@@ -149,7 +153,7 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
             try result.appendSlice(try s.checkStringMap(ff41node.dType));
             try result.append(ff41node.numElements);
             for (ff41node.values) |val| {
-                try result.appendSlice(try convertDataUnion(s, val));
+                try result.appendSlice(try convertDataUnion(s, val, ff41node.dType));
             }
         },
         .ff4eNodeT => {
@@ -170,27 +174,27 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
     return result.items;
 }
 
-fn convertDataUnion(s: *status, data: n.dataUnion) ![]const u8 {
+fn convertDataUnion(s: *status, data: n.dataUnion, expectedDtype: []const u8) ![]const u8 {
     var returnSlice = std.ArrayList(u8).init(allocator);
     switch (data) {
-        ._bool => |val| {
-            try returnSlice.appendSlice(&std.mem.toBytes(val));
+        ._bool => |bVal| {
+            try returnSlice.appendSlice(&std.mem.toBytes(bVal));
         },
-        ._sUInt8 => |val| {
-            try returnSlice.appendSlice(&std.mem.toBytes(val));
+        ._sUInt8 => |u8Val| {
+            try returnSlice.appendSlice(&std.mem.toBytes(u8Val));
         },
-        ._sInt32 => |val| {
-            try returnSlice.appendSlice(&std.mem.toBytes(val));
+        ._sInt32 => |iVal| {
+            try returnSlice.appendSlice(&std.mem.toBytes(iVal));
         },
-        ._sFloat32 => |val| {
-            try returnSlice.appendSlice(&std.mem.toBytes(val));
+        ._sFloat32 => |fVal| {
+            try returnSlice.appendSlice(&std.mem.toBytes(fVal));
+            std.os.exit(1);
         },
-        ._sUInt64 => |val| {
-            try returnSlice.appendSlice(&std.mem.toBytes(val));
+        ._sUInt64 => |u64Val| {
+            try returnSlice.appendSlice(&std.mem.toBytes(u64Val));
         },
-        ._cDeltaString => |val| {
-            //try returnSlice.appendSlice(&std.mem.toBytes(val));
-            try returnSlice.appendSlice(try s.checkStringMap(val));
+        ._cDeltaString => |sVal| {
+            try returnSlice.appendSlice(try s.checkStringMap(sVal));
         },
     }
     return returnSlice.items;

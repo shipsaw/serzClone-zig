@@ -5,6 +5,7 @@ const jsonParser = @import("json2bin.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
+const expectEqualSlices = std.testing.expectEqualSlices;
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 const size_limit = std.math.maxInt(u32);
@@ -47,4 +48,51 @@ pub fn main() !void {
     } else {
         unreachable;
     }
+}
+
+test "bin -> json -> bin test" {
+    std.debug.print("BEGIN TEST:\n", .{});
+    var inFile = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
+    defer inFile.close();
+
+    var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
+    const nodes = (try binParser.parse(inputBytes));
+    const jsonResult = try objParser.parse(nodes);
+
+    const binResult = try jsonParser.parse(jsonResult);
+
+    for (inputBytes) |inputByte, i| {
+        if (binResult[i] != inputByte) {
+            std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, binResult[i] });
+
+            std.debug.print("EXPECTED:\n", .{});
+            var j: u8 = 20;
+            while (j > 0) : (j -= 1) {
+                std.debug.print("{X} ", .{inputBytes[i - j]});
+            }
+
+            std.debug.print("({X}) ", .{inputBytes[i]});
+
+            var k: u8 = 1;
+            while (k < 21) : (k += 1) {
+                std.debug.print("{X} ", .{inputBytes[i + k]});
+            }
+
+            std.debug.print("\n\nACTUAL:\n", .{});
+            j = 20;
+            while (j > 0) : (j -= 1) {
+                std.debug.print("{X} ", .{binResult[i - j]});
+            }
+
+            std.debug.print("({X}) ", .{binResult[i]});
+
+            k = 1;
+            while (k < 21) : (k += 1) {
+                std.debug.print("{X} ", .{binResult[i + k]});
+            }
+            std.os.exit(1);
+        }
+    }
+
+    try expectEqualSlices(u8, inputBytes, binResult);
 }
