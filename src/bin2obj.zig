@@ -16,7 +16,7 @@ const dataUnion = n.dataUnion;
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 
-pub const status = struct {
+const status = struct {
     start: usize,
     current: usize,
     line: usize,
@@ -25,7 +25,7 @@ pub const status = struct {
     savedTokenList: std.ArrayList(node),
     result: std.ArrayList(node),
 
-    pub fn init(src: []const u8) status {
+    fn init(src: []const u8) status {
         return status{
             .start = 0,
             .current = 0,
@@ -37,20 +37,20 @@ pub const status = struct {
         };
     }
 
-    pub fn advance(self: *status) u8 {
+    fn advance(self: *status) u8 {
         defer self.current += 1;
         return self.source[self.current];
     }
 
-    pub fn peek(self: *status) u8 {
+    fn peek(self: *status) u8 {
         return if (self.isAtEnd()) 0 else self.source[self.current];
     }
 
-    pub fn peekNext(self: *status) u8 {
+    fn peekNext(self: *status) u8 {
         return if (self.current + 1 >= self.source.len) 0 else self.source[self.current + 1];
     }
 
-    pub fn isAtEnd(self: *status) bool {
+    fn isAtEnd(self: *status) bool {
         return self.current >= self.source.len;
     }
 };
@@ -68,7 +68,9 @@ const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "sFloat32", ._sFloat32 },
     .{ "cDeltaString", ._cDeltaString },
 });
-pub fn parse(s: *status) !std.ArrayList(node) {
+pub fn parse(inputBytes: []const u8) ![]const node {
+    var stat = status.init(inputBytes);
+    var s = &stat;
     errdefer {
         errorInfo(s);
     }
@@ -117,7 +119,7 @@ pub fn parse(s: *status) !std.ArrayList(node) {
         }
         if (s.line < 255) s.line += 1;
     }
-    return s.result;
+    return s.result.items;
 }
 
 fn identifier(s: *status) ![]const u8 {
@@ -609,16 +611,4 @@ test "parse function" {
 
     try expectEqualStrings(result.items[1].ff56node.name, expected[1].ff56node.name);
     try expect(result.items[1].ff56node.value._bool == expected[1].ff56node.value._bool);
-}
-
-pub fn main() !void {
-    const size_limit = std.math.maxInt(u32);
-    var file = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
-
-    const testBytes = try file.readToEndAlloc(allocator, size_limit);
-    var testStatus = status.init(testBytes);
-    std.debug.print("Total Nodes: {any}\n", .{(try parse(&testStatus)).items.len});
-    // for ((try parse(&testStatus)).items) |node| {
-    //     std.debug.print("{any}\n", .{node});
-    // }
 }

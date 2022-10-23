@@ -1,5 +1,5 @@
 const std = @import("std");
-const parser = @import("binParser.zig");
+const parser = @import("bin2obj.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
@@ -21,7 +21,14 @@ const parentStatus = struct {
 };
 const parentStatusStackType = std.ArrayList(parentStatus);
 
-pub fn sort(nodes: []n.node) !textNode {
+pub fn parse(nodes: []const n.node) ![]const u8 {
+    const textNodesList = try sort(nodes);
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(textNodesList, .{}, string.writer());
+    return string.items;
+}
+
+fn sort(nodes: []const n.node) !textNode {
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
     try initDtypeMap(&dTypeMap);
     var parentStatusStack = std.ArrayList(parentStatus).init(allocator);
@@ -49,7 +56,7 @@ pub fn sort(nodes: []n.node) !textNode {
     return rootNode;
 }
 
-pub fn main() !void {
+fn main() !void {
     errdefer {
         std.debug.print("OH NO\n", .{});
     }

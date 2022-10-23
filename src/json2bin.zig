@@ -1,6 +1,4 @@
 const std = @import("std");
-const parser = @import("binParser.zig");
-const sorter = @import("sort.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
@@ -104,12 +102,18 @@ const status = struct {
     }
 };
 
-pub fn parse(inputString: []const u8) []const u8 {
+pub fn parse(inputString: []const u8) ![]const u8 {
     var stream = std.json.TokenStream.init(inputString);
     var rootNode = try std.json.parse(n.textNode, &stream, .{ .allocator = allocator });
     var parserStatus = status.init(rootNode);
+    try addPrelude(&parserStatus);
     try walkNodes(&parserStatus, rootNode);
     return parserStatus.result.items;
+}
+
+fn addPrelude(s: *status) !void {
+    try s.result.appendSlice(serz);
+    try s.result.appendSlice(unknown);
 }
 
 fn walkNodes(s: *status, parentNode: n.textNode) !void {

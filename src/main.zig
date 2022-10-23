@@ -1,6 +1,7 @@
 const std = @import("std");
-const parser = @import("binParser.zig");
-const sorter = @import("sort.zig");
+const binParser = @import("bin2obj.zig");
+const objParser = @import("obj2json.zig");
+const jsonParser = @import("json2bin.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
@@ -19,23 +20,31 @@ pub fn main() !void {
     var inFile = try std.fs.cwd().openFile(args[1], .{});
     defer inFile.close();
 
-    var iterator = std.mem.split(u8, args[1], ".");
+    var inputFileNameArray = std.mem.split(u8, args[1], ".");
     var outFileArray = std.ArrayList(u8).init(allocator);
-    try outFileArray.appendSlice(iterator.first());
-    try outFileArray.appendSlice(".json");
+    try outFileArray.appendSlice(inputFileNameArray.first());
+
+    if (std.mem.eql(u8, inputFileNameArray.rest(), "bin")) {
+        try outFileArray.appendSlice("2.json");
+    } else if (std.mem.eql(u8, inputFileNameArray.rest(), "json")) {
+        try outFileArray.appendSlice("2.bin");
+    } else unreachable;
     var outFileName = if (args.len > 2) args[2] else outFileArray.items;
     const outFile = try std.fs.cwd().createFile(
         outFileName,
         .{ .read = true },
     );
     defer outFile.close();
-    const inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
-    var testStatus = parser.status.init(inputBytes);
 
-    const nodes = (try parser.parse(&testStatus)).items;
-    const textNodesList = try sorter.sort(nodes);
-
-    var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(textNodesList, .{}, string.writer());
-    try outFile.writeAll(string.items);
+    var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
+    if (std.mem.eql(u8, inputFileNameArray.rest(), "bin")) {
+        const nodes = (try binParser.parse(inputBytes));
+        const jsonResult = try objParser.parse(nodes);
+        try outFile.writeAll(jsonResult);
+    } else if (std.mem.eql(u8, inputFileNameArray.rest(), "json")) {
+        const binResult = try jsonParser.parse(inputBytes);
+        try outFile.writeAll(binResult);
+    } else {
+        unreachable;
+    }
 }
