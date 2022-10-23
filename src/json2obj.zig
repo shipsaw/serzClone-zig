@@ -34,7 +34,7 @@ pub const status = struct {
     source: n.textNode,
     stringMap: strMapType,
     lineMap: lineMapType,
-    parentStack: ?std.ArrayList(*n.node),
+    parentStack: ?std.ArrayList(*n.textNode),
     result: std.ArrayList(u8),
 
     fn init(src: n.textNode) status {
@@ -65,10 +65,66 @@ pub const status = struct {
             return resultArray.items;
         }
     }
+
+    // TODO: test this method
+    fn checkLineMap(self: *status, node: n.textNode) !?u8 {
+        var nodeAsStr = std.ArrayList(u8).init(allocator);
+        switch (node) {
+            .ff41NodeT => |n| {
+                try nodeAsStr.appendSlice(ff41);
+                try nodeAsStr.appendSlice(n.name);
+                try nodeAsStr.appendSlice(n.dType);
+            },
+            .ff50NodeT => |n| {
+                try nodeAsStr.appendSlice(ff50);
+                try nodeAsStr.appendSlice(n.name);
+            },
+            .ff56NodeT => |n| {
+                try nodeAsStr.appendSlice(ff56);
+                try nodeAsStr.appendSlice(n.name);
+                try nodeAsStr.appendSlice(n.dType);
+            },
+            .ff70NodeT => |n| {
+                try nodeAsStr.appendSlice(ff70);
+                try nodeAsStr.appendSlice(n.name);
+            },
+            else => {},
+        }
+
+        const result: ?u8 = self.lineMap.map.get(nodeAsStr.items);
+        if (result == null) {
+            try self.lineMap.map.put(nodeAsStr.items, self.lineMap.currentPos);
+            self.lineMap.currentPos += 1;
+            return null;
+        }
+        return result;
+    }
+
+    fn getCurrentParent(self: *status) *n.textNode {
+        return self.parentStack.items[self.parentStack.len - 1];
+    }
 };
+
+fn parse(s: *status, parentNode: n.textNode) !void {
+    try s.result.appendSlice(try convertTnode(s, parentNode));
+    for (parentNode.ff50NodeT.children) |child| {
+        switch (child) {
+            .ff50NodeT => try parse(s, child),
+            else => |node| try s.result.appendSlice(try convertTnode(s, node)),
+        }
+    }
+    const closingNode = n.textNode{ .ff70NodeT = n.ff70NodeT{ .name = parentNode.ff50NodeT.name } };
+    try s.result.appendSlice(try convertTnode(s, closingNode));
+}
 
 fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
     var result = std.ArrayList(u8).init(allocator);
+
+    const savedLine = try s.checkLineMap(node);
+    if (savedLine != null) {
+        try s.result.append(savedLine.?);
+    }
+
     switch (node) {
         .ff56NodeT => |ff56node| {
             try result.appendSlice(ff56);
@@ -95,8 +151,9 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
             try result.appendSlice(&std.mem.toBytes(ff50node.id));
             try result.appendSlice(&std.mem.toBytes(numChildren));
         },
-        else => {
-            unreachable;
+        .ff70NodeT => |ff70node| {
+            try result.appendSlice(ff70);
+            try result.appendSlice(try s.checkStringMap(ff70node.name));
         },
     }
     return result.items;
@@ -129,35 +186,36 @@ fn convertDataUnion(s: *status, data: n.dataUnion) ![]const u8 {
 }
 
 pub fn main() !void {
-    const testNode = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node1", .dType = "sInt32", .value = n.dataUnion{ ._sInt32 = 123 } } };
-    var s = status.init(testNode);
-    std.debug.print("{any}\n", .{try convertTnode(&s, testNode)});
+    var inFile = try std.fs.cwd().openFile("testFiles/test.bin", .{});
+    defer inFile.close();
 
-    //var inFile = try std.fs.cwd().openFile("testFiles/test.bin", .{});
-    //defer inFile.close();
+    const outFile = try std.fs.cwd().createFile(
+        "results.txt",
+        .{ .read = true },
+    );
+    defer outFile.close();
+    const inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
+    var testStatus = parser.status.init(inputBytes);
 
-    //const outFile = try std.fs.cwd().createFile(
-    //    "results.txt",
-    //    .{ .read = true },
-    //);
-    //defer outFile.close();
-    //const inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
-    //var testStatus = parser.status.init(inputBytes);
+    const nodes = (try parser.parse(&testStatus)).items;
+    const textNodesList = try sorter.sort(nodes);
 
-    //const nodes = (try parser.parse(&testStatus)).items;
-    //const textNodesList = try sorter.sort(nodes);
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(textNodesList, .{}, string.writer());
 
-    //var string = std.ArrayList(u8).init(allocator);
-    //try std.json.stringify(textNodesList, .{}, string.writer());
+    var jparser = std.json.Parser.init(allocator, false);
+    defer jparser.deinit();
 
-    //var jparser = std.json.Parser.init(allocator, false);
-    //defer jparser.deinit();
-
-    //var stream = std.json.TokenStream.init(string.items);
-    //const parsedData = try std.json.parse(n.textNode, &stream, .{ .allocator = allocator });
+    var stream = std.json.TokenStream.init(string.items);
+    var parsedData = try std.json.parse(n.textNode, &stream, .{ .allocator = allocator });
     //std.debug.print("{any}\n", .{parsedData});
+    var s = status.init(parsedData);
+    try parse(&s, parsedData);
+    for (s.result.items) |item| {
+        std.debug.print("{X} ", .{item});
+    }
 
-    //try outFile.writeAll(string.items);
+    try outFile.writeAll(string.items);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
