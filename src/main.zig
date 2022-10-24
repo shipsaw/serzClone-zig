@@ -51,7 +51,6 @@ pub fn main() !void {
 }
 
 test "bin -> json -> bin test" {
-    std.debug.print("BEGIN TEST:\n", .{});
     var inFile = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
     defer inFile.close();
 

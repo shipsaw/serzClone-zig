@@ -56,29 +56,6 @@ fn sort(nodes: []const n.node) !textNode {
     return rootNode;
 }
 
-fn main() !void {
-    errdefer {
-        std.debug.print("OH NO\n", .{});
-    }
-    var inFile = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
-    defer inFile.close();
-    const outFile = try std.fs.cwd().createFile(
-        "results.json",
-        .{ .read = true },
-    );
-    defer outFile.close();
-    const testBytes = try inFile.readToEndAlloc(allocator, size_limit);
-    var testStatus = parser.status.init(testBytes);
-
-    const nodes = (try parser.parse(&testStatus)).items;
-
-    const textNodesList = try sort(nodes);
-
-    var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(textNodesList, .{}, string.writer());
-    try outFile.writeAll(string.items);
-}
-
 fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
     return switch (node) {
         .ff41node => |ff41| textNode{ .ff41NodeT = ff41NodeT{
@@ -113,14 +90,12 @@ fn initDtypeMap(dTypeMap: *dataTypeMap) !void {
 
 fn updateParentStack(stack: *parentStatusStackType, node: *textNode) !void {
     var currentTop = &stack.items[stack.items.len - 1];
-    //std.debug.print("LEN: {any}\n", .{stack.items.len});
     switch (node.*) {
         .ff41NodeT => currentTop.childPos += 1,
         .ff4eNodeT => currentTop.childPos += 1,
         .ff50NodeT => {
             currentTop.childPos += 1;
             try stack.append(parentStatus{ .childPos = 0, .parentPointer = &node.ff50NodeT });
-            //std.debug.print("PUSH\n", .{});
         },
         .ff56NodeT => currentTop.childPos += 1,
         .ff70NodeT => unreachable,
@@ -278,6 +253,34 @@ test "Convert ff56 node" {
     try std.json.stringify(actual, .{}, string.writer());
 }
 
+test "Convert ff56 node with negative zero" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    const testNode = n.ff56node{
+        .name = "Node1",
+        .dType = n.dataType._sFloat32,
+        .value = n.dataUnion{ ._cDeltaString = "-0" },
+    };
+
+    const expectedName = "Node1";
+    const expectedDtype = "sFloat32";
+    const expectedValue = "-0";
+
+    // Act
+    var actual = (try convertNode(n.node{ .ff56node = testNode }, &dTypeMap)).ff56NodeT;
+
+    // Assert
+    try expectEqualStrings(actual.name, expectedName);
+    try expectEqualStrings(actual.dType, expectedDtype);
+    try expectEqualStrings(actual.value._cDeltaString, expectedValue);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actual, .{}, string.writer());
+}
+
 test "Convert ff70 node" {
     // Arrange
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
@@ -344,6 +347,49 @@ test "sort with one child" {
     try std.json.stringify(actualRootNode, .{}, string.writer());
 }
 
+test "sort with one child, negative zero" {
+    // Arrange
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    var testInput = [_]n.node{
+        n.node{ .ff50node = n.ff50node{
+            .name = "Node1",
+            .id = 12345,
+            .children = 1,
+        } },
+        n.node{ .ff56node = n.ff56node{
+            .name = "Node2",
+            .dType = n.dataType._sFloat32,
+            .value = n.dataUnion{ ._cDeltaString = "-0" },
+        } },
+    };
+
+    const rootExpectedName = "Node1";
+    const rootExpectedId: u32 = 12345;
+    const rootExpectedChildrenSlice = 1;
+
+    const childExpectedName = "Node2";
+    const childExpectedType = "sFloat32";
+    const childExpectedValue = "-0";
+
+    // Act
+    var actualRootNode = (try sort(testInput[0..])).ff50NodeT;
+
+    // Assert
+    try expectEqualStrings(actualRootNode.name, rootExpectedName);
+    try expect(actualRootNode.id == rootExpectedId);
+    try expect(actualRootNode.children.len == rootExpectedChildrenSlice);
+
+    const actualChildNode = actualRootNode.children[0].ff56NodeT;
+    try expectEqualStrings(actualChildNode.name, childExpectedName);
+    try expectEqualStrings(actualChildNode.dType, childExpectedType);
+    try expectEqualStrings(actualChildNode.value._cDeltaString, childExpectedValue);
+
+    // test JSON Stringify
+    var string = std.ArrayList(u8).init(allocator);
+    try std.json.stringify(actualRootNode, .{}, string.writer());
+}
 test "sort with two children" {
     // Arrange
     var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);

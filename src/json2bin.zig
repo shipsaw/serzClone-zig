@@ -85,7 +85,9 @@ const status = struct {
                 try nodeAsStr.appendSlice(ff70);
                 try nodeAsStr.appendSlice(n.name);
             },
-            else => {},
+            .ff4eNodeT => {
+                try nodeAsStr.appendSlice(ff4e);
+            },
         }
 
         const result: ?u8 = self.lineMap.map.get(nodeAsStr.items);
@@ -159,7 +161,9 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
             }
         },
         .ff4eNodeT => {
-            try result.appendSlice(ff4e);
+            if (isSavedLine == false) {
+                try result.appendSlice(ff4e);
+            }
         },
         .ff50NodeT => |ff50node| {
             const numChildren = @truncate(u32, @bitCast(u64, ff50node.children.len));
@@ -200,7 +204,11 @@ fn convertDataUnion(s: *status, data: n.dataUnion, expectedType: []const u8) ![]
             try returnSlice.appendSlice(&std.mem.toBytes(u64Val));
         },
         ._cDeltaString => |sVal| {
-            try returnSlice.appendSlice(try s.checkStringMap(sVal));
+            if (std.mem.eql(u8, expectedType, "sFloat32")) { // If "Negative zero" case
+                try returnSlice.appendSlice(&[_]u8{ 0x00, 0x00, 0x00, 0x80 });
+            } else {
+                try returnSlice.appendSlice(try s.checkStringMap(sVal));
+            }
         },
     }
     return returnSlice.items;
@@ -231,6 +239,7 @@ fn correctType(data: n.dataUnion, expectedType: []const u8) !n.dataUnion {
         ._sUInt8 => try fixSuint8(data, expected),
         ._sInt32 => try fixSint32(data, expected),
         ._sUInt64 => try fixSuint64(data, expected),
+        ._cDeltaString => data,
         else => unreachable,
     };
 }
@@ -315,7 +324,7 @@ test "convertDataUnion test" {
     const boolTResult = try convertDataUnion(&s, boolUnionT, "bool");
     const boolFResult = try convertDataUnion(&s, boolUnionF, "bool");
     const sUint8Result = try convertDataUnion(&s, sUInt8Union, "sUInt8");
-    const sInt32Result = try convertDataUnion(&s, sInt32Union, "sUInt32");
+    const sInt32Result = try convertDataUnion(&s, sInt32Union, "sInt32");
     const sFloat32Result = try convertDataUnion(&s, sFloat32Union, "sFloat32");
     const sUInt64Result = try convertDataUnion(&s, sUInt64Union, "sUInt64");
     const cDeltaStringResult = try convertDataUnion(&s, cDeltaStringUnion, "cDeltaString");
@@ -334,6 +343,19 @@ test "ff56 to bin, no compress" {
     // Arrange
     const testNode = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node1", .dType = "sInt32", .value = n.dataUnion{ ._sInt32 = 1003 } } };
     const expected = &[_]u8{ 0xFF, 0x56, 0xFF, 0xFF, 0x05, 0x00, 0x00, 0x00, 'N', 'o', 'd', 'e', '1', 0xFF, 0xFF, 0x06, 0x00, 0x00, 0x00, 's', 'I', 'n', 't', '3', '2', 0xEB, 0x03, 0x00, 0x00 };
+    var s = status.init(testNode);
+
+    // Act
+    const result = try convertTnode(&s, testNode);
+
+    // Assert
+    try expectEqualSlices(u8, expected, result);
+}
+
+test "ff56 to bin, no compress, negative float" {
+    // Arrange
+    const testNode = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node1", .dType = "sFloat32", .value = n.dataUnion{ ._cDeltaString = "(-0)" } } };
+    const expected = &[_]u8{ 0xFF, 0x56, 0xFF, 0xFF, 0x05, 0x00, 0x00, 0x00, 'N', 'o', 'd', 'e', '1', 0xFF, 0xFF, 0x08, 0x00, 0x00, 0x00, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x00, 0x00, 0x00, 0x80 };
     var s = status.init(testNode);
 
     // Act
@@ -392,6 +414,7 @@ test "line saving logic test" {
     // Arrange
     var node1 = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node1", .dType = "bool", .value = n.dataUnion{ ._bool = true } } };
     var node2 = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "Node2", .dType = "bool", .value = n.dataUnion{ ._bool = false } } };
+    var node3 = n.textNode{ .ff4eNodeT = n.ff4eNodeT{} };
     var s = status.init(node1);
 
     // Act
@@ -399,10 +422,14 @@ test "line saving logic test" {
     const result2 = s.checkLineMap(node2);
     const result3 = try s.checkLineMap(node1);
     const result4 = try s.checkLineMap(node2);
+    const result5 = s.checkLineMap(node3);
+    const result6 = try s.checkLineMap(node3);
 
     // Assert
     try expectEqual(result1, null);
     try expectEqual(result2, null);
     try expectEqual(result3.?, 0);
     try expectEqual(result4.?, 1);
+    try expectEqual(result5, null);
+    try expectEqual(result6.?, 2);
 }
