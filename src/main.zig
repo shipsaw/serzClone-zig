@@ -14,7 +14,7 @@ pub fn main() !void {
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
     if (args.len < 2 or args.len > 3) {
-        std.debug.print("Usage: zigSerz [filename]\n", .{});
+        std.debug.print("Usage: zigSerz input_filename [output_filename]\n", .{});
         std.os.exit(1);
     }
 
@@ -26,9 +26,9 @@ pub fn main() !void {
     try outFileArray.appendSlice(inputFileNameArray.first());
 
     if (std.mem.eql(u8, inputFileNameArray.rest(), "bin")) {
-        try outFileArray.appendSlice("2.json");
+        try outFileArray.appendSlice(".json");
     } else if (std.mem.eql(u8, inputFileNameArray.rest(), "json")) {
-        try outFileArray.appendSlice("2.bin");
+        try outFileArray.appendSlice(".bin");
     } else unreachable;
     var outFileName = if (args.len > 2) args[2] else outFileArray.items;
     const outFile = try std.fs.cwd().createFile(

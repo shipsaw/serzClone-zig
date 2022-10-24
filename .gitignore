@@ -22,4 +22,5 @@ notes.txt
 results.txt
 *test.zig
 *.json
+*.obj
 zigSerz
