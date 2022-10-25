@@ -17,6 +17,12 @@ const ff56 = &[_]u8{ 0xFF, 0x56 };
 const ff70 = &[_]u8{ 0xFF, 0x70 };
 const newStr = &[_]u8{ 0xFF, 0xFF };
 
+const stringContext = enum {
+    NAME,
+    DTYPE,
+    VALUE,
+};
+
 const strMapType = struct {
     map: std.StringHashMap(u16),
     currentPos: u16,
@@ -51,17 +57,19 @@ const status = struct {
         };
     }
 
-    fn checkStringMap(self: *status, str: []const u8) ![]const u8 {
+    fn checkStringMap(self: *status, str: []const u8, ctx: stringContext) ![]const u8 {
+        // TODO: Check underscore logic
+        const correctedStr = if (str.len > 0 and str[0] == '_' and ctx == stringContext.VALUE) str[1..] else str;
         var resultArray = std.ArrayList(u8).init(allocator);
-        const result: ?u16 = self.stringMap.map.get(str);
+        const result: ?u16 = self.stringMap.map.get(correctedStr);
         if (result == null) {
-            try self.stringMap.map.put(str, self.stringMap.currentPos);
+            try self.stringMap.map.put(correctedStr, self.stringMap.currentPos);
             self.stringMap.currentPos += 1;
 
-            const strLen: u32 = @truncate(u32, @bitCast(u64, str.len));
+            const strLen: u32 = @truncate(u32, @bitCast(u64, correctedStr.len));
             try resultArray.appendSlice(&[_]u8{ 0xFF, 0xFF });
             try resultArray.appendSlice(&std.mem.toBytes(strLen));
-            try resultArray.appendSlice(str);
+            try resultArray.appendSlice(correctedStr);
             return resultArray.items;
         } else {
             try resultArray.appendSlice(&std.mem.toBytes(result.?));
@@ -157,16 +165,16 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
         .ff56NodeT => |ff56node| {
             if (isSavedLine == false) {
                 try result.appendSlice(ff56);
-                try result.appendSlice(try s.checkStringMap(ff56node.name));
-                try result.appendSlice(try s.checkStringMap(ff56node.dType));
+                try result.appendSlice(try s.checkStringMap(ff56node.name, stringContext.NAME));
+                try result.appendSlice(try s.checkStringMap(ff56node.dType, stringContext.VALUE));
             }
             try result.appendSlice(try convertDataUnion(s, ff56node.value, ff56node.dType));
         },
         .ff41NodeT => |ff41node| {
             if (isSavedLine == false) {
                 try result.appendSlice(ff41);
-                try result.appendSlice(try s.checkStringMap(ff41node.name));
-                try result.appendSlice(try s.checkStringMap(ff41node.dType));
+                try result.appendSlice(try s.checkStringMap(ff41node.name, stringContext.NAME));
+                try result.appendSlice(try s.checkStringMap(ff41node.dType, stringContext.DTYPE));
             }
             try result.append(ff41node.numElements);
             for (ff41node.values) |val| {
@@ -182,7 +190,7 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
             const numChildren = @truncate(u32, @bitCast(u64, ff50node.children.len));
             if (isSavedLine == false) {
                 try result.appendSlice(ff50);
-                try result.appendSlice(try s.checkStringMap(ff50node.name));
+                try result.appendSlice(try s.checkStringMap(ff50node.name, stringContext.NAME));
             }
             try result.appendSlice(&std.mem.toBytes(ff50node.id));
             try result.appendSlice(&std.mem.toBytes(numChildren));
@@ -190,7 +198,7 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
         .ff70NodeT => |ff70node| {
             if (isSavedLine == false) {
                 try result.appendSlice(ff70);
-                try result.appendSlice(try s.checkStringMap(ff70node.name));
+                try result.appendSlice(try s.checkStringMap(ff70node.name, stringContext.NAME));
             }
         },
     }
@@ -226,7 +234,7 @@ fn convertDataUnion(s: *status, data: n.dataUnion, expectedType: []const u8) ![]
             if (std.mem.eql(u8, expectedType, "sFloat32")) { // If "Negative zero" case
                 try returnSlice.appendSlice(&[_]u8{ 0x00, 0x00, 0x00, 0x80 });
             } else {
-                try returnSlice.appendSlice(try s.checkStringMap(sVal));
+                try returnSlice.appendSlice(try s.checkStringMap(sVal, stringContext.VALUE));
             }
         },
     }
@@ -234,17 +242,7 @@ fn convertDataUnion(s: *status, data: n.dataUnion, expectedType: []const u8) ![]
 }
 
 fn correctType(data: n.dataUnion, expectedType: []const u8) !n.dataUnion {
-    const dataTypeMap = std.ComptimeStringMap(n.dataType, .{
-        .{ "bool", ._bool },
-        .{ "sUInt8", ._sUInt8 },
-        .{ "sInt16", ._sInt16 },
-        .{ "sInt32", ._sInt32 },
-        .{ "sUInt32", ._sUInt32 },
-        .{ "sUInt64", ._sUInt64 },
-        .{ "sFloat32", ._sFloat32 },
-        .{ "cDeltaString", ._cDeltaString },
-    });
-    const expected = dataTypeMap.get(expectedType).?;
+    const expected = n.dataTypeMap.get(expectedType).?;
     const actual = switch (data) {
         ._bool => n.dataType._bool,
         ._sUInt8 => n.dataType._sUInt8,
@@ -353,10 +351,10 @@ test "stringMap functionality" {
     var s = status.init(dummyNode);
 
     // Act
-    const result1 = try s.checkStringMap(inputString1);
-    const result2 = try s.checkStringMap(inputString2);
-    const result3 = try s.checkStringMap(inputString3);
-    const result4 = try s.checkStringMap(inputString4);
+    const result1 = try s.checkStringMap(inputString1, stringContext.NAME);
+    const result2 = try s.checkStringMap(inputString2, stringContext.NAME);
+    const result3 = try s.checkStringMap(inputString3, stringContext.NAME);
+    const result4 = try s.checkStringMap(inputString4, stringContext.NAME);
 
     // Assert
     try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x07, 0x00, 0x00, 0x00, 'J', 'u', 'p', 'i', 't', 'e', 'r' }, result1);

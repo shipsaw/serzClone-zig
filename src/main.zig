@@ -51,48 +51,61 @@ pub fn main() !void {
 }
 
 test "bin -> json -> bin test" {
-    var inFile = try std.fs.cwd().openFile("testFiles/ScenarioControl.bin", .{});
+    // Original Scenario with ff43 node
+    var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioWff43.bin", .{});
+    defer inFile43.close();
+    var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
+
+    // Scenario parsed by serz
+    var inFile = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
     defer inFile.close();
-
     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
-    const nodes = (try binParser.parse(inputBytes));
-    const jsonResult = try objParser.parse(nodes);
 
+    const nodes = (try binParser.parse(inputBytes43));
+    const jsonResult = try objParser.parse(nodes);
     const binResult = try jsonParser.parse(jsonResult);
 
     for (inputBytes) |inputByte, i| {
         if (binResult[i] != inputByte) {
-            std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, binResult[i] });
+            const binVal = @bitCast(f32, std.mem.readIntSlice(i32, binResult[i..], std.builtin.Endian.Little));
+            const inputVal = @bitCast(f32, std.mem.readIntSlice(i32, inputBytes[i..], std.builtin.Endian.Little));
+            if (!std.math.approxEqAbs(f32, binVal, inputVal, 0.1)) {
+                std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, binResult[i] });
+                std.debug.print("Float diff: {any}", .{@fabs(binVal - inputVal)});
 
-            std.debug.print("EXPECTED:\n", .{});
-            var j: u8 = 25;
-            while (j > 0) : (j -= 1) {
-                std.debug.print("{X} ", .{inputBytes[i - j]});
+                std.debug.print("EXPECTED:\n", .{});
+                var j = if (i < 25) i else 25;
+                while (j > 0) : (j -= 1) {
+                    std.debug.print("{X} ", .{inputBytes[i - j]});
+                }
+
+                std.debug.print("({X}) ", .{inputBytes[i]});
+
+                var k: u8 = 1;
+                while (k < 26) : (k += 1) {
+                    std.debug.print("{X} ", .{inputBytes[i + k]});
+                }
+
+                std.debug.print("\nACTUAL:\n", .{});
+                j = if (i < 25) i else 25;
+                while (j > 0) : (j -= 1) {
+                    std.debug.print("{X} ", .{binResult[i - j]});
+                }
+
+                std.debug.print("({X}) ", .{binResult[i]});
+
+                k = 1;
+                while (k < 26) : (k += 1) {
+                    std.debug.print("{X} ", .{binResult[i + k]});
+                }
+                std.debug.print("\n", .{});
+                i += 3;
+            } else {
+                i += 3;
             }
-
-            std.debug.print("({X}) ", .{inputBytes[i]});
-
-            var k: u8 = 1;
-            while (k < 26) : (k += 1) {
-                std.debug.print("{X} ", .{inputBytes[i + k]});
-            }
-
-            std.debug.print("\n\nACTUAL:\n", .{});
-            j = 25;
-            while (j > 0) : (j -= 1) {
-                std.debug.print("{X} ", .{binResult[i - j]});
-            }
-
-            std.debug.print("({X}) ", .{binResult[i]});
-
-            k = 1;
-            while (k < 26) : (k += 1) {
-                std.debug.print("{X} ", .{binResult[i + k]});
-            }
-            std.debug.print("\n", .{});
-            std.os.exit(1);
         }
     }
 
+    std.debug.print("{d}, {d}\n", .{ inputBytes.len, binResult.len });
     try expectEqualSlices(u8, inputBytes, binResult);
 }

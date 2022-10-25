@@ -6,6 +6,7 @@ const n = @import("node.zig");
 
 const node = n.node;
 const ff41node = n.ff41node;
+const ff43node = n.ff43node;
 const ff4enode = n.ff4enode;
 const ff50node = n.ff50node;
 const ff56node = n.ff56node;
@@ -62,17 +63,6 @@ const errors = error{
     TooManyChildren,
 };
 
-const dataTypeMap = std.ComptimeStringMap(dataType, .{
-    .{ "bool", ._bool },
-    .{ "sUInt8", ._sUInt8 },
-    .{ "sInt16", ._sInt16 },
-    .{ "sInt32", ._sInt32 },
-    .{ "sUInt32", ._sUInt32 },
-    .{ "sUInt64", ._sUInt64 },
-    .{ "sFloat32", ._sFloat32 },
-    .{ "cDeltaString", ._cDeltaString },
-});
-
 pub fn parse(inputBytes: []const u8) ![]const node {
     var stat = status.init(inputBytes);
     var s = &stat;
@@ -93,6 +83,9 @@ pub fn parse(inputBytes: []const u8) ![]const node {
                     const tok = try processFF41(s);
                     try s.result.append(node{ .ff41node = tok });
                     s.savedTokenList[s.savedTokenListIdx] = node{ .ff41node = tok };
+                },
+                0x43 => {
+                    s.current += 6;
                 },
                 0x4e => {
                     s.current += 1;
@@ -140,6 +133,7 @@ fn identifier(s: *status) ![]const u8 {
             return errors.InvalidNodeType;
         }
         var str = s.source[s.current..(s.current + strLen)];
+
         try s.stringMap.append(str);
         defer s.current += strLen;
 
@@ -175,7 +169,6 @@ fn processBool(s: *status) !dataUnion {
 
 fn processSUInt8(s: *status) dataUnion {
     defer s.current += 1;
-    // const val = std.mem.readIntSlice(u8, s.source[s.current..], std.builtin.Endian.Little);
     const val = s.source[s.current];
     return dataUnion{ ._sUInt8 = val };
 }
@@ -216,13 +209,18 @@ fn processSFloat32(s: *status) dataUnion {
 }
 
 fn processCDeltaString(s: *status) !dataUnion {
+    var result = std.ArrayList(u8).init(allocator);
     const str = try identifier(s);
-    return dataUnion{ ._cDeltaString = str };
+    if (str.len > 0 and std.ascii.isDigit(str[0])) {
+        try result.append('_');
+    }
+    try result.appendSlice(str);
+    return dataUnion{ ._cDeltaString = result.items };
 }
 
 fn processFF41(s: *status) !ff41node {
     const nodeName = try identifier(s);
-    const elemType = dataTypeMap.get(try identifier(s)).?;
+    const elemType = n.dataTypeMap.get(try identifier(s)).?;
     const numElements = s.source[s.current];
     s.current += 1;
 
@@ -255,7 +253,7 @@ fn processFF50(s: *status) !ff50node {
 fn processFF56(s: *status) !ff56node {
     const nodeName = try identifier(s);
     const dTypeString = try identifier(s);
-    const dType = dataTypeMap.get(dTypeString);
+    const dType = n.dataTypeMap.get(dTypeString);
     if (dType == null) {
         std.debug.print("\nMissing type: {s}\n", .{dTypeString});
     }
@@ -306,7 +304,6 @@ fn processSavedLine(s: *status) !node {
             return node{ .ff41node = newNode };
         },
         .ff50node => {
-            // return errors.InvalidNodeType;
             const id = processU32(s);
             const children = processU32(s);
             if (children > 100) {
@@ -365,62 +362,8 @@ fn errorInfo(s: *status) void {
         std.debug.print(", {x}", .{s.source[s.current + i]});
     }
     std.debug.print("\n", .{});
-
-    //for (s.stringMap.items) |item, idx| {
-    //    std.debug.print("{X}, {s}\n", .{ idx, item });
-    //}
-    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
-    initDtypeMap(&dTypeMap) catch return;
-
-    //for (s.savedTokenList) |item, idx| {
-    //    std.debug.print("{X}, {s},      {s},     {s}\n", .{ idx, errorGetNodeFF(item), errorGetNodeName(item), errorGetNodeType(item, &dTypeMap) });
-    //}
-    //std.debug.print("ELEMENT STACK:\n", .{});
-    //for (s.result.items) |item| {
-    //    std.debug.print("{any}\n", .{item});
-    //}
 }
 
-fn initDtypeMap(dTypeMap: *std.AutoHashMap(n.dataType, []const u8)) !void {
-    try dTypeMap.put(n.dataType._bool, "bool");
-    try dTypeMap.put(n.dataType._sUInt8, "sUInt8");
-    try dTypeMap.put(n.dataType._sInt16, "sInt16");
-    try dTypeMap.put(n.dataType._sInt32, "sInt32");
-    try dTypeMap.put(n.dataType._sUInt32, "sUInt32");
-    try dTypeMap.put(n.dataType._sUInt64, "sUInt64");
-    try dTypeMap.put(n.dataType._sFloat32, "sFloat32");
-    try dTypeMap.put(n.dataType._cDeltaString, "cDeltaString");
-}
-
-fn errorGetNodeFF(nde: n.node) []const u8 {
-    return switch (nde) {
-        .ff41node => "ff41",
-        .ff4enode => "ff4e",
-        .ff50node => "ff50",
-        .ff56node => "ff56",
-        .ff70node => "ff70",
-    };
-}
-
-fn errorGetNodeName(nde: n.node) []const u8 {
-    return switch (nde) {
-        .ff41node => |f| f.name,
-        .ff4enode => "NULL NODE",
-        .ff50node => |f| f.name,
-        .ff56node => |f| f.name,
-        .ff70node => |f| f.name,
-    };
-}
-
-fn errorGetNodeType(nde: n.node, mp: *std.AutoHashMap(n.dataType, []const u8)) []const u8 {
-    return switch (nde) {
-        .ff41node => |f| mp.get(f.dType).?,
-        .ff4enode => "",
-        .ff50node => "",
-        .ff56node => |f| mp.get(f.dType).?,
-        .ff70node => "",
-    };
-}
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////  Test Area ////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -469,10 +412,10 @@ test "bool data" {
     var statusStructFalse = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 0 });
 
     // Act
-    const dTypeT = dataTypeMap.get(try identifier(&statusStructTrue)).?;
+    const dTypeT = n.dataTypeMap.get(try identifier(&statusStructTrue)).?;
     const dataTrue = try processData(&statusStructTrue, dTypeT);
 
-    const dTypeF = dataTypeMap.get(try identifier(&statusStructFalse)).?;
+    const dTypeF = n.dataTypeMap.get(try identifier(&statusStructFalse)).?;
     const dataFalse = try processData(&statusStructFalse, dTypeF);
 
     // Assert
@@ -490,10 +433,10 @@ test "sUInt8 data" {
     var statusStruct0 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 0 });
 
     // Act
-    const dType11 = dataTypeMap.get(try identifier(&statusStruct11)).?;
+    const dType11 = n.dataTypeMap.get(try identifier(&statusStruct11)).?;
     const data11 = try processData(&statusStruct11, dType11);
 
-    const dType0 = dataTypeMap.get(try identifier(&statusStruct0)).?;
+    const dType0 = n.dataTypeMap.get(try identifier(&statusStruct0)).?;
     const data0 = try processData(&statusStruct0, dType0);
 
     // Assert
@@ -511,10 +454,10 @@ test "sInt32 data" {
     var statusStruct3210 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x8a, 0x0c, 0x00, 0x00 }); // 3210
 
     // Act
-    const dType_3200 = dataTypeMap.get(try identifier(&statusStruct_3200)).?;
+    const dType_3200 = n.dataTypeMap.get(try identifier(&statusStruct_3200)).?;
     const data_3200 = try processData(&statusStruct_3200, dType_3200);
 
-    const dType3210 = dataTypeMap.get(try identifier(&statusStruct3210)).?;
+    const dType3210 = n.dataTypeMap.get(try identifier(&statusStruct3210)).?;
     const data3210 = try processData(&statusStruct3210, dType3210);
 
     // Assert
@@ -535,19 +478,19 @@ test "sFloat32 data" {
     var statusStructNegZero = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x00, 0x00, 0x00, 0x80 }); // -1234
 
     // Act
-    const dType12345 = dataTypeMap.get(try identifier(&statusStruct12345)).?;
+    const dType12345 = n.dataTypeMap.get(try identifier(&statusStruct12345)).?;
     const data12345 = try processData(&statusStruct12345, dType12345);
 
-    const dType_1234 = dataTypeMap.get(try identifier(&statusStruct_1234)).?;
+    const dType_1234 = n.dataTypeMap.get(try identifier(&statusStruct_1234)).?;
     const data_1234 = try processData(&statusStruct_1234, dType_1234);
 
-    const dType_s1 = dataTypeMap.get(try identifier(&statusStruct_s1)).?;
+    const dType_s1 = n.dataTypeMap.get(try identifier(&statusStruct_s1)).?;
     const data_s1 = try processData(&statusStruct_s1, dType_s1);
 
-    const dType_s2 = dataTypeMap.get(try identifier(&statusStruct_s2)).?;
+    const dType_s2 = n.dataTypeMap.get(try identifier(&statusStruct_s2)).?;
     const data_s2 = try processData(&statusStruct_s2, dType_s2);
 
-    const dType_negZero = dataTypeMap.get(try identifier(&statusStructNegZero)).?;
+    const dType_negZero = n.dataTypeMap.get(try identifier(&statusStructNegZero)).?;
     const data_negZero = try processData(&statusStructNegZero, dType_negZero);
 
     // Assert
@@ -569,7 +512,7 @@ test "sUInt64 data" {
     var statusStruct = status.init(u64Name ++ u64Value);
 
     // Act
-    const dType = dataTypeMap.get(try identifier(&statusStruct)).?;
+    const dType = n.dataTypeMap.get(try identifier(&statusStruct)).?;
     const data = try processData(&statusStruct, dType);
 
     // Assert
@@ -587,10 +530,10 @@ test "cDeltaString data" {
     try statusStructExisting.stringMap.append("iExist");
 
     // Act
-    const dTypeHello = dataTypeMap.get(try identifier(&statusStructHello)).?;
+    const dTypeHello = n.dataTypeMap.get(try identifier(&statusStructHello)).?;
     const dataHello = try processData(&statusStructHello, dTypeHello);
 
-    const dTypeExisting = dataTypeMap.get(try identifier(&statusStructExisting)).?;
+    const dTypeExisting = n.dataTypeMap.get(try identifier(&statusStructExisting)).?;
     const dataExisting = try processData(&statusStructExisting, dTypeExisting);
 
     // Assert

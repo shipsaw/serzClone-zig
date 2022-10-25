@@ -16,7 +16,7 @@ const ff70NodeT = n.ff70NodeT;
 const dataTypeMap = std.AutoHashMap(n.dataType, []const u8);
 
 const parentStatus = struct {
-    childPos: u8,
+    childPos: u32,
     parentPointer: *ff50NodeT,
 };
 const parentStatusStackType = std.ArrayList(parentStatus);
@@ -59,24 +59,28 @@ fn sort(nodes: []const n.node) !textNode {
 fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
     return switch (node) {
         .ff41node => |ff41| textNode{ .ff41NodeT = ff41NodeT{
-            .name = ff41.name,
+            .name = correctName(ff41.name),
             .dType = dTypeMap.get(ff41.dType).?,
             .numElements = ff41.numElements,
             .values = ff41.values.items,
         } },
         .ff4enode => textNode{ .ff4eNodeT = ff4eNodeT{} },
         .ff50node => |ff50| textNode{ .ff50NodeT = ff50NodeT{
-            .name = node.ff50node.name,
+            .name = correctName(ff50.name),
             .id = ff50.id,
             .children = (try std.ArrayList(textNode).initCapacity(allocator, ff50.children)).allocatedSlice(),
         } },
         .ff56node => |ff56| textNode{ .ff56NodeT = ff56NodeT{
-            .name = ff56.name,
+            .name = correctName(ff56.name),
             .dType = dTypeMap.get(ff56.dType).?,
             .value = ff56.value,
         } },
-        .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = node.ff70node.name } },
+        .ff70node => textNode{ .ff70NodeT = ff70NodeT{ .name = correctName(node.ff70node.name) } },
     };
+}
+
+fn correctName(nme: []const u8) []const u8 {
+    return if (std.mem.eql(u8, nme, "")) "e" else nme;
 }
 
 fn initDtypeMap(dTypeMap: *dataTypeMap) !void {
