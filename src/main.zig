@@ -51,7 +51,7 @@ pub fn main() !void {
 }
 
 test "bin -> json -> bin test" {
-    var inFile = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
+    var inFile = try std.fs.cwd().openFile("testFiles/ScenarioControl.bin", .{});
     defer inFile.close();
 
     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);

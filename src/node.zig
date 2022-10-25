@@ -4,16 +4,31 @@ const std = @import("std");
 pub const dataType = enum {
     _bool,
     _sUInt8,
+    _sInt16,
     _sInt32,
+    _sUInt32,
     _sUInt64,
     _sFloat32,
     _cDeltaString,
 };
 
+pub const dataTypeMap = std.ComptimeStringMap(dataType, .{
+    .{ "bool", ._bool },
+    .{ "sUInt8", ._sUInt8 },
+    .{ "sInt16", ._sInt16 },
+    .{ "sInt32", ._sInt32 },
+    .{ "sUInt32", ._sUInt32 },
+    .{ "sUInt64", ._sUInt64 },
+    .{ "sFloat32", ._sFloat32 },
+    .{ "cDeltaString", ._cDeltaString },
+});
+
 pub const dataUnion = union(dataType) {
     _bool: bool,
     _sUInt8: u8,
+    _sInt16: i16,
     _sInt32: i32,
+    _sUInt32: u32,
     _sUInt64: u64,
     _sFloat32: f32,
     _cDeltaString: []const u8,

@@ -82,7 +82,9 @@ fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
 fn initDtypeMap(dTypeMap: *dataTypeMap) !void {
     try dTypeMap.put(n.dataType._bool, "bool");
     try dTypeMap.put(n.dataType._sUInt8, "sUInt8");
+    try dTypeMap.put(n.dataType._sInt16, "sInt16");
     try dTypeMap.put(n.dataType._sInt32, "sInt32");
+    try dTypeMap.put(n.dataType._sUInt32, "sUInt32");
     try dTypeMap.put(n.dataType._sUInt64, "sUInt64");
     try dTypeMap.put(n.dataType._sFloat32, "sFloat32");
     try dTypeMap.put(n.dataType._cDeltaString, "cDeltaString");

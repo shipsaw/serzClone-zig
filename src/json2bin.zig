@@ -194,8 +194,14 @@ fn convertDataUnion(s: *status, data: n.dataUnion, expectedType: []const u8) ![]
         ._sUInt8 => |u8Val| {
             try returnSlice.appendSlice(&std.mem.toBytes(u8Val));
         },
+        ._sInt16 => |i16Val| {
+            try returnSlice.appendSlice(&std.mem.toBytes(i16Val));
+        },
         ._sInt32 => |iVal| {
             try returnSlice.appendSlice(&std.mem.toBytes(iVal));
+        },
+        ._sUInt32 => |uVal| {
+            try returnSlice.appendSlice(&std.mem.toBytes(uVal));
         },
         ._sFloat32 => |fVal| {
             try returnSlice.appendSlice(&std.mem.toBytes(fVal));
@@ -218,7 +224,9 @@ fn correctType(data: n.dataUnion, expectedType: []const u8) !n.dataUnion {
     const dataTypeMap = std.ComptimeStringMap(n.dataType, .{
         .{ "bool", ._bool },
         .{ "sUInt8", ._sUInt8 },
+        .{ "sInt16", ._sInt16 },
         .{ "sInt32", ._sInt32 },
+        .{ "sUInt32", ._sUInt32 },
         .{ "sUInt64", ._sUInt64 },
         .{ "sFloat32", ._sFloat32 },
         .{ "cDeltaString", ._cDeltaString },
@@ -227,7 +235,9 @@ fn correctType(data: n.dataUnion, expectedType: []const u8) !n.dataUnion {
     const actual = switch (data) {
         ._bool => n.dataType._bool,
         ._sUInt8 => n.dataType._sUInt8,
+        ._sInt16 => n.dataType._sInt16,
         ._sInt32 => n.dataType._sInt32,
+        ._sUInt32 => n.dataType._sUInt32,
         ._sFloat32 => n.dataType._sFloat32,
         ._sUInt64 => n.dataType._sUInt64,
         ._cDeltaString => n.dataType._cDeltaString,
@@ -237,7 +247,9 @@ fn correctType(data: n.dataUnion, expectedType: []const u8) !n.dataUnion {
 
     return switch (data) {
         ._sUInt8 => try fixSuint8(data, expected),
+        ._sInt16 => try fixSint16(data, expected),
         ._sInt32 => try fixSint32(data, expected),
+        ._sUInt32 => try fixSuint32(data, expected),
         ._sUInt64 => try fixSuint64(data, expected),
         ._cDeltaString => data,
         else => unreachable,
@@ -248,6 +260,22 @@ fn fixSuint8(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
     const boxedData = data._sUInt8;
     return switch (expectedType) {
         n.dataType._sInt32 => n.dataUnion{ ._sInt32 = @intCast(i32, boxedData) },
+        n.dataType._sUInt32 => n.dataUnion{ ._sUInt32 = @intCast(u32, boxedData) },
+        n.dataType._sUInt64 => n.dataUnion{ ._sUInt64 = @intCast(u64, boxedData) },
+        n.dataType._sFloat32 => n.dataUnion{ ._sFloat32 = @intToFloat(f32, boxedData) },
+        n.dataType._cDeltaString => {
+            return n.dataUnion{ ._cDeltaString = try std.fmt.allocPrint(allocator, "{any}", .{boxedData}) };
+        },
+        else => unreachable,
+    };
+}
+
+// TODO: test
+fn fixSint16(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
+    const boxedData = data._sInt16;
+    return switch (expectedType) {
+        n.dataType._sInt32 => n.dataUnion{ ._sInt32 = @intCast(i32, boxedData) },
+        n.dataType._sUInt32 => n.dataUnion{ ._sUInt32 = @intCast(u32, boxedData) },
         n.dataType._sUInt64 => n.dataUnion{ ._sUInt64 = @intCast(u64, boxedData) },
         n.dataType._sFloat32 => n.dataUnion{ ._sFloat32 = @intToFloat(f32, boxedData) },
         n.dataType._cDeltaString => {
@@ -261,6 +289,22 @@ fn fixSint32(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
     const boxedData = data._sInt32;
     return switch (expectedType) {
         n.dataType._sInt32 => n.dataUnion{ ._sInt32 = @intCast(i32, boxedData) },
+        n.dataType._sUInt32 => n.dataUnion{ ._sUInt32 = @intCast(u32, boxedData) },
+        n.dataType._sUInt64 => n.dataUnion{ ._sUInt64 = @intCast(u64, boxedData) },
+        n.dataType._sFloat32 => n.dataUnion{ ._sFloat32 = @intToFloat(f32, boxedData) },
+        n.dataType._cDeltaString => {
+            return n.dataUnion{ ._cDeltaString = try std.fmt.allocPrint(allocator, "{any}", .{boxedData}) };
+        },
+        else => unreachable,
+    };
+}
+
+// TODO: test
+fn fixSuint32(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
+    const boxedData = data._sUInt32;
+    return switch (expectedType) {
+        n.dataType._sInt32 => n.dataUnion{ ._sInt32 = @intCast(i32, boxedData) },
+        n.dataType._sUInt32 => n.dataUnion{ ._sUInt32 = @intCast(u32, boxedData) },
         n.dataType._sUInt64 => n.dataUnion{ ._sUInt64 = @intCast(u64, boxedData) },
         n.dataType._sFloat32 => n.dataUnion{ ._sFloat32 = @intToFloat(f32, boxedData) },
         n.dataType._cDeltaString => {

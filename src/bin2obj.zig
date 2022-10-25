@@ -22,7 +22,8 @@ const status = struct {
     line: usize,
     source: []const u8,
     stringMap: std.ArrayList([]const u8),
-    savedTokenList: std.ArrayList(node),
+    savedTokenList: [255]node, // one less than 0xFF to avoid this important byte pattern
+    savedTokenListIdx: usize,
     result: std.ArrayList(node),
 
     fn init(src: []const u8) status {
@@ -32,7 +33,8 @@ const status = struct {
             .line = 0,
             .source = src,
             .stringMap = std.ArrayList([]const u8).init(allocator),
-            .savedTokenList = std.ArrayList(node).init(allocator),
+            .savedTokenList = undefined,
+            .savedTokenListIdx = 0,
             .result = std.ArrayList(node).init(allocator),
         };
     }
@@ -63,11 +65,14 @@ const errors = error{
 const dataTypeMap = std.ComptimeStringMap(dataType, .{
     .{ "bool", ._bool },
     .{ "sUInt8", ._sUInt8 },
+    .{ "sInt16", ._sInt16 },
     .{ "sInt32", ._sInt32 },
+    .{ "sUInt32", ._sUInt32 },
     .{ "sUInt64", ._sUInt64 },
     .{ "sFloat32", ._sFloat32 },
     .{ "cDeltaString", ._cDeltaString },
 });
+
 pub fn parse(inputBytes: []const u8) ![]const node {
     var stat = status.init(inputBytes);
     var s = &stat;
@@ -82,54 +87,60 @@ pub fn parse(inputBytes: []const u8) ![]const node {
     while (!s.isAtEnd()) {
         if (s.source[s.current] == 0xff) {
             s.current += 1;
+            std.debug.print("PUSH {X}\n", .{s.savedTokenListIdx});
             switch (s.source[s.current]) {
                 0x41 => {
                     s.current += 1;
                     const tok = try processFF41(s);
                     try s.result.append(node{ .ff41node = tok });
-                    try s.savedTokenList.append(node{ .ff41node = tok });
+                    s.savedTokenList[s.savedTokenListIdx] = node{ .ff41node = tok };
                 },
                 0x4e => {
                     s.current += 1;
                     try s.result.append(node{ .ff4enode = ff4enode{} });
-                    try s.savedTokenList.append(node{ .ff4enode = ff4enode{} });
+                    s.savedTokenList[s.savedTokenListIdx] = node{ .ff4enode = ff4enode{} };
                 },
                 0x50 => {
                     s.current += 1;
                     const tok = try processFF50(s);
                     try s.result.append(node{ .ff50node = tok });
-                    try s.savedTokenList.append(node{ .ff50node = tok });
+                    s.savedTokenList[s.savedTokenListIdx] = node{ .ff50node = tok };
                 },
                 0x56 => {
                     s.current += 1;
                     const tok = try processFF56(s);
                     try s.result.append(node{ .ff56node = tok });
-                    try s.savedTokenList.append(node{ .ff56node = tok });
+                    s.savedTokenList[s.savedTokenListIdx] = node{ .ff56node = tok };
                 },
                 0x70 => {
                     s.current += 1;
                     const tok = try processFF70(s);
                     try s.result.append(node{ .ff70node = tok });
-                    try s.savedTokenList.append(node{ .ff70node = tok });
+                    s.savedTokenList[s.savedTokenListIdx] = node{ .ff70node = tok };
                 },
                 else => return errors.InvalidNodeType,
             }
+            s.savedTokenListIdx = (s.savedTokenListIdx + 1) % 255;
         } else {
             try s.result.append(try processSavedLine(s));
         }
-        if (s.line < 255) s.line += 1;
+        s.line += 1;
     }
     return s.result.items;
 }
 
 fn identifier(s: *status) ![]const u8 {
-    if (s.source[s.current] == 255) // New string
+    if (s.source[s.current] == 0xFF and s.source[s.current + 1] == 0xFF) // New string
     {
         s.current += 2;
 
         const strLen = std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
         s.current += 4;
 
+        if (s.current + strLen > s.source.len) {
+            std.debug.print("{s}\n", .{s.source[s.current .. s.current + 40]});
+            return errors.InvalidNodeType;
+        }
         var str = s.source[s.current..(s.current + strLen)];
         try s.stringMap.append(str);
         defer s.current += strLen;
@@ -139,26 +150,29 @@ fn identifier(s: *status) ![]const u8 {
     const strIdx = std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
     s.current += 2;
 
+    //std.debug.print("{X}, {s}\n", .{ strIdx, s.stringMap.items[strIdx] });
     return s.stringMap.items[strIdx];
 }
 
 fn processData(s: *status, dType: dataType) !dataUnion {
     return switch (dType) {
-        dataType._bool => processBool(s),
+        dataType._bool => try processBool(s),
         dataType._sUInt8 => processSUInt8(s),
+        dataType._sInt16 => processSInt16(s),
         dataType._sInt32 => processSInt32(s),
+        dataType._sUInt32 => processSUInt32(s),
         dataType._sUInt64 => processU64(s),
         dataType._sFloat32 => processSFloat32(s),
         dataType._cDeltaString => processCDeltaString(s),
     };
 }
 
-fn processBool(s: *status) dataUnion {
+fn processBool(s: *status) !dataUnion {
     defer s.current += 1;
     return switch (s.source[s.current]) {
         1 => dataUnion{ ._bool = true },
         0 => dataUnion{ ._bool = false },
-        else => unreachable,
+        else => errors.InvalidNodeType,
     };
 }
 
@@ -169,10 +183,24 @@ fn processSUInt8(s: *status) dataUnion {
     return dataUnion{ ._sUInt8 = val };
 }
 
+// TODO: test
+fn processSInt16(s: *status) dataUnion {
+    defer s.current += 2;
+    const val = std.mem.readIntSlice(i16, s.source[s.current..], std.builtin.Endian.Little);
+    return dataUnion{ ._sInt16 = val };
+}
+
 fn processSInt32(s: *status) dataUnion {
     defer s.current += 4;
     const val = std.mem.readIntSlice(i32, s.source[s.current..], std.builtin.Endian.Little);
     return dataUnion{ ._sInt32 = val };
+}
+
+// TODO: test
+fn processSUInt32(s: *status) dataUnion {
+    defer s.current += 4;
+    const val = std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
+    return dataUnion{ ._sUInt32 = val };
 }
 
 fn processU64(s: *status) dataUnion {
@@ -229,12 +257,16 @@ fn processFF50(s: *status) !ff50node {
 
 fn processFF56(s: *status) !ff56node {
     const nodeName = try identifier(s);
-    const dType = dataTypeMap.get(try identifier(s)).?;
-    const data = try processData(s, dType);
+    const dTypeString = try identifier(s);
+    const dType = dataTypeMap.get(dTypeString);
+    if (dType == null) {
+        std.debug.print("\nMissing type: {s}\n", .{dTypeString});
+    }
+    const data = try processData(s, dType.?);
 
     return ff56node{
         .name = nodeName,
-        .dType = dType,
+        .dType = dType.?,
         .value = data,
     };
 }
@@ -248,10 +280,12 @@ fn processFF70(s: *status) !ff70node {
 }
 
 fn processSavedLine(s: *status) !node {
-    if (s.source[s.current] > s.savedTokenList.items.len) {
+    if (s.source[s.current] > s.savedTokenList.len) {
         return error.InvalidFileError;
     }
-    const savedLine = s.savedTokenList.items[s.source[s.current]];
+    //std.debug.print("{X}, {any}\n", .{ s.current, s.savedTokenList.items[s.source[s.current]] });
+    const savedLine = s.savedTokenList[s.source[s.current]];
+    std.debug.print("POP {X}\n", .{s.source[s.current]});
     s.current += 1;
     switch (savedLine) {
         .ff56node => {
@@ -336,10 +370,63 @@ fn errorInfo(s: *status) void {
         std.debug.print(", {x}", .{s.source[s.current + i]});
     }
     std.debug.print("\n", .{});
-    std.debug.print("ELEMENT STACK:\n", .{});
-    for (s.result.items) |item| {
-        std.debug.print("{any}\n", .{item});
-    }
+
+    //for (s.stringMap.items) |item, idx| {
+    //    std.debug.print("{X}, {s}\n", .{ idx, item });
+    //}
+    var dTypeMap = std.AutoHashMap(n.dataType, []const u8).init(allocator);
+    initDtypeMap(&dTypeMap) catch return;
+
+    //for (s.savedTokenList) |item, idx| {
+    //    std.debug.print("{X}, {s},      {s},     {s}\n", .{ idx, errorGetNodeFF(item), errorGetNodeName(item), errorGetNodeType(item, &dTypeMap) });
+    //}
+    //std.debug.print("ELEMENT STACK:\n", .{});
+    //for (s.result.items) |item| {
+    //    std.debug.print("{any}\n", .{item});
+    //}
+    std.debug.print("FF: {s}\n", .{s.stringMap.items[0xff]});
+    std.debug.print("0b: {s}\n", .{s.stringMap.items[0x0b]});
+}
+
+fn initDtypeMap(dTypeMap: *std.AutoHashMap(n.dataType, []const u8)) !void {
+    try dTypeMap.put(n.dataType._bool, "bool");
+    try dTypeMap.put(n.dataType._sUInt8, "sUInt8");
+    try dTypeMap.put(n.dataType._sInt16, "sInt16");
+    try dTypeMap.put(n.dataType._sInt32, "sInt32");
+    try dTypeMap.put(n.dataType._sUInt32, "sUInt32");
+    try dTypeMap.put(n.dataType._sUInt64, "sUInt64");
+    try dTypeMap.put(n.dataType._sFloat32, "sFloat32");
+    try dTypeMap.put(n.dataType._cDeltaString, "cDeltaString");
+}
+
+fn errorGetNodeFF(nde: n.node) []const u8 {
+    return switch (nde) {
+        .ff41node => "ff41",
+        .ff4enode => "ff4e",
+        .ff50node => "ff50",
+        .ff56node => "ff56",
+        .ff70node => "ff70",
+    };
+}
+
+fn errorGetNodeName(nde: n.node) []const u8 {
+    return switch (nde) {
+        .ff41node => |f| f.name,
+        .ff4enode => "NULL NODE",
+        .ff50node => |f| f.name,
+        .ff56node => |f| f.name,
+        .ff70node => |f| f.name,
+    };
+}
+
+fn errorGetNodeType(nde: n.node, mp: *std.AutoHashMap(n.dataType, []const u8)) []const u8 {
+    return switch (nde) {
+        .ff41node => |f| mp.get(f.dType).?,
+        .ff4enode => "",
+        .ff50node => "",
+        .ff56node => |f| mp.get(f.dType).?,
+        .ff70node => "",
+    };
 }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////  Test Area ////////////////////////////////////
