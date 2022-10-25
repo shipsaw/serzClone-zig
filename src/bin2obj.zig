@@ -87,7 +87,6 @@ pub fn parse(inputBytes: []const u8) ![]const node {
     while (!s.isAtEnd()) {
         if (s.source[s.current] == 0xff) {
             s.current += 1;
-            std.debug.print("PUSH {X}\n", .{s.savedTokenListIdx});
             switch (s.source[s.current]) {
                 0x41 => {
                     s.current += 1;
@@ -138,7 +137,6 @@ fn identifier(s: *status) ![]const u8 {
         s.current += 4;
 
         if (s.current + strLen > s.source.len) {
-            std.debug.print("{s}\n", .{s.source[s.current .. s.current + 40]});
             return errors.InvalidNodeType;
         }
         var str = s.source[s.current..(s.current + strLen)];
@@ -150,7 +148,6 @@ fn identifier(s: *status) ![]const u8 {
     const strIdx = std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
     s.current += 2;
 
-    //std.debug.print("{X}, {s}\n", .{ strIdx, s.stringMap.items[strIdx] });
     return s.stringMap.items[strIdx];
 }
 
@@ -283,9 +280,7 @@ fn processSavedLine(s: *status) !node {
     if (s.source[s.current] > s.savedTokenList.len) {
         return error.InvalidFileError;
     }
-    //std.debug.print("{X}, {any}\n", .{ s.current, s.savedTokenList.items[s.source[s.current]] });
     const savedLine = s.savedTokenList[s.source[s.current]];
-    std.debug.print("POP {X}\n", .{s.source[s.current]});
     s.current += 1;
     switch (savedLine) {
         .ff56node => {
@@ -384,8 +379,6 @@ fn errorInfo(s: *status) void {
     //for (s.result.items) |item| {
     //    std.debug.print("{any}\n", .{item});
     //}
-    std.debug.print("FF: {s}\n", .{s.stringMap.items[0xff]});
-    std.debug.print("0b: {s}\n", .{s.stringMap.items[0x0b]});
 }
 
 fn initDtypeMap(dTypeMap: *std.AutoHashMap(n.dataType, []const u8)) !void {

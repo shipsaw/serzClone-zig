@@ -24,6 +24,7 @@ const strMapType = struct {
 
 const lineMapType = struct {
     map: std.StringHashMap(u8),
+    posMap: std.AutoHashMap(u8, []const u8),
     currentPos: u8,
 };
 
@@ -40,7 +41,11 @@ const status = struct {
             .current = 0,
             .source = src,
             .stringMap = strMapType{ .map = std.StringHashMap(u16).init(allocator), .currentPos = 0 },
-            .lineMap = lineMapType{ .map = std.StringHashMap(u8).init(allocator), .currentPos = 0 },
+            .lineMap = lineMapType{
+                .map = std.StringHashMap(u8).init(allocator),
+                .posMap = std.AutoHashMap(u8, []const u8).init(allocator),
+                .currentPos = 0,
+            },
             .parentStack = null,
             .result = std.ArrayList(u8).init(allocator),
         };
@@ -91,9 +96,17 @@ const status = struct {
         }
 
         const result: ?u8 = self.lineMap.map.get(nodeAsStr.items);
-        if (result == null and self.lineMap.currentPos < 255) {
+        if (result == null) {
+            // Remove the existing entry in the "buffer"
+            const lineToRemove = self.lineMap.posMap.get(self.lineMap.currentPos);
+            if (lineToRemove != null) {
+                _ = self.lineMap.map.remove(lineToRemove.?);
+            }
+
+            // Add the new line to the buffer
             try self.lineMap.map.put(nodeAsStr.items, self.lineMap.currentPos);
-            self.lineMap.currentPos += 1;
+            try self.lineMap.posMap.put(self.lineMap.currentPos, nodeAsStr.items);
+            self.lineMap.currentPos = (self.lineMap.currentPos + 1) % 255;
             return null;
         }
         return result;
@@ -260,6 +273,7 @@ fn fixSuint8(data: n.dataUnion, expectedType: n.dataType) !n.dataUnion {
     const boxedData = data._sUInt8;
     return switch (expectedType) {
         n.dataType._sInt32 => n.dataUnion{ ._sInt32 = @intCast(i32, boxedData) },
+        n.dataType._sInt16 => n.dataUnion{ ._sInt16 = @intCast(i16, boxedData) },
         n.dataType._sUInt32 => n.dataUnion{ ._sUInt32 = @intCast(u32, boxedData) },
         n.dataType._sUInt64 => n.dataUnion{ ._sUInt64 = @intCast(u64, boxedData) },
         n.dataType._sFloat32 => n.dataUnion{ ._sFloat32 = @intToFloat(f32, boxedData) },
