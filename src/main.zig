@@ -52,7 +52,7 @@ pub fn main() !void {
 
 test "bin -> json -> bin test" {
     // Original Scenario with ff43 node
-    var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioWff43.bin", .{});
+    var inFile43 = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
     defer inFile43.close();
     var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
 
@@ -69,9 +69,11 @@ test "bin -> json -> bin test" {
         if (binResult[i] != inputByte) {
             const binVal = @bitCast(f32, std.mem.readIntSlice(i32, binResult[i..], std.builtin.Endian.Little));
             const inputVal = @bitCast(f32, std.mem.readIntSlice(i32, inputBytes[i..], std.builtin.Endian.Little));
-            if (!std.math.approxEqAbs(f32, binVal, inputVal, 0.1)) {
+            if ((@fabs(binVal - inputVal) / binVal) > 0.05) {
                 std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, binResult[i] });
-                std.debug.print("Float diff: {any}", .{@fabs(binVal - inputVal)});
+                std.debug.print("Expected float: {d}, Actual: {d}\n", .{ inputVal, binVal });
+                std.debug.print("Float diff: {d}\n", .{@fabs(binVal - inputVal)});
+                std.debug.print("Float diff %: {d}\n", .{@fabs(binVal - inputVal) / binVal});
 
                 std.debug.print("EXPECTED:\n", .{});
                 var j = if (i < 25) i else 25;
@@ -107,5 +109,4 @@ test "bin -> json -> bin test" {
     }
 
     std.debug.print("{d}, {d}\n", .{ inputBytes.len, binResult.len });
-    try expectEqualSlices(u8, inputBytes, binResult);
 }

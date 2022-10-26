@@ -58,7 +58,6 @@ const status = struct {
     }
 
     fn checkStringMap(self: *status, str: []const u8, ctx: stringContext) ![]const u8 {
-        // TODO: Check underscore logic
         const correctedStr = if (str.len > 0 and str[0] == '_' and ctx == stringContext.VALUE) str[1..] else str;
         var resultArray = std.ArrayList(u8).init(allocator);
         const result: ?u16 = self.stringMap.map.get(correctedStr);
@@ -361,6 +360,29 @@ test "stringMap functionality" {
     try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x06, 0x00, 0x00, 0x00, 'S', 'a', 't', 'u', 'r', 'n' }, result2);
     try expectEqualSlices(u8, &[_]u8{ 0x00, 0x00 }, result3);
     try expectEqualSlices(u8, &[_]u8{ 0x01, 0x00 }, result4);
+}
+
+test "stringMap underScore functionality" {
+    // Arrange
+    const inputString1 = "_0123";
+    const inputString2 = "Saturn";
+    const inputString3 = "Jupiter";
+
+    const dummyNode = n.textNode{ .ff56NodeT = n.ff56NodeT{ .name = "name", .dType = "bool", .value = n.dataUnion{ ._bool = true } } };
+    var s = status.init(dummyNode);
+
+    // Act
+    const result1 = try s.checkStringMap(inputString1, stringContext.VALUE);
+    const result2 = try s.checkStringMap(inputString1, stringContext.NAME);
+    const result3 = try s.checkStringMap(inputString2, stringContext.NAME);
+    const result4 = try s.checkStringMap(inputString3, stringContext.VALUE);
+
+    // Assert
+    try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x04, 0x00, 0x00, 0x00, '0', '1', '2', '3' }, result1);
+    try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x05, 0x00, 0x00, 0x00, '_', '0', '1', '2', '3' }, result2);
+
+    try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x06, 0x00, 0x00, 0x00, 'S', 'a', 't', 'u', 'r', 'n' }, result3);
+    try expectEqualSlices(u8, &[_]u8{ 0xFF, 0xFF, 0x07, 0x00, 0x00, 0x00, 'J', 'u', 'p', 'i', 't', 'e', 'r' }, result4);
 }
 
 test "convertDataUnion test" {
