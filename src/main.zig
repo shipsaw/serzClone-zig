@@ -52,12 +52,12 @@ pub fn main() !void {
 
 test "bin -> json -> bin test" {
     // Original Scenario with ff43 node
-    var inFile43 = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
+    var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioWff43.bin", .{});
     defer inFile43.close();
     var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
 
     // Scenario parsed by serz
-    var inFile = try std.fs.cwd().openFile("testFiles/Scenario.bin", .{});
+    var inFile = try std.fs.cwd().openFile("testFiles/ScenarioAfterSerz.bin", .{});
     defer inFile.close();
     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
 
@@ -67,13 +67,15 @@ test "bin -> json -> bin test" {
 
     for (inputBytes) |inputByte, i| {
         if (binResult[i] != inputByte) {
-            const binVal = @bitCast(f32, std.mem.readIntSlice(i32, binResult[i..], std.builtin.Endian.Little));
-            const inputVal = @bitCast(f32, std.mem.readIntSlice(i32, inputBytes[i..], std.builtin.Endian.Little));
-            if ((@fabs(binVal - inputVal) / binVal) > 0.05) {
+            const expectedVal = @bitCast(f32, std.mem.readIntSlice(i32, inputBytes[i..], std.builtin.Endian.Little));
+            const actualVal = @bitCast(f32, std.mem.readIntSlice(i32, binResult[i..], std.builtin.Endian.Little));
+            if (@fabs(expectedVal - actualVal) / expectedVal > 0.01) {
                 std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, binResult[i] });
-                std.debug.print("Expected float: {d}, Actual: {d}\n", .{ inputVal, binVal });
-                std.debug.print("Float diff: {d}\n", .{@fabs(binVal - inputVal)});
-                std.debug.print("Float diff %: {d}\n", .{@fabs(binVal - inputVal) / binVal});
+                std.debug.print("EXPECTED: {s},\n", .{try formatFloat(expectedVal)});
+                std.debug.print("ACTUAL:   {s},\n", .{try formatFloat(actualVal)});
+
+                std.debug.print("EXPECTED(full): {d},\n", .{expectedVal});
+                std.debug.print("ACTUAL(full):   {d},\n", .{actualVal});
 
                 std.debug.print("EXPECTED:\n", .{});
                 var j = if (i < 25) i else 25;
@@ -101,12 +103,28 @@ test "bin -> json -> bin test" {
                     std.debug.print("{X} ", .{binResult[i + k]});
                 }
                 std.debug.print("\n", .{});
-                i += 3;
-            } else {
-                i += 3;
             }
+            i += 3;
         }
     }
+}
 
-    std.debug.print("{d}, {d}\n", .{ inputBytes.len, binResult.len });
+fn formatFloat(val: f32) ![]const u8 {
+    if (val < 1) {
+        return try std.fmt.allocPrint(allocator, "{d:.7}", .{val});
+    } else if (val < 10) {
+        return try std.fmt.allocPrint(allocator, "{d:.5}", .{val});
+    } else if (val < 100) {
+        return try std.fmt.allocPrint(allocator, "{d:.4}", .{val});
+    } else if (val < 1000) {
+        return try std.fmt.allocPrint(allocator, "{d:.3}", .{val});
+    } else if (val < 10_000) {
+        return try std.fmt.allocPrint(allocator, "{d:.2}", .{val});
+    } else if (val < 100_000) {
+        return try std.fmt.allocPrint(allocator, "{d:.1}", .{val});
+    } else if (val < 1_000_000) {
+        return try std.fmt.allocPrint(allocator, "{d:.0}", .{val});
+    } else {
+        return try std.fmt.allocPrint(allocator, "{e:.6}", .{val});
+    }
 }

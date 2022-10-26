@@ -1,5 +1,6 @@
 const std = @import("std");
 const parser = @import("bin2obj.zig");
+const json = @import("custom_json.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
@@ -24,7 +25,7 @@ const parentStatusStackType = std.ArrayList(parentStatus);
 pub fn parse(nodes: []const n.node) ![]const u8 {
     const textNodesList = try sort(nodes);
     var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(textNodesList, .{}, string.writer());
+    try json.stringify(textNodesList, .{}, string.writer());
     return string.items;
 }
 
@@ -150,7 +151,7 @@ test "Convert ff41 node" {
 
     // test JSON Stringify
     var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(actual, .{}, string.writer());
+    try json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff50 node" {
@@ -209,7 +210,7 @@ test "Convert ff50 node with children" {
 
     // test JSON Stringify
     var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(actual, .{}, string.writer());
+    try json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff4e node" {
@@ -229,7 +230,7 @@ test "Convert ff4e node" {
 
     // test JSON Stringify
     var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(actual, .{}, string.writer());
+    try json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff56 node" {
@@ -257,7 +258,7 @@ test "Convert ff56 node" {
 
     // test JSON Stringify
     var string = std.ArrayList(u8).init(allocator);
-    try std.json.stringify(actual, .{}, string.writer());
+    try json.stringify(actual, .{}, string.writer());
 }
 
 test "Convert ff56 node with negative zero" {

@@ -153,7 +153,7 @@ fn processData(s: *status, dType: dataType) !dataUnion {
         dataType._sInt32 => processSInt32(s),
         dataType._sUInt32 => processSUInt32(s),
         dataType._sUInt64 => processU64(s),
-        dataType._sFloat32 => processSFloat32(s),
+        dataType._sFloat32 => try processSFloat32(s),
         dataType._cDeltaString => processCDeltaString(s),
     };
 }
@@ -199,9 +199,9 @@ fn processU64(s: *status) dataUnion {
     return dataUnion{ ._sUInt64 = val };
 }
 
-fn processSFloat32(s: *status) dataUnion {
+fn processSFloat32(s: *status) !dataUnion {
     defer s.current += 4;
-    const val = @bitCast(f32, std.mem.readIntSlice(i32, s.source[s.current..], std.builtin.Endian.Little));
+    const val = @bitCast(f32, std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little));
     if (std.mem.eql(u8, s.source[s.current .. s.current + 4], &[_]u8{ 0x00, 0x00, 0x00, 0x80 })) {
         return dataUnion{ ._cDeltaString = &[_]u8{ '(', '-', '0', ')' } };
     }

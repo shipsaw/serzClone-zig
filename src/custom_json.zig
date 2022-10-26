@@ -1177,13 +1177,13 @@ pub const ObjectMap = StringArrayHashMap(Value);
 pub const Array = ArrayList(Value);
 
 /// Represents a JSON value
-/// Currently only supports numbers that fit into i64 or f64.
+/// Currently only supports numbers that fit into i64 or f32.
 pub const Value = union(enum) {
     Null,
     Bool: bool,
     Integer: i64,
-    Float: f64,
-    //NumberString: []const u8,
+    Float: f32,
+    NumberString: []const u8,
     String: []const u8,
     Array: Array,
     Object: ObjectMap,
@@ -1198,7 +1198,7 @@ pub const Value = union(enum) {
             .Bool => |inner| try stringify(inner, options, out_stream),
             .Integer => |inner| try stringify(inner, options, out_stream),
             .Float => |inner| try stringify(inner, options, out_stream),
-            //.NumberString => |inner| try out_stream.writeAll(inner),
+            .NumberString => |inner| try out_stream.writeAll(inner),
             .String => |inner| try stringify(inner, options, out_stream),
             .Array => |inner| try stringify(inner.items, options, out_stream),
             .Object => |inner| {
@@ -2005,12 +2005,12 @@ pub const Parser = struct {
         return if (n.is_integer)
             Value{
                 .Integer = std.fmt.parseInt(i64, n.slice(input, i), 10) catch |e| switch (e) {
-                    error.Overflow => |err| return err,
+                    error.Overflow => return Value{ .NumberString = n.slice(input, i) },
                     error.InvalidCharacter => |err| return err,
                 },
             }
         else
-            Value{ .Float = try std.fmt.parseFloat(f64, n.slice(input, i)) };
+            Value{ .Float = try std.fmt.parseFloat(f32, n.slice(input, i)) };
     }
 };
 
@@ -2220,7 +2220,7 @@ pub fn stringify(
     const T = @TypeOf(value);
     switch (@typeInfo(T)) {
         .Float, .ComptimeFloat => {
-            return std.fmt.formatFloatScientific(value, std.fmt.FormatOptions{}, out_stream);
+            return try formatFloat(value, out_stream);
         },
         .Int, .ComptimeInt => {
             return std.fmt.formatIntValue(value, "", std.fmt.FormatOptions{}, out_stream);
@@ -2365,6 +2365,26 @@ pub fn stringify(
         else => @compileError("Unable to stringify type '" ++ @typeName(T) ++ "'"),
     }
     unreachable;
+}
+
+fn formatFloat(val: f32, writer: anytype) !void {
+    if (@fabs(val) <= 1) {
+        try std.fmt.format(writer, "{d:.7}", .{val});
+    } else if (@fabs(val) < 10) {
+        try std.fmt.format(writer, "{d:.5}", .{val});
+    } else if (@fabs(val) < 100) {
+        try std.fmt.format(writer, "{d:.4}", .{val});
+    } else if (@fabs(val) < 1000) {
+        try std.fmt.format(writer, "{d:.3}", .{val});
+    } else if (@fabs(val) < 10_000) {
+        try std.fmt.format(writer, "{d:.2}", .{val});
+    } else if (@fabs(val) < 100_000) {
+        try std.fmt.format(writer, "{d:.1}", .{val});
+    } else if (@fabs(val) < 10_000_000) {
+        try std.fmt.format(writer, "{d:.0}", .{val});
+    } else {
+        try std.fmt.format(writer, "{e:.5}", .{val});
+    }
 }
 
 // Same as `stringify` but accepts an Allocator and stores result in dynamically allocated memory instead of using a Writer.
