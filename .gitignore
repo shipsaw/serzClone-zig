@@ -18,12 +18,8 @@ zig-out/
 /docgen_tmp/
 /helix
 /kcov-output
-/testFiles/
-notes.txt
-results.txt
 *test.zig
 *.json
 *.obj
-*.bin
-*.xml
+build.zig
 zigSerz
