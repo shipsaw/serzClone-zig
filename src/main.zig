@@ -50,7 +50,25 @@ pub fn main() !void {
     }
 }
 
-test "bin -> json -> bin test" {
+test "bin -> json -> bin test: InitalSave.bin" {
+    // Original Scenario with ff43 node
+    var inFile43 = try std.fs.cwd().openFile("testFiles/InitialSave.bin", .{});
+    defer inFile43.close();
+    var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
+
+    // Scenario parsed by serz
+    var inFile = try std.fs.cwd().openFile("testFiles/InitialSaveAfterSerz.bin", .{});
+    defer inFile.close();
+    var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
+
+    const nodes = (try binParser.parse(inputBytes43));
+    const jsonResult = try objParser.parse(nodes);
+    const binResult = try jsonParser.parse(jsonResult);
+
+    try compareResults(inputBytes, binResult);
+}
+
+test "bin -> json -> bin test: Scenario.bin" {
     // Original Scenario with ff43 node
     var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioWff43.bin", .{});
     defer inFile43.close();
@@ -65,12 +83,16 @@ test "bin -> json -> bin test" {
     const jsonResult = try objParser.parse(nodes);
     const binResult = try jsonParser.parse(jsonResult);
 
-    for (inputBytes) |inputByte, i| {
-        if (binResult[i] != inputByte) {
-            const expectedVal = @bitCast(f32, std.mem.readIntSlice(i32, inputBytes[i..], std.builtin.Endian.Little));
-            const actualVal = @bitCast(f32, std.mem.readIntSlice(i32, binResult[i..], std.builtin.Endian.Little));
-            if (@fabs(expectedVal - actualVal) / expectedVal > 0.01) {
-                std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, binResult[i] });
+    try compareResults(inputBytes, binResult);
+}
+
+fn compareResults(expectedBytes: []const u8, actualBytes: []const u8) !void {
+    for (expectedBytes) |inputByte, i| {
+        if (actualBytes[i] != inputByte) {
+            const expectedVal = @bitCast(f32, std.mem.readIntSlice(i32, expectedBytes[i..], std.builtin.Endian.Little));
+            const actualVal = @bitCast(f32, std.mem.readIntSlice(i32, actualBytes[i..], std.builtin.Endian.Little));
+            if (@fabs(expectedVal - actualVal) / expectedVal > 0.00001) {
+                std.debug.print("ERROR, MISMATCH AT INDEX {any}\nEXPECTED: {any}\nACTUAL: {any}\n", .{ i, inputByte, actualBytes[i] });
                 std.debug.print("EXPECTED: {s},\n", .{try formatFloat(expectedVal)});
                 std.debug.print("ACTUAL:   {s},\n", .{try formatFloat(actualVal)});
 
@@ -80,29 +102,30 @@ test "bin -> json -> bin test" {
                 std.debug.print("EXPECTED:\n", .{});
                 var j = if (i < 25) i else 25;
                 while (j > 0) : (j -= 1) {
-                    std.debug.print("{X} ", .{inputBytes[i - j]});
+                    std.debug.print("{X} ", .{expectedBytes[i - j]});
                 }
 
-                std.debug.print("({X}) ", .{inputBytes[i]});
+                std.debug.print("({X}) ", .{expectedBytes[i]});
 
                 var k: u8 = 1;
                 while (k < 26) : (k += 1) {
-                    std.debug.print("{X} ", .{inputBytes[i + k]});
+                    std.debug.print("{X} ", .{expectedBytes[i + k]});
                 }
 
                 std.debug.print("\nACTUAL:\n", .{});
                 j = if (i < 25) i else 25;
                 while (j > 0) : (j -= 1) {
-                    std.debug.print("{X} ", .{binResult[i - j]});
+                    std.debug.print("{X} ", .{actualBytes[i - j]});
                 }
 
-                std.debug.print("({X}) ", .{binResult[i]});
+                std.debug.print("({X}) ", .{actualBytes[i]});
 
                 k = 1;
                 while (k < 26) : (k += 1) {
-                    std.debug.print("{X} ", .{binResult[i + k]});
+                    std.debug.print("{X} ", .{actualBytes[i + k]});
                 }
                 std.debug.print("\n", .{});
+                std.os.exit(1);
             }
             i += 3;
         }

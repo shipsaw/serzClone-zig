@@ -17,6 +17,12 @@ const dataUnion = n.dataUnion;
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 
+const stringContext = enum {
+    NAME,
+    DTYPE,
+    VALUE,
+};
+
 const status = struct {
     start: usize,
     current: usize,
@@ -86,6 +92,9 @@ pub fn parse(inputBytes: []const u8) ![]const node {
                 },
                 0x43 => {
                     s.current += 6;
+                    if (s.result.items.len > 0) {
+                        s.result.items[s.result.items.len - 1].ff50node.children = 1;
+                    }
                 },
                 0x4e => {
                     s.current += 1;
@@ -121,7 +130,8 @@ pub fn parse(inputBytes: []const u8) ![]const node {
     return s.result.items;
 }
 
-fn identifier(s: *status) ![]const u8 {
+fn identifier(s: *status, ctx: stringContext) ![]const u8 {
+    var retArray = std.ArrayList(u8).init(allocator);
     if (s.source[s.current] == 0xFF and s.source[s.current + 1] == 0xFF) // New string
     {
         s.current += 2;
@@ -133,11 +143,22 @@ fn identifier(s: *status) ![]const u8 {
             return errors.InvalidNodeType;
         }
         var str = s.source[s.current..(s.current + strLen)];
+        if (ctx == stringContext.NAME) { // Replace '-' with '::' in names only
+            for (str) |c| {
+                if (c == '-') {
+                    try retArray.appendSlice("::");
+                } else {
+                    try retArray.append(c);
+                }
+            }
+        } else {
+            try retArray.appendSlice(str);
+        }
 
         try s.stringMap.append(str);
         defer s.current += strLen;
 
-        return str;
+        return retArray.items;
     }
     const strIdx = std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
     s.current += 2;
@@ -210,7 +231,7 @@ fn processSFloat32(s: *status) !dataUnion {
 
 fn processCDeltaString(s: *status) !dataUnion {
     var result = std.ArrayList(u8).init(allocator);
-    const str = try identifier(s);
+    const str = try identifier(s, stringContext.VALUE);
     if (str.len > 0 and std.ascii.isDigit(str[0])) {
         try result.append('_');
     }
@@ -219,8 +240,8 @@ fn processCDeltaString(s: *status) !dataUnion {
 }
 
 fn processFF41(s: *status) !ff41node {
-    const nodeName = try identifier(s);
-    const elemType = n.dataTypeMap.get(try identifier(s)).?;
+    const nodeName = try identifier(s, stringContext.NAME);
+    const elemType = n.dataTypeMap.get(try identifier(s, stringContext.DTYPE)).?;
     const numElements = s.source[s.current];
     s.current += 1;
 
@@ -239,7 +260,7 @@ fn processFF41(s: *status) !ff41node {
 }
 
 fn processFF50(s: *status) !ff50node {
-    const nodeName = try identifier(s);
+    const nodeName = try identifier(s, stringContext.NAME);
     const id = processU32(s);
     const children = processU32(s);
 
@@ -251,8 +272,8 @@ fn processFF50(s: *status) !ff50node {
 }
 
 fn processFF56(s: *status) !ff56node {
-    const nodeName = try identifier(s);
-    const dTypeString = try identifier(s);
+    const nodeName = try identifier(s, stringContext.NAME);
+    const dTypeString = try identifier(s, stringContext.DTYPE);
     const dType = n.dataTypeMap.get(dTypeString);
     if (dType == null) {
         std.debug.print("\nMissing type: {s}\n", .{dTypeString});
@@ -385,7 +406,7 @@ test "identifier test, not in map" {
     var statusStruct = status.init(&[_]u8{ 255, 255, 5, 0, 0, 0, 72, 101, 108, 108, 111 });
 
     // Act
-    const actual = try identifier(&statusStruct);
+    const actual = try identifier(&statusStruct, stringContext.NAME);
 
     // Assert
     try expectEqualStrings(actual, "Hello");
@@ -399,7 +420,7 @@ test "identifier test, in map" {
     try statusStruct.stringMap.append("Hello");
 
     // Act
-    const actual = try identifier(&statusStruct);
+    const actual = try identifier(&statusStruct, stringContext.NAME);
 
     // Assert
     try expectEqualStrings(actual, "Hello");
@@ -412,10 +433,10 @@ test "bool data" {
     var statusStructFalse = status.init(&[_]u8{ 255, 255, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 0 });
 
     // Act
-    const dTypeT = n.dataTypeMap.get(try identifier(&statusStructTrue)).?;
+    const dTypeT = n.dataTypeMap.get(try identifier(&statusStructTrue, stringContext.NAME)).?;
     const dataTrue = try processData(&statusStructTrue, dTypeT);
 
-    const dTypeF = n.dataTypeMap.get(try identifier(&statusStructFalse)).?;
+    const dTypeF = n.dataTypeMap.get(try identifier(&statusStructFalse, stringContext.NAME)).?;
     const dataFalse = try processData(&statusStructFalse, dTypeF);
 
     // Assert
@@ -433,10 +454,10 @@ test "sUInt8 data" {
     var statusStruct0 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'U', 'I', 'n', 't', '8', 0 });
 
     // Act
-    const dType11 = n.dataTypeMap.get(try identifier(&statusStruct11)).?;
+    const dType11 = n.dataTypeMap.get(try identifier(&statusStruct11, stringContext.NAME)).?;
     const data11 = try processData(&statusStruct11, dType11);
 
-    const dType0 = n.dataTypeMap.get(try identifier(&statusStruct0)).?;
+    const dType0 = n.dataTypeMap.get(try identifier(&statusStruct0, stringContext.NAME)).?;
     const data0 = try processData(&statusStruct0, dType0);
 
     // Assert
@@ -454,10 +475,10 @@ test "sInt32 data" {
     var statusStruct3210 = status.init(&[_]u8{ 255, 255, 6, 0, 0, 0, 's', 'I', 'n', 't', '3', '2', 0x8a, 0x0c, 0x00, 0x00 }); // 3210
 
     // Act
-    const dType_3200 = n.dataTypeMap.get(try identifier(&statusStruct_3200)).?;
+    const dType_3200 = n.dataTypeMap.get(try identifier(&statusStruct_3200, stringContext.NAME)).?;
     const data_3200 = try processData(&statusStruct_3200, dType_3200);
 
-    const dType3210 = n.dataTypeMap.get(try identifier(&statusStruct3210)).?;
+    const dType3210 = n.dataTypeMap.get(try identifier(&statusStruct3210, stringContext.NAME)).?;
     const data3210 = try processData(&statusStruct3210, dType3210);
 
     // Assert
@@ -478,19 +499,19 @@ test "sFloat32 data" {
     var statusStructNegZero = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x00, 0x00, 0x00, 0x80 }); // -1234
 
     // Act
-    const dType12345 = n.dataTypeMap.get(try identifier(&statusStruct12345)).?;
+    const dType12345 = n.dataTypeMap.get(try identifier(&statusStruct12345, stringContext.NAME)).?;
     const data12345 = try processData(&statusStruct12345, dType12345);
 
-    const dType_1234 = n.dataTypeMap.get(try identifier(&statusStruct_1234)).?;
+    const dType_1234 = n.dataTypeMap.get(try identifier(&statusStruct_1234, stringContext.NAME)).?;
     const data_1234 = try processData(&statusStruct_1234, dType_1234);
 
-    const dType_s1 = n.dataTypeMap.get(try identifier(&statusStruct_s1)).?;
+    const dType_s1 = n.dataTypeMap.get(try identifier(&statusStruct_s1, stringContext.NAME)).?;
     const data_s1 = try processData(&statusStruct_s1, dType_s1);
 
-    const dType_s2 = n.dataTypeMap.get(try identifier(&statusStruct_s2)).?;
+    const dType_s2 = n.dataTypeMap.get(try identifier(&statusStruct_s2, stringContext.NAME)).?;
     const data_s2 = try processData(&statusStruct_s2, dType_s2);
 
-    const dType_negZero = n.dataTypeMap.get(try identifier(&statusStructNegZero)).?;
+    const dType_negZero = n.dataTypeMap.get(try identifier(&statusStructNegZero, stringContext.NAME)).?;
     const data_negZero = try processData(&statusStructNegZero, dType_negZero);
 
     // Assert
@@ -512,7 +533,7 @@ test "sUInt64 data" {
     var statusStruct = status.init(u64Name ++ u64Value);
 
     // Act
-    const dType = n.dataTypeMap.get(try identifier(&statusStruct)).?;
+    const dType = n.dataTypeMap.get(try identifier(&statusStruct, stringContext.DTYPE)).?;
     const data = try processData(&statusStruct, dType);
 
     // Assert
@@ -530,10 +551,10 @@ test "cDeltaString data" {
     try statusStructExisting.stringMap.append("iExist");
 
     // Act
-    const dTypeHello = n.dataTypeMap.get(try identifier(&statusStructHello)).?;
+    const dTypeHello = n.dataTypeMap.get(try identifier(&statusStructHello, stringContext.DTYPE)).?;
     const dataHello = try processData(&statusStructHello, dTypeHello);
 
-    const dTypeExisting = n.dataTypeMap.get(try identifier(&statusStructExisting)).?;
+    const dTypeExisting = n.dataTypeMap.get(try identifier(&statusStructExisting, stringContext.DTYPE)).?;
     const dataExisting = try processData(&statusStructExisting, dTypeExisting);
 
     // Assert
