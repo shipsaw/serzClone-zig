@@ -1,0 +1,4257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cRecordSet xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0" d:id="593046224">
+	<Record>
+		<cScenarioNetworkProperties d:id="795209798">
+			<Property>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="302374332">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5366218607794238318</e>
+								<e d:type="sUInt64">4033062305255241130</e>
+							</UUID>
+							<DevString d:type="cDeltaString">70aab36e-a364-4a78-aab5-c16dcc50f837</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="653817564">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="669807412">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332587252">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock Departure</English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">49a69abb-a8bf-406b-a15d-255644432328</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock Departure</DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333352078">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">112</Palette0Index>
+											<Palette1Index d:type="sUInt8">81</Palette1Index>
+											<Palette2Index d:type="sUInt8">187</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="662126434">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="662126440">
+													<Height d:type="sFloat32" d:alt_encoding="000000E020711040" d:precision="string">4.11048</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.1541583 -0.0000000 0.9880462 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 1.0000000 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9880462 0.0000000 0.1541583 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="662126447">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-38</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="000000A0F09C8940" d:precision="string">819.617</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="000000C06A278240" d:precision="string">580.927</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Destination marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - destination</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">4893400893930470837</e>
+												<e d:type="sUInt64">11102099185300939693</e>
+											</UUID>
+											<DevString d:type="cDeltaString">ca4dfdb5-da2f-43e8-ad23-04396394129a</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="000000A070113E40" d:precision="string">30.0681</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000E024624140" d:precision="string">34.7668</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334715228">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5066708752729876511</e>
+								<e d:type="sUInt64">16020969604133593530</e>
+							</UUID>
+							<DevString d:type="cDeltaString">1ad3a81f-90c4-4650-baa1-b6e3f8ea55de</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826504378">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526466126">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332566748">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock Siding</English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">85e66be4-6fe9-4731-93d4-b262d328be64</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock Siding</DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333343238">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">103</Palette0Index>
+											<Palette1Index d:type="sUInt8">81</Palette1Index>
+											<Palette2Index d:type="sUInt8">64</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795814992">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795814998">
+													<Height d:type="sFloat32" d:alt_encoding="000000C078711040" d:precision="string">4.11081</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.1541579 -0.0000000 0.9880462 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 0.9999999 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9880462 0.0000000 0.1541579 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795815005">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-38</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000088FF8B40" d:precision="string">895.941</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000088E88140" d:precision="string">573.066</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Siding marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - siding</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5694020359513693555</e>
+												<e d:type="sUInt64">3383791863058608818</e>
+											</UUID>
+											<DevString d:type="cDeltaString">48a7dd73-3959-4f05-b232-7777c5a4f52e</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000C02FB96740" d:precision="string">189.787</_end>
+							<First d:type="bool">0</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334695380">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5741296018796857711</e>
+								<e d:type="sUInt64">3284588442266943417</e>
+							</UUID>
+							<DevString d:type="cDeltaString">76c0496f-2e4f-4fad-b9bf-ac26c933952d</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507038">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526467010">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332564768">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock Through</English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">c1ea3c13-b7b7-4d32-b3c0-c6194d845baa</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock Through</DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333340768">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">33</Palette0Index>
+											<Palette1Index d:type="sUInt8">155</Palette1Index>
+											<Palette2Index d:type="sUInt8">61</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795814632">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795814638">
+													<Height d:type="sFloat32" d:alt_encoding="000000E09F711040" d:precision="string">4.11096</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.1541580 -0.0000000 0.9880462 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 0.9999999 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9880462 0.0000000 0.1541580 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795814645">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-38</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="00000000640C8D40" d:precision="string">929.549</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="00000000349E8140" d:precision="string">563.775</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Destination marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - destination</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">4985330274108024719</e>
+												<e d:type="sUInt64">13119321201589119928</e>
+											</UUID>
+											<DevString d:type="cDeltaString">8c35a78f-7378-452f-b86b-f8aa1f3111b6</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="000000E063165C40" d:precision="string">112.35</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000008027D85F40" d:precision="string">127.377</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334680684">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4816894133824758895</e>
+								<e d:type="sUInt64">4496508078748201644</e>
+							</UUID>
+							<DevString d:type="cDeltaString">9749a46f-0bb1-42d9-acf2-752b46ce663e</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507048">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526466256">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332566044">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock DM Reverse </English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">907e8ce9-ebe9-4fa1-97bd-b6e46542e3ca</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock DM Reverse </DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333341418">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">165</Palette0Index>
+											<Palette1Index d:type="sUInt8">12</Palette1Index>
+											<Palette2Index d:type="sUInt8">250</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795815292">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795815298">
+													<Height d:type="sFloat32" d:alt_encoding="000000600F711040" d:precision="string">4.11041</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.1541580 -0.0000000 0.9880462 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 1.0000000 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9880462 0.0000000 0.1541580 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795815305">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-38</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000098BC8640" d:precision="string">727.574</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000078448240" d:precision="string">584.559</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Destination marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - destination</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5282540869046320297</e>
+												<e d:type="sUInt64">53702625494494886</e>
+											</UUID>
+											<DevString d:type="cDeltaString">aafd3ca9-5aee-494f-a6ee-1adc40cabe00</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0460B3A40" d:precision="string">26.044</_end>
+							<First d:type="bool">0</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334685340">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5715733617245730287</e>
+								<e d:type="sUInt64">5261586762810261639</e>
+							</UUID>
+							<DevString d:type="cDeltaString">0eb0b5ef-5d71-4f52-8700-34a048e90449</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507058">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526465398">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332566968">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Heathfield Siding</English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">a6b4d986-fca0-4854-bf31-48c0027db77a</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Heathfield Siding</DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333340898">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">61</Palette0Index>
+											<Palette1Index d:type="sUInt8">216</Palette1Index>
+											<Palette2Index d:type="sUInt8">218</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795814852">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795814858">
+													<Height d:type="sFloat32" d:alt_encoding="00000080DBB83940" d:precision="string">25.7221</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.6303087 0.0000000 -0.7763447 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 1.0000001 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.7763447 0.0000000 -0.6303087 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795814865">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-8</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="000000C0AEBD8E40" d:precision="string">983.71</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-18</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="000000C0129F8D40" d:precision="string">947.884</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Siding marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - siding</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5246751837087077249</e>
+												<e d:type="sUInt64">5087200209809332635</e>
+											</UUID>
+											<DevString d:type="cDeltaString">52341381-34ff-48d0-9b59-fa3ea35d9946</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="00000000F2165240" d:precision="string">72.3585</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000E0DE976440" d:precision="string">164.746</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334679228">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5009935684652280601</e>
+								<e d:type="sUInt64">17487959046959701932</e>
+							</UUID>
+							<DevString d:type="cDeltaString">1f40ab19-ddf6-4586-ac9f-9c1819b6b1f2</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507098">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526465814">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332565912">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">E706 </English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">94c11bec-f7d2-4eff-8e11-d272eaaa4f10</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">E706 </DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333341158">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">130</Palette0Index>
+											<Palette1Index d:type="sUInt8">199</Palette1Index>
+											<Palette2Index d:type="sUInt8">169</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795813992">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795813998">
+													<Height d:type="sFloat32" d:alt_encoding="000000A061380E40" d:precision="string">3.77753</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.9760167 0.0000000 -0.2176957 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.0000000 1.0000000 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.2176957 0.0000000 0.9760167 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795814005">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-4</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000050334A40" d:precision="string">52.4009</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-22</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="000000008C258540" d:precision="string">676.693</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Destination marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - destination</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5086438264944982586</e>
+												<e d:type="sUInt64">332032026555680445</e>
+											</UUID>
+											<DevString d:type="cDeltaString">21fffa3a-a8a7-4696-bd86-e7745e9d9b04</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="0000006048385E40" d:precision="string">120.879</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000031B86040" d:precision="string">133.756</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334674876">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5608992475399455997</e>
+								<e d:type="sUInt64">9252731054165149608</e>
+							</UUID>
+							<DevString d:type="cDeltaString">4c0604fd-24f0-4dd7-a847-bde5de4d6880</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507198">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:type="ref">526466256</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="0000002067204340" d:precision="string">38.2531</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF5740" d:precision="string">94.7465</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334707852">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4932026912918614874</e>
+								<e d:type="sUInt64">7285634881890312624</e>
+							</UUID>
+							<DevString d:type="cDeltaString">a72e335a-1458-4472-b061-44fa52c61b65</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507208">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:type="ref">526466126</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="00000080056D4640" d:precision="string">44.8517</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A001B05240" d:precision="string">74.7501</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334750196">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5318335830275311357</e>
+								<e d:type="sUInt64">10414795146420175014</e>
+							</UUID>
+							<DevString d:type="cDeltaString">87cac6fd-8642-49ce-a640-d67601c98890</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507238">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:type="ref">526466256</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000012F43A40" d:precision="string">26.9534</_end>
+							<First d:type="bool">0</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334680740">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4968181236034644668</e>
+								<e d:type="sUInt64">14833525936327013778</e>
+							</UUID>
+							<DevString d:type="cDeltaString">f99b2abc-8682-44f2-92b5-50693f45dbcd</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507268">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526466880">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332565428">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock Reversal West</English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">3b504453-9d37-4a2c-a57c-c2365ac7d6a7</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock Reversal West</DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333341288">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">203</Palette0Index>
+											<Palette1Index d:type="sUInt8">199</Palette1Index>
+											<Palette2Index d:type="sUInt8">63</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795814812">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795814818">
+													<Height d:type="sFloat32" d:alt_encoding="00000040AF711040" d:precision="string">4.11102</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.2645288 -0.0000000 0.9643778 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 0.9999999 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9643778 0.0000000 0.2645288 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795814825">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-38</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="000000004C158140" d:precision="string">546.662</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="00000000B8628440" d:precision="string">652.34</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Destination marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - destination</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5015963963821224000</e>
+												<e d:type="sUInt64">2699012525623434894</e>
+											</UUID>
+											<DevString d:type="cDeltaString">3db97040-48a6-459c-8e5e-1d9297d17425</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="00000000BE515140" d:precision="string">69.2772</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000000FE367340" d:precision="string">307.437</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334687140">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4969841423570571276</e>
+								<e d:type="sUInt64">11265187531290971575</e>
+							</UUID>
+							<DevString d:type="cDeltaString">81f2100c-6c71-44f8-b70d-c2ca5ffc559c</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507278">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526465918">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332564680">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock Rev</English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">6a12b8e2-dd19-4269-adaf-a7ad0fc22dfd</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock Rev</DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333342328">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">203</Palette0Index>
+											<Palette1Index d:type="sUInt8">236</Palette1Index>
+											<Palette2Index d:type="sUInt8">191</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795815152">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795815158">
+													<Height d:type="sFloat32" d:alt_encoding="00000040AF711040" d:precision="string">4.11102</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.2645286 -0.0000000 0.9643779 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 1.0000000 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9643779 0.0000000 0.2645286 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795815165">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-38</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000064448340" d:precision="string">616.549</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000074EB8340" d:precision="string">637.432</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Destination marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - destination</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5163547482335132014</e>
+												<e d:type="sUInt64">10428595697041654449</e>
+											</UUID>
+											<DevString d:type="cDeltaString">d972b96e-9b13-47a8-b1c2-558c88d0b990</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="000000A0E2144240" d:precision="string">36.1632</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A02AFA6240" d:precision="string">151.818</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334683228">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5537131173156590808</e>
+								<e d:type="sUInt64">11927848887448198835</e>
+							</UUID>
+							<DevString d:type="cDeltaString">0abd94d8-d777-4cd7-b35e-e3de5d3b88a5</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507288">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526465840">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332567188">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock UM Reverse </English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">aee1111b-579b-428d-89a7-1c01950e1dfd</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock UM Reverse </DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333340638">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">118</Palette0Index>
+											<Palette1Index d:type="sUInt8">172</Palette1Index>
+											<Palette2Index d:type="sUInt8">0</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795814692">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795814698">
+													<Height d:type="sFloat32" d:alt_encoding="00000000B3721040" d:precision="string">4.11201</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.1541579 -0.0000000 0.9880462 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 1.0000000 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9880462 0.0000000 0.1541579 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795814705">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000000FC6140" d:precision="string">143.875</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="0000000018408040" d:precision="string">520.012</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Destination marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - destination</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5753958532615187429</e>
+												<e d:type="sUInt64">868155890908263595</e>
+											</UUID>
+											<DevString d:type="cDeltaString">b4db2be5-2acc-4fda-abf4-3fdf2e4f0c0c</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="0000006038515940" d:precision="string">101.269</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A06D747B40" d:precision="string">439.277</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+				<cScenarioNetworkProperties-cUnlinkedPropertyPair d:id="334747748">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5034575253357027886</e>
+								<e d:type="sUInt64">11216118476082070954</e>
+							</UUID>
+							<DevString d:type="cDeltaString">c351622e-6784-45de-aa45-911554a8a79b</DevString>
+						</cGUID>
+					</ID>
+					<Property>
+						<Network-cTrackMarkerProperty d:id="826507338">
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Entity>
+								<cOwnedEntity d:id="526465424">
+									<Component>
+										<Network-cTrackMarkerComponent d:id="332564724">
+											<LocalisedDisplayName>
+												<Localisation-cUserLocalisedString>
+													<English d:type="cDeltaString">Tavistock Yard East Headshunt</English>
+													<French d:type="cDeltaString"></French>
+													<Italian d:type="cDeltaString"></Italian>
+													<German d:type="cDeltaString"></German>
+													<Spanish d:type="cDeltaString"></Spanish>
+													<Dutch d:type="cDeltaString"></Dutch>
+													<Polish d:type="cDeltaString"></Polish>
+													<Russian d:type="cDeltaString"></Russian>
+													<Other/>
+													<Key d:type="cDeltaString">3bd06505-9c47-4ee8-bb34-3c93a43fe7e6</Key>
+												</Localisation-cUserLocalisedString>
+											</LocalisedDisplayName>
+											<DisplayName d:type="cDeltaString">Tavistock Yard East Headshunt</DisplayName>
+											<Distance d:type="sInt32">0</Distance>
+											<WaitTime d:type="sInt32">0</WaitTime>
+											<FacingDirection d:type="cDeltaString">eSCFacingForwards</FacingDirection>
+											<ElectricTypeFlags d:type="sUInt32">0</ElectricTypeFlags>
+											<ConsistTypeFlags d:type="sUInt32">0</ConsistTypeFlags>
+										</Network-cTrackMarkerComponent>
+										<cTrackMarkerSceneryRender d:id="333341678">
+											<DetailLevel d:type="sInt32">10</DetailLevel>
+											<Global d:type="bool">0</Global>
+											<Saved d:type="bool">1</Saved>
+											<Palette0Index d:type="sUInt8">117</Palette0Index>
+											<Palette1Index d:type="sUInt8">217</Palette1Index>
+											<Palette2Index d:type="sUInt8">129</Palette2Index>
+										</cTrackMarkerSceneryRender>
+										<cPosOri d:id="795812732">
+											<Scale d:numElements="4" d:elementType="sFloat32" d:precision="string">1.0000000 1.0000000 1.0000000 0.0000000</Scale>
+											<RFarMatrix>
+												<cFarMatrix d:id="795812738">
+													<Height d:type="sFloat32" d:alt_encoding="000000208C721040" d:precision="string">4.11186</Height>
+													<RXAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.1541579 -0.0000000 0.9880462 0.0000000</RXAxis>
+													<RYAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">0.0000000 0.9999999 0.0000000 0.0000000</RYAxis>
+													<RZAxis d:numElements="4" d:elementType="sFloat32" d:precision="string">-0.9880462 0.0000000 0.1541579 0.0000000</RZAxis>
+													<RFarPosition>
+														<cFarVector2 d:id="795812745">
+															<X>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="00000000A0C05B40" d:precision="string">111.01</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</X>
+															<Z>
+																<cFarCoordinate>
+																	<RouteCoordinate>
+																		<cRouteCoordinate>
+																			<Distance d:type="sInt32">-37</Distance>
+																		</cRouteCoordinate>
+																	</RouteCoordinate>
+																	<TileCoordinate>
+																		<cTileCoordinate>
+																			<Distance d:type="sFloat32" d:alt_encoding="00000000C09D8040" d:precision="string">531.719</Distance>
+																		</cTileCoordinate>
+																	</TileCoordinate>
+																</cFarCoordinate>
+															</Z>
+														</cFarVector2>
+													</RFarPosition>
+												</cFarMatrix>
+											</RFarMatrix>
+										</cPosOri>
+									</Component>
+									<BlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">Kuju</Provider>
+													<Product d:type="cDeltaString">RailSimulatorCore</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\Markers\Siding marker.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</BlueprintID>
+									<ReskinBlueprintID>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString"></Provider>
+													<Product d:type="cDeltaString"></Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString"></BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</ReskinBlueprintID>
+									<Name d:type="cDeltaString">Marker - siding</Name>
+									<EntityID>
+										<cGUID>
+											<UUID>
+												<e d:type="sUInt64">5193939567967464541</e>
+												<e d:type="sUInt64">9498556057000180865</e>
+											</UUID>
+											<DevString d:type="cDeltaString">b58bec5d-9484-4814-817c-a18868a6d183</DevString>
+										</cGUID>
+									</EntityID>
+								</cOwnedEntity>
+							</Entity>
+							<_start d:type="sFloat32" d:alt_encoding="0000000026EE1640" d:precision="string">5.73257</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000020E6B16240" d:precision="string">149.559</_end>
+							<First d:type="bool">1</First>
+						</Network-cTrackMarkerProperty>
+					</Property>
+				</cScenarioNetworkProperties-cUnlinkedPropertyPair>
+			</Property>
+			<SimpleValuePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="594432276">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5635367636364964953</e>
+								<e d:type="sUInt64">7771751425539822502</e>
+							</UUID>
+							<DevString d:type="cDeltaString">00443459-d902-4e34-a6d3-efb9beceda6b</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">9</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="0000008093806340" d:precision="string">156.018</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000060FD878240" d:precision="string">592.999</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A0EE758340" d:precision="string">622.742</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000609BA87B40" d:precision="string">442.538</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000601AC08440" d:precision="string">664.013</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkLineType d:id="334221006">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000008093806340" d:precision="string">156.018</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkLineType-cPropertyValue>
+									<LineType d:type="cDeltaString">Yard</LineType>
+								</Network-iTrackNetworkLineType-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkLineType>
+						<Network-cTrackNetworkSpeedLimit d:id="826507488">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000008093806340" d:precision="string">156.018</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkTrackRule d:id="826507468">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000008093806340" d:precision="string">156.018</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829100">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000008093806340" d:precision="string">156.018</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585799390">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5537131173156590808</e>
+								<e d:type="sUInt64">11927848887448198835</e>
+							</UUID>
+							<DevString d:type="cDeltaString">0abd94d8-d777-4cd7-b35e-e3de5d3b88a5</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">80</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="00000060913D8040" d:precision="string">519.696</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000004023AC7940" d:precision="string">410.759</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000004051207E40" d:precision="string">482.02</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000807ACB8C40" d:precision="string">921.435</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000060B3738140" d:precision="string">558.463</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkSpeedLimit d:id="826508018">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000060913D8040" d:precision="string">519.696</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">80</Primary>
+									<Secondary d:type="sInt32">80</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkTrackRule d:id="826507608">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000060913D8040" d:precision="string">519.696</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829388">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000060913D8040" d:precision="string">519.696</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_conc.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackBedRumble d:id="826507758">
+							<_start d:type="sFloat32" d:alt_encoding="000000E04D467C40" d:precision="string">452.394</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000006012957D40" d:precision="string">473.317</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+									<TrackBedRumble>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">Audio\RailNetwork\TrackBedRumble\Wide.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackBedRumble>
+								</Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackBedRumble>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585799624">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5715733617245730287</e>
+								<e d:type="sUInt64">5261586762810261639</e>
+							</UUID>
+							<DevString d:type="cDeltaString">0eb0b5ef-5d71-4f52-8700-34a048e90449</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">66</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000A09BC87740" d:precision="string">380.538</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-8</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000600ECD8B40" d:precision="string">889.632</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-18</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0AADE8F40" d:precision="string">1019.83</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-7</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A01ADE6540" d:precision="string">174.941</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-18</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A07AF98840" d:precision="string">799.185</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkLineType d:id="334221262">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A09BC87740" d:precision="string">380.538</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkLineType-cPropertyValue>
+									<LineType d:type="cDeltaString">Yard</LineType>
+								</Network-iTrackNetworkLineType-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkLineType>
+						<Network-cTrackNetworkTrackRule d:id="826507668">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A09BC87740" d:precision="string">380.538</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826828876">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000080970A7540" d:precision="string">336.662</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkSpeedLimit d:id="826507918">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A09BC87740" d:precision="string">380.538</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cSectionGenericProperties d:id="826829548">
+							<_start d:type="sFloat32" d:alt_encoding="00000080970A7540" d:precision="string">336.662</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000054497540" d:precision="string">340.583</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_conc.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cSectionGenericProperties d:id="826829452">
+							<_start d:type="sFloat32" d:alt_encoding="0000000054497540" d:precision="string">340.583</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A09BC87740" d:precision="string">380.538</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585633298">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5066708752729876511</e>
+								<e d:type="sUInt64">16020969604133593530</e>
+							</UUID>
+							<DevString d:type="cDeltaString">1ad3a81f-90c4-4650-baa1-b6e3f8ea55de</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">31</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000803F256840" d:precision="string">193.164</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000008071778E40" d:precision="string">974.93</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000F2858140" d:precision="string">560.743</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000609B808840" d:precision="string">784.076</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C02A748240" d:precision="string">590.521</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkTrackRule d:id="826507778">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000803F256840" d:precision="string">193.164</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829356">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000803F256840" d:precision="string">193.164</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585633280">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5009935684652280601</e>
+								<e d:type="sUInt64">17487959046959701932</e>
+							</UUID>
+							<DevString d:type="cDeltaString">1f40ab19-ddf6-4586-ac9f-9c1819b6b1f2</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">211</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000408DA36340" d:precision="string">157.111</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-4</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000DC5B4140" d:precision="string">34.7177</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-22</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A0BD358140" d:precision="string">550.718</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-4</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000080ABC14D40" d:precision="string">59.513</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-22</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000080FB0C8640" d:precision="string">705.623</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkTrackRule d:id="826508148">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000408DA36340" d:precision="string">157.111</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829324">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000E0BE4A5240" d:precision="string">73.1679</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_conc.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkSpeedLimit d:id="826508128">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000000F50A2E40" d:precision="string">15.0214</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">60</Primary>
+									<Secondary d:type="sInt32">60</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkTrackBedRumble d:id="826507868">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000006032C53240" d:precision="string">18.7703</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+									<TrackBedRumble>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">Audio\RailNetwork\TrackBedRumble\Station_Large_100.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackBedRumble>
+								</Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackBedRumble>
+						<Network-cTrackNetworkSpeedLimit d:id="826507848">
+							<_start d:type="sFloat32" d:alt_encoding="00000000F50A2E40" d:precision="string">15.0214</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000408DA36340" d:precision="string">157.111</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cSectionGenericProperties d:id="826829404">
+							<_start d:type="sFloat32" d:alt_encoding="000000E0BE4A5240" d:precision="string">73.1679</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000020A7005440" d:precision="string">80.0102</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_conc.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cSectionGenericProperties d:id="826829020">
+							<_start d:type="sFloat32" d:alt_encoding="00000020A7005440" d:precision="string">80.0102</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000408DA36340" d:precision="string">157.111</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">DTG</Provider>
+											<Product d:type="cDeltaString">ExeterKingswear</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585633262">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5163255962965930524</e>
+								<e d:type="sUInt64">5077208788953165231</e>
+							</UUID>
+							<DevString d:type="cDeltaString">3500721c-91f1-47a7-af6d-0b4c7ede7546</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">9</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000808C515340" d:precision="string">77.2742</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000008024E78440" d:precision="string">668.893</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0EF038340" d:precision="string">608.492</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000060FD878240" d:precision="string">592.999</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A0EE758340" d:precision="string">622.742</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cSectionGenericProperties d:id="826829804">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000808C515340" d:precision="string">77.2742</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackRule d:id="826507688">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000808C515340" d:precision="string">77.2742</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cTrackNetworkLineType d:id="334220966">
+							<_start d:type="sFloat32" d:alt_encoding="000000203AB23F40" d:precision="string">31.6962</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000808C515340" d:precision="string">77.2742</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkLineType-cPropertyValue>
+									<LineType d:type="cDeltaString">Yard</LineType>
+								</Network-iTrackNetworkLineType-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkLineType>
+						<Network-cTrackNetworkSpeedLimit d:id="826507718">
+							<_start d:type="sFloat32" d:alt_encoding="000000203AB23F40" d:precision="string">31.6962</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000808C515340" d:precision="string">77.2742</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585633244">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5608992475399455997</e>
+								<e d:type="sUInt64">9252731054165149608</e>
+							</UUID>
+							<DevString d:type="cDeltaString">4c0604fd-24f0-4dd7-a847-bde5de4d6880</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">15</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000A0C6AF5740" d:precision="string">94.7465</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0B19B8940" d:precision="string">819.462</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A0C6D18140" d:precision="string">570.222</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000080C8AE8640" d:precision="string">725.848</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000809F468240" d:precision="string">584.828</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cSectionGenericProperties d:id="826829676">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF5740" d:precision="string">94.7465</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_conc.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackRule d:id="826507748">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF5740" d:precision="string">94.7465</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cTrackNetworkSpeedLimit d:id="826508028">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF5740" d:precision="string">94.7465</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">80</Primary>
+									<Secondary d:type="sInt32">80</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585633100">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5366218607794238318</e>
+								<e d:type="sUInt64">4033062305255241130</e>
+							</UUID>
+							<DevString d:type="cDeltaString">70aab36e-a364-4a78-aab5-c16dcc50f837</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">5</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000409BBD4740" d:precision="string">47.4813</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000E02D9D8A40" d:precision="string">851.647</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000000070FF8140" d:precision="string">575.93</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000080DE258940" d:precision="string">804.734</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A0FE398240" d:precision="string">583.249</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkTrackRule d:id="319361796">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000409BBD4740" d:precision="string">47.4813</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="319337516">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000409BBD4740" d:precision="string">47.4813</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585630518">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5741296018796857711</e>
+								<e d:type="sUInt64">3284588442266943417</e>
+							</UUID>
+							<DevString d:type="cDeltaString">76c0496f-2e4f-4fad-b9bf-ac26c933952d</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">129</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000E0A7D66840" d:precision="string">198.708</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000F9FA3740" d:precision="string">23.9804</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0600A8140" d:precision="string">545.297</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000E02D9D8A40" d:precision="string">851.647</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000000070FF8140" d:precision="string">575.93</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkTrackRule d:id="826508048">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000E0A7D66840" d:precision="string">198.708</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829756">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000E0A7D66840" d:precision="string">198.708</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackBedRumble d:id="826507648">
+							<_start d:type="sFloat32" d:alt_encoding="00000000BEF04C40" d:precision="string">57.8808</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000010995340" d:precision="string">78.3916</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+									<TrackBedRumble>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">Audio\RailNetwork\TrackBedRumble\Wide.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackBedRumble>
+								</Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackBedRumble>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="302260228">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4969841423570571276</e>
+								<e d:type="sUInt64">11265187531290971575</e>
+							</UUID>
+							<DevString d:type="cDeltaString">81f2100c-6c71-44f8-b70d-c2ca5ffc559c</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">36</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="00000000D7697240" d:precision="string">294.615</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000808D148640" d:precision="string">706.569</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000E0B9158340" d:precision="string">610.716</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000006023717A40" d:precision="string">423.071</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000006006948540" d:precision="string">690.503</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkLineType d:id="334221158">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000000D7697240" d:precision="string">294.615</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkLineType-cPropertyValue>
+									<LineType d:type="cDeltaString">Yard</LineType>
+								</Network-iTrackNetworkLineType-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkLineType>
+						<Network-cTrackNetworkSpeedLimit d:id="826508108">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000000D7697240" d:precision="string">294.615</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkTrackRule d:id="826507768">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000000D7697240" d:precision="string">294.615</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829564">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000000D7697240" d:precision="string">294.615</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="302260210">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5318335830275311357</e>
+								<e d:type="sUInt64">10414795146420175014</e>
+							</UUID>
+							<DevString d:type="cDeltaString">87cac6fd-8642-49ce-a640-d67601c98890</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">10</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="0000000012F43A40" d:precision="string">26.9534</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000080C8AE8640" d:precision="string">725.848</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000809F468240" d:precision="string">584.828</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0BBD98540" d:precision="string">699.217</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000020DD678240" d:precision="string">588.983</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkSpeedLimit d:id="826507658">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000012F43A40" d:precision="string">26.9534</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">80</Primary>
+									<Secondary d:type="sInt32">80</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkTrackRule d:id="826507878">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000012F43A40" d:precision="string">26.9534</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829004">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000012F43A40" d:precision="string">26.9534</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_conc.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="302260192">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4816894133824758895</e>
+								<e d:type="sUInt64">4496508078748201644</e>
+							</UUID>
+							<DevString d:type="cDeltaString">9749a46f-0bb1-42d9-acf2-752b46ce663e</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">10</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="0000000054D35F40" d:precision="string">127.302</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0BBD98540" d:precision="string">699.217</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000020DD678240" d:precision="string">588.983</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000080F7E98140" d:precision="string">573.246</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000020C8F98240" d:precision="string">607.223</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkSpeedLimit d:id="826507788">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000054D35F40" d:precision="string">127.302</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">80</Primary>
+									<Secondary d:type="sInt32">80</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkTrackRule d:id="826507888">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000054D35F40" d:precision="string">127.302</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829644">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="0000000054D35F40" d:precision="string">127.302</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_conc.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="302260174">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4932026912918614874</e>
+								<e d:type="sUInt64">7285634881890312624</e>
+							</UUID>
+							<DevString d:type="cDeltaString">a72e335a-1458-4472-b061-44fa52c61b65</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">24</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000A001B05240" d:precision="string">74.7501</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000F8FA3740" d:precision="string">23.9803</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0600A8140" d:precision="string">545.297</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000006071778E40" d:precision="string">974.93</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000F2858140" d:precision="string">560.743</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkLineType d:id="334220870">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000020E2D04B40" d:precision="string">55.6319</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkLineType-cPropertyValue>
+									<LineType d:type="cDeltaString">Yard</LineType>
+								</Network-iTrackNetworkLineType-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkLineType>
+						<Network-cTrackNetworkSpeedLimit d:id="826508158">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000020E2D04B40" d:precision="string">55.6319</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkTrackRule d:id="826507898">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A001B05240" d:precision="string">74.7501</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829580">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A001B05240" d:precision="string">74.7501</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackBedRumble d:id="826507798">
+							<_start d:type="sFloat32" d:alt_encoding="000000A03C944E40" d:precision="string">61.1581</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A001B05240" d:precision="string">74.7501</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+									<TrackBedRumble>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">Audio\RailNetwork\TrackBedRumble\Wide.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackBedRumble>
+								</Network-iTrackNetworkTrackBedRumble-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackBedRumble>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585630500">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5536534673782518697</e>
+								<e d:type="sUInt64">8940702734461119403</e>
+							</UUID>
+							<DevString d:type="cDeltaString">b570b3a9-b8f3-4cd5-ab2b-eb61c4c1137c</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">32</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="00000080974A6740" d:precision="string">186.331</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000909B8340" d:precision="string">627.445</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000008048178340" d:precision="string">610.91</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000006AF57B40" d:precision="string">447.338</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000006079938440" d:precision="string">658.434</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cSectionGenericProperties d:id="826829148">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000080974A6740" d:precision="string">186.331</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackRule d:id="826507808">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000080974A6740" d:precision="string">186.331</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cTrackNetworkSpeedLimit d:id="826508188">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000080974A6740" d:precision="string">186.331</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkLineType d:id="334220974">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="00000080974A6740" d:precision="string">186.331</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkLineType-cPropertyValue>
+									<LineType d:type="cDeltaString">Yard</LineType>
+								</Network-iTrackNetworkLineType-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkLineType>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585630536">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5034575253357027886</e>
+								<e d:type="sUInt64">11216118476082070954</e>
+							</UUID>
+							<DevString d:type="cDeltaString">c351622e-6784-45de-aa45-911554a8a79b</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">4</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000C04BB76440" d:precision="string">165.728</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A043776740" d:precision="string">187.727</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000FE3D8040" d:precision="string">519.749</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000000F9FA3740" d:precision="string">23.9804</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000C0600A8140" d:precision="string">545.297</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cSectionGenericProperties d:id="826829692">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000C04BB76440" d:precision="string">165.728</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackRule d:id="826508118">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000C04BB76440" d:precision="string">165.728</_end>
+							<ScenarioOwned d:type="bool">0</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585630554">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">5659630945225763041</e>
+								<e d:type="sUInt64">5983122916629111938</e>
+							</UUID>
+							<DevString d:type="cDeltaString">d1fd68e1-0c5b-4e8b-8264-2dbd97520853</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">5</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000A0571A4A40" d:precision="string">52.2058</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000006030A18740" d:precision="string">756.149</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000006006978240" d:precision="string">594.878</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000000089048640" d:precision="string">704.567</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000A068D78240" d:precision="string">602.926</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cTrackNetworkTrackRule d:id="826507818">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0571A4A40" d:precision="string">52.2058</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cSectionGenericProperties d:id="826829596">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0571A4A40" d:precision="string">52.2058</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+				<cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement d:id="585630230">
+					<ID>
+						<cGUID>
+							<UUID>
+								<e d:type="sUInt64">4968181236034644668</e>
+								<e d:type="sUInt64">14833525936327013778</e>
+							</UUID>
+							<DevString d:type="cDeltaString">f99b2abc-8682-44f2-92b5-50693f45dbcd</DevString>
+						</cGUID>
+					</ID>
+					<SimpleValuePropertyEditFlag d:type="sUInt32">9</SimpleValuePropertyEditFlag>
+					<RibbonLength d:type="sFloat32" d:alt_encoding="000000A0C6AF7340" d:precision="string">314.986</RibbonLength>
+					<RibbonStartPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="0000006078C28640" d:precision="string">728.309</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="000000E01DD48240" d:precision="string">602.515</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonStartPosition>
+					<RibbonEndPosition>
+						<cFarVector2>
+							<X>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-38</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000020B1887A40" d:precision="string">424.543</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</X>
+							<Z>
+								<cFarCoordinate>
+									<RouteCoordinate>
+										<cRouteCoordinate>
+											<Distance d:type="sInt32">-37</Distance>
+										</cRouteCoordinate>
+									</RouteCoordinate>
+									<TileCoordinate>
+										<cTileCoordinate>
+											<Distance d:type="sFloat32" d:alt_encoding="00000020B36E8540" d:precision="string">685.837</Distance>
+										</cTileCoordinate>
+									</TileCoordinate>
+								</cFarCoordinate>
+							</Z>
+						</cFarVector2>
+					</RibbonEndPosition>
+					<RibbonExplicitDirection>
+						<Network-cDirection>
+							<_dir d:type="cDeltaString">either</_dir>
+						</Network-cDirection>
+					</RibbonExplicitDirection>
+					<Property>
+						<Network-cSectionGenericProperties d:id="826829420">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF7340" d:precision="string">314.986</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">RSC</Provider>
+											<Product d:type="cDeltaString">RivieraLine</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\Track\track01_wood_rust.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<SecondaryBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</SecondaryBlueprintID>
+							<ElectrificationBlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString"></Provider>
+											<Product d:type="cDeltaString"></Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString"></BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</ElectrificationBlueprintID>
+							<LoftScaleFactor d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</LoftScaleFactor>
+						</Network-cSectionGenericProperties>
+						<Network-cTrackNetworkTrackRule d:id="826507998">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF7340" d:precision="string">314.986</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkTrackRule-cPropertyValue>
+									<TrackRule>
+										<iBlueprintLibrary-cAbsoluteBlueprintID>
+											<BlueprintSetID>
+												<iBlueprintLibrary-cBlueprintSetID>
+													<Provider d:type="cDeltaString">RSC</Provider>
+													<Product d:type="cDeltaString">RivieraLine</Product>
+												</iBlueprintLibrary-cBlueprintSetID>
+											</BlueprintSetID>
+											<BlueprintID d:type="cDeltaString">RailNetwork\TrackRules\DR_Track_Rule.xml</BlueprintID>
+										</iBlueprintLibrary-cAbsoluteBlueprintID>
+									</TrackRule>
+								</Network-iTrackNetworkTrackRule-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkTrackRule>
+						<Network-cTrackNetworkSpeedLimit d:id="826507728">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF7340" d:precision="string">314.986</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkSpeedLimit-cPropertyValue>
+									<Primary d:type="sInt32">15</Primary>
+									<Secondary d:type="sInt32">15</Secondary>
+								</Network-iTrackNetworkSpeedLimit-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkSpeedLimit>
+						<Network-cTrackNetworkLineType d:id="334220878">
+							<_start d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</_start>
+							<_end d:type="sFloat32" d:alt_encoding="000000A0C6AF7340" d:precision="string">314.986</_end>
+							<ScenarioOwned d:type="bool">1</ScenarioOwned>
+							<Property>
+								<Network-iTrackNetworkLineType-cPropertyValue>
+									<LineType d:type="cDeltaString">Yard</LineType>
+								</Network-iTrackNetworkLineType-cPropertyValue>
+							</Property>
+						</Network-cTrackNetworkLineType>
+					</Property>
+				</cScenarioNetworkProperties-cNetworkRibbonSimplePropertyReplacement>
+			</SimpleValuePropertyReplacement>
+		</cScenarioNetworkProperties>
+	</Record>
+</cRecordSet>

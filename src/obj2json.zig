@@ -12,6 +12,7 @@ const textNode = n.textNode;
 const ff41NodeT = n.ff41NodeT;
 const ff4eNodeT = n.ff4eNodeT;
 const ff50NodeT = n.ff50NodeT;
+const ff52NodeT = n.ff52NodeT;
 const ff56NodeT = n.ff56NodeT;
 const ff70NodeT = n.ff70NodeT;
 const dataTypeMap = std.AutoHashMap(n.dataType, []const u8);
@@ -71,6 +72,10 @@ fn convertNode(node: n.node, dTypeMap: *dataTypeMap) !textNode {
             .id = ff50.id,
             .children = (try std.ArrayList(textNode).initCapacity(allocator, ff50.children)).allocatedSlice(),
         } },
+        .ff52node => |ff52| textNode{ .ff52NodeT = ff52NodeT{
+            .name = correctName(ff52.name),
+            .value = ff52.value,
+        } },
         .ff56node => |ff56| textNode{ .ff56NodeT = ff56NodeT{
             .name = correctName(ff56.name),
             .dType = dTypeMap.get(ff56.dType).?,
@@ -104,6 +109,7 @@ fn updateParentStack(stack: *parentStatusStackType, node: *textNode) !void {
             currentTop.childPos += 1;
             try stack.append(parentStatus{ .childPos = 0, .parentPointer = &node.ff50NodeT });
         },
+        .ff52NodeT => currentTop.childPos += 1,
         .ff56NodeT => currentTop.childPos += 1,
         .ff70NodeT => unreachable,
     }

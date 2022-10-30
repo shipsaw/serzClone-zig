@@ -9,6 +9,7 @@ const ff41node = n.ff41node;
 const ff43node = n.ff43node;
 const ff4enode = n.ff4enode;
 const ff50node = n.ff50node;
+const ff52node = n.ff52node;
 const ff56node = n.ff56node;
 const ff70node = n.ff70node;
 const dataType = n.dataType;
@@ -106,6 +107,12 @@ pub fn parse(inputBytes: []const u8) ![]const node {
                     const tok = try processFF50(s);
                     try s.result.append(node{ .ff50node = tok });
                     s.savedTokenList[s.savedTokenListIdx] = node{ .ff50node = tok };
+                },
+                0x52 => {
+                    s.current += 1;
+                    const tok = try processFF52(s);
+                    try s.result.append(node{ .ff52node = tok });
+                    s.savedTokenList[s.savedTokenListIdx] = node{ .ff52node = tok };
                 },
                 0x56 => {
                     s.current += 1;
@@ -271,6 +278,17 @@ fn processFF50(s: *status) !ff50node {
     };
 }
 
+// TODO: Add Test
+fn processFF52(s: *status) !ff52node {
+    const nodeName = try identifier(s, stringContext.NAME);
+    const value = processU32(s);
+
+    return ff52node{
+        .name = nodeName,
+        .value = value,
+    };
+}
+
 fn processFF56(s: *status) !ff56node {
     const nodeName = try identifier(s, stringContext.NAME);
     const dTypeString = try identifier(s, stringContext.DTYPE);
@@ -335,6 +353,13 @@ fn processSavedLine(s: *status) !node {
                 .name = savedLine.ff50node.name,
                 .id = id,
                 .children = children,
+            } };
+        },
+        .ff52node => {
+            const value = processU32(s);
+            return node{ .ff52node = ff52node{
+                .name = savedLine.ff52node.name,
+                .value = value,
             } };
         },
         .ff70node => {

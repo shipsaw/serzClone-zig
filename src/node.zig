@@ -49,6 +49,11 @@ pub const ff50node = struct {
     children: u32,
 };
 
+pub const ff52node = struct {
+    name: []const u8,
+    value: u32,
+};
+
 pub const ff56node = struct {
     name: []const u8,
     dType: dataType,
@@ -63,6 +68,7 @@ pub const node = union(enum) {
     ff41node: ff41node,
     ff4enode: ff4enode,
     ff50node: ff50node,
+    ff52node: ff52node,
     ff56node: ff56node,
     ff70node: ff70node,
 };
@@ -71,6 +77,7 @@ pub const textNode = union(enum) {
     ff41NodeT: ff41NodeT,
     ff4eNodeT: ff4eNodeT,
     ff50NodeT: ff50NodeT,
+    ff52NodeT: ff52NodeT,
     ff56NodeT: ff56NodeT,
     ff70NodeT: ff70NodeT,
 };
@@ -88,6 +95,11 @@ pub const ff50NodeT = struct {
     name: []const u8,
     id: u32,
     children: []textNode,
+};
+
+pub const ff52NodeT = struct {
+    name: []const u8,
+    value: u32,
 };
 
 pub const ff56NodeT = struct {

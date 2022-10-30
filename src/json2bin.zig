@@ -14,6 +14,7 @@ const unknown = &[_]u8{ 0x00, 0x00, 0x01, 0x00 };
 const ff41 = &[_]u8{ 0xFF, 0x41 };
 const ff4e = &[_]u8{ 0xFF, 0x4e };
 const ff50 = &[_]u8{ 0xFF, 0x50 };
+const ff52 = &[_]u8{ 0xFF, 0x52 };
 const ff56 = &[_]u8{ 0xFF, 0x56 };
 const ff70 = &[_]u8{ 0xFF, 0x70 };
 const newStr = &[_]u8{ 0xFF, 0xFF };
@@ -87,6 +88,10 @@ const status = struct {
             },
             .ff50NodeT => |n| {
                 try nodeAsStr.appendSlice(ff50);
+                try nodeAsStr.appendSlice(n.name);
+            },
+            .ff52NodeT => |n| {
+                try nodeAsStr.appendSlice(ff52);
                 try nodeAsStr.appendSlice(n.name);
             },
             .ff56NodeT => |n| {
@@ -169,6 +174,13 @@ fn convertTnode(s: *status, node: n.textNode) ![]const u8 {
                 try result.appendSlice(try s.checkStringMap(ff56node.dType, stringContext.VALUE));
             }
             try result.appendSlice(try convertDataUnion(s, ff56node.value, ff56node.dType));
+        },
+        .ff52NodeT => |ff52node| {
+            if (isSavedLine == false) {
+                try result.appendSlice(ff52);
+                try result.appendSlice(try s.checkStringMap(ff52node.name, stringContext.NAME));
+            }
+            try result.appendSlice(&std.mem.toBytes(ff52node.value));
         },
         .ff41NodeT => |ff41node| {
             if (isSavedLine == false) {
