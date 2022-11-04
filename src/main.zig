@@ -88,8 +88,8 @@ test "bin -> json -> bin test: Scenario.bin" {
 
 test "bin -> json -> bin test: ScenarioNetworkProperties.bin" {
     // Original Scenario with ff43 node
-    //var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioNetworkProperties.bin", .{});
-    var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioNetworkPropertiesAfterSerz.bin", .{});
+    var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioNetworkProperties.bin", .{});
+    //var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioNetworkPropertiesAfterSerz.bin", .{});
     defer inFile43.close();
     var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
 

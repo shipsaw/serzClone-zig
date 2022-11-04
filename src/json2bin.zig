@@ -81,27 +81,27 @@ const status = struct {
     fn checkLineMap(self: *status, node: n.textNode) !?u8 {
         var nodeAsStr = std.ArrayList(u8).init(allocator);
         switch (node) {
-            .ff41NodeT => |n| {
+            .ff41NodeT => |nde| {
                 try nodeAsStr.appendSlice(ff41);
-                try nodeAsStr.appendSlice(n.name);
-                try nodeAsStr.appendSlice(n.dType);
+                try nodeAsStr.appendSlice(nde.name);
+                try nodeAsStr.appendSlice(nde.dType);
             },
-            .ff50NodeT => |n| {
+            .ff50NodeT => |nde| {
                 try nodeAsStr.appendSlice(ff50);
-                try nodeAsStr.appendSlice(n.name);
+                try nodeAsStr.appendSlice(nde.name);
             },
-            .ff52NodeT => |n| {
+            .ff52NodeT => |nde| {
                 try nodeAsStr.appendSlice(ff52);
-                try nodeAsStr.appendSlice(n.name);
+                try nodeAsStr.appendSlice(nde.name);
             },
-            .ff56NodeT => |n| {
+            .ff56NodeT => |nde| {
                 try nodeAsStr.appendSlice(ff56);
-                try nodeAsStr.appendSlice(n.name);
-                try nodeAsStr.appendSlice(n.dType);
+                try nodeAsStr.appendSlice(nde.name);
+                try nodeAsStr.appendSlice(nde.dType);
             },
-            .ff70NodeT => |n| {
+            .ff70NodeT => |nde| {
                 try nodeAsStr.appendSlice(ff70);
-                try nodeAsStr.appendSlice(n.name);
+                try nodeAsStr.appendSlice(nde.name);
             },
             .ff4eNodeT => {
                 try nodeAsStr.appendSlice(ff4e);
