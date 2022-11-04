@@ -220,10 +220,102 @@ const Localisation_cUserLocalisedString = struct {
     Key: []const u8,
 };
 
+const sTimeOfDay = struct {
+    _iHour: i32,
+    _iMinute: i32,
+    _iSeconds: i32,
+};
+
 const cDriverInstructionContainer = struct {
     id: u32,
     DriverInstruction: DriverInstruction,
 };
 
-const DriverInstruction = struct {
-    cTriggerInstruction: cT
+const DriverInstruction = union {
+    cTriggerInstruction: cTriggerInstruction,
+    cStopAtDestination: cStopAtDestination,
+    cConsistOperation: cConsistOperation,
+};
+
+const cTriggerInstruction = struct {
+    id: u32,
+    ActivationLevel: i16,
+    SuccessTextToBeSavedMessage: bool,
+    FailureTextToBeSavedMessage: bool,
+    DisplayTextToBeSavedMessage: bool,
+    TriggeredText: Localisation_cUserLocalisedString,
+    UntriggeredText: Localisation_cUserLocalisedString,
+    DisplayText: Localisation_cUserLocalisedString,
+    TriggerTrainStop: bool,
+    TriggerWheelSlip: bool,
+    WheelSlipDuration: i16,
+    TriggerSound: cGUID,
+    TriggerAnimation: cGUID,
+    SecondsDelay: i16,
+    Active: bool,
+    ArriveTime: sTimeOfDay,
+    DepartTime: sTimeOfDay,
+    Condition: []const u8,
+    SuccessEvent: []const u8,
+    FailureEvent: []const u8,
+    Started: bool,
+    Satisfied: bool,
+    DeltaTarget: undefined,
+    StartTime: f32,
+};
+
+const cStopAtDestination = struct {
+    ActivationLevel: i16,
+    SuccessTextToBeSavedMessage: bool,
+    FailureTextToBeSavedMessage: bool,
+    DisplayTextToBeSavedMessage: bool,
+    TriggeredText: Localisation_cUserLocalisedString,
+    UntriggeredText: Localisation_cUserLocalisedString,
+    DisplayText: Localisation_cUserLocalisedString,
+    TriggerTrainStop: bool,
+    TriggerWheelSlip: bool,
+    WheelSlipDuration: i16,
+    TriggerSound: cGUID,
+    TriggerAnimation: cGUID,
+    SecondsDelay: i16,
+    Active: bool,
+    ArriveTime: sTimeOfDay,
+    DepartTime: sTimeOfDay,
+    Condition: []const u8,
+    SuccessEvent: []const u8,
+    FailureEvent: []const u8,
+    Started: bool,
+    Satisfied: bool,
+    DeltaTarget: cDriverInstructionTarget,
+    TravelForwards: bool,
+};
+
+const cConsistOperation = struct {
+    ActivationLevel: i16,
+    SuccessTextToBeSavedMessage: bool,
+    FailureTextToBeSavedMessage: bool,
+    DisplayTextToBeSavedMessage: bool,
+    TriggeredText: Localisation_cUserLocalisedString,
+    UntriggeredText: Localisation_cUserLocalisedString,
+    DisplayText: Localisation_cUserLocalisedString,
+    TriggerTrainStop: bool,
+    TriggerWheelSlip: bool,
+    WheelSlipDuration: i16,
+    TriggerSound: cGUID,
+    TriggerAnimation: cGUID,
+    SecondsDelay: i16,
+    Active: bool,
+    ArriveTime: sTimeOfDay,
+    DepartTime: sTimeOfDay,
+    Condition: []const u8,
+    SuccessEvent: []const u8,
+    FailureEvent: []const u8,
+    Started: bool,
+    Satisfied: bool,
+    DeltaTarget: cDriverInstructionTarget,
+    OperationOrder: bool,
+    FirstUpdateDone: bool,
+    LastCompletedTargetIndex: i32,
+    CurrentTargetIndex: u32,
+    TargetCompletedTime: f32,
+};
