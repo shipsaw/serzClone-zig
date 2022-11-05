@@ -68,6 +68,7 @@ pub const Network_cDirection = struct {
     _dir: []const u8,
 };
 
+// DONE
 pub const cGUID = struct {
     UUID: []u64,
     DevString: []const u8,
@@ -140,6 +141,7 @@ pub const cFarVector2 = struct {
     Z: cFarCoordinate,
 };
 
+// TODO TEST
 pub const cFarCoordinate = struct {
     RouteCoordinate: cRouteCoordinate,
     TileCoordinate: cTileCoordinate,
@@ -199,7 +201,7 @@ pub const cDriverInstructionTarget = struct {
     DepartureTime: f32,
     TickedTime: f32,
     DueTime: f32,
-    RailVehicleNumber: undefined,
+    RailVehicleNumber: [][]const u8,
     TimingTestTime: f32,
     GroupName: Localisation_cUserLocalisedString,
     ShowRVNumbersWithGroup: bool,
@@ -207,6 +209,7 @@ pub const cDriverInstructionTarget = struct {
     ScenarioChainGUID: cGUID,
 };
 
+// DONE
 pub const Localisation_cUserLocalisedString = struct {
     English: []const u8,
     French: []const u8,
@@ -220,6 +223,7 @@ pub const Localisation_cUserLocalisedString = struct {
     Key: []const u8,
 };
 
+// DONE
 pub const Localization_otherLanguage = struct {
     LangName: []const u8,
     Value: []const u8,

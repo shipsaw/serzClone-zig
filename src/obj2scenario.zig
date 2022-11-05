@@ -47,17 +47,6 @@ fn parse_sTimeOfDay(s: *status) sm.sTimeOfDay {
 }
 
 fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUserLocalisedString {
-    // <English d:type="cDeltaString">6C58 10:45 Heathfield-St Blazey S.S</English>
-    // <French d:type="cDeltaString"></French>
-    // <Italian d:type="cDeltaString"></Italian>
-    // <German d:type="cDeltaString"></German>
-    // <Spanish d:type="cDeltaString"></Spanish>
-    // <Dutch d:type="cDeltaString"></Dutch>
-    // <Polish d:type="cDeltaString"></Polish>
-    // <Russian d:type="cDeltaString"></Russian>
-    // <Other/>
-    // <Key d:type="cDeltaString">3c129cec-eef3-48a9-9fbb-05c5ab331e05</Key>
-
     const english = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
     const french = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
     const italian = s.nodeList[s.current + 3].ff56node.value._cDeltaString;
@@ -92,6 +81,94 @@ fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUs
         .Russian = russian,
         .Other = otherList.items,
         .Key = key,
+    };
+}
+
+fn parse_cGUID(s: *status) sm.cGUID {
+    const uuid = s.nodeList[s.current + 1].ff56node.value._sUInt64;
+    const devString = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
+    s.current += 3;
+
+    return sm.cGUID{
+        .UUID = uuid,
+        .DevString = devString,
+    };
+}
+
+fn parse_cDriverInstructionTarget(s: *status) sm.parse_cDriverInstructionTarget {
+    const idVal = s.nodeList[s.current + 0].ff50node.id;
+    const displayName = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
+    const timeTabled = s.nodeList[s.current + 2].ff56node.value._bool;
+    const performance = s.nodeList[s.current + 3].ff56node.value._sInt32;
+    const minSpeed = s.nodeList[s.current + 4].ff56node.value._sInt32;
+    const durationSecs = s.nodeList[s.current + 5].ff56node.value._sFloat32;
+    const entityName = s.nodeList[s.current + 6].ff56node.value._cDeltaString;
+    const trainOrder = s.nodeList[s.current + 7].ff56node.value._bool;
+    const operation = s.nodeList[s.current + 8].ff56node.value._cDeltaString;
+    s.current += 9;
+    const deadline = parse_sTimeOfDay(s);
+
+    const pickingUp = s.nodeList[s.current + 0].ff56node.value._cDeltaString;
+    const duration = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
+    const handleOffPath = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
+    const earliestDepartureTime = s.nodeList[s.current + 3].ff56node.value._cDeltaString;
+    const durationSet = s.nodeList[s.current + 4].ff56node.value._cDeltaString;
+    const reversingAllowed = s.nodeList[s.current + 5].ff56node.value._cDeltaString;
+    const waypoint = s.nodeList[s.current + 6].ff56node.value._cDeltaString;
+    const hidden = s.nodeList[s.current + 7].ff56node.value._cDeltaString;
+    const progressCode = s.nodeList[s.current + 8].ff56node.value._cDeltaString;
+    const arrivalTime = s.nodeList[s.current + 9].ff56node.value._cDeltaString;
+    const departureTime = s.nodeList[s.current + 10].ff56node.value._cDeltaString;
+    const tickedTime = s.nodeList[s.current + 11].ff56node.value._cDeltaString;
+    const dueTime = s.nodeList[s.current + 12].ff56node.value._cDeltaString;
+
+    var railVehicleNumbersList = std.ArrayList([]const u8).init(allocator);
+    const railVehicleNumbersListLen = s.nodeList[s.current + 13].ff50node.children;
+    var i: u32 = 0;
+    while (i < railVehicleNumbersListLen) : (i += 1) {
+        try railVehicleNumbersList.append(s.nodeList[s.current + 14 + i].ff56node._cDeltaString);
+    }
+
+    const timingTestTime = s.nodeList[s.current + 14 + railVehicleNumbersListLen].ff56node.value._cDeltaString;
+    s.current += 15 + railVehicleNumbersListLen;
+
+    const groupName = parse_parseLocalisation_cUserLocalisedString;
+    const showRVNumbersWithGroup = s.nodeList[s.current + 0].ff56node.value._cDeltaString;
+    const scenarioChainTarget = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
+    const scenarioChainGUID = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
+
+    s.current += 3;
+
+    return sm.cDriverInstructionTarget{
+        .id = idVal,
+        .DisplayName = displayName,
+        .Timetabled = timeTabled,
+        .Performance = performance,
+        .MinSpeed = minSpeed,
+        .DurationSecs = durationSecs,
+        .EntityName = entityName,
+        .TrainOrder = trainOrder,
+        .Operation = operation,
+        .Deadline = deadline,
+        .PickingUp = pickingUp,
+        .Duration = duration,
+        .HandleOffPath = handleOffPath,
+        .EarliestDepartureTime = earliestDepartureTime,
+        .DurationSet = durationSet,
+        .ReversingAllowed = reversingAllowed,
+        .Waypoint = waypoint,
+        .Hidden = hidden,
+        .ProgressCode = progressCode,
+        .ArrivalTime = arrivalTime,
+        .DepartureTime = departureTime,
+        .TickedTime = tickedTime,
+        .DueTime = dueTime,
+        .RailVehicleNumber = railVehicleNumbersList.items,
+        .TimingTestTime = timingTestTime,
+        .GroupName = groupName,
+        .ShowRVNumbersWithGroup = showRVNumbersWithGroup,
+        .ScenarioChainTarget = scenarioChainTarget,
+        .ScenarioChainGUID = scenarioChainGUID,
     };
 }
 
