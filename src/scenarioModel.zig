@@ -216,10 +216,16 @@ pub const Localisation_cUserLocalisedString = struct {
     Dutch: []const u8,
     Polish: []const u8,
     Russian: []const u8,
-    Other: undefined,
+    Other: []Localization_otherLanguage,
     Key: []const u8,
 };
 
+pub const Localization_otherLanguage = struct {
+    LangName: []const u8,
+    Value: []const u8,
+};
+
+// DONE
 pub const sTimeOfDay = struct {
     _iHour: i32,
     _iMinute: i32,
