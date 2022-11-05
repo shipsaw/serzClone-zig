@@ -1,13 +1,13 @@
-const cRecordSet = struct {
+pub const cRecordSet = struct {
     id: u32,
     Record: Record,
 };
 
-const Record = struct {
+pub const Record = struct {
     cConsists: []cConsist,
 };
 
-const cConsist = struct {
+pub const cConsist = struct {
     RailVehicles: []cOwnedEntity,
     FrontFollower: Network_cTrackFollower,
     RearFollower: Network_cTrackFollower,
@@ -22,7 +22,7 @@ const cConsist = struct {
     IgnoreProximity: bool,
 };
 
-const cOwnedEntity = struct {
+pub const cOwnedEntity = struct {
     Component: Component,
     BlueprintID: iBlueprintLibrary_cAbsoluteBlueprintID,
     ReskinBlueprintID: iBlueprintLibrary_cAbsoluteBlueprintID,
@@ -30,7 +30,7 @@ const cOwnedEntity = struct {
     EntityID: cGUID,
 };
 
-const Component = struct {
+pub const Component = struct {
     cWagon: cWagon,
     cAnimObjectRender: cAnimObjectRender,
     cPosOri: cPosOri,
@@ -40,7 +40,7 @@ const Component = struct {
     cScriptComponent: cScriptComponent,
 };
 
-const cWagon = struct {
+pub const cWagon = struct {
     id: u32,
     PantographInfo: []const u8,
     PantographIsDirectional: bool,
@@ -55,7 +55,7 @@ const cWagon = struct {
     InTunnel: bool,
 };
 
-const Network_cTrackFollower = struct {
+pub const Network_cTrackFollower = struct {
     id: u32,
     Height: f32,
     _type: []const u8,
@@ -64,30 +64,30 @@ const Network_cTrackFollower = struct {
     RibbonId: cGUID,
 };
 
-const Network_cDirection = struct {
+pub const Network_cDirection = struct {
     _dir: []const u8,
 };
 
-const cGUID = struct {
+pub const cGUID = struct {
     UUID: []u64,
     DevString: []const u8,
 };
 
-const cHcRVector4 = struct {
+pub const cHcRVector4 = struct {
     Element: []f32,
 };
 
-const iBlueprintLibrary_cAbsoluteBlueprintID = struct {
+pub const iBlueprintLibrary_cAbsoluteBlueprintID = struct {
     BlueprintSetId: iBlueprintLibrary_cBlueprintSetId,
     BlueprintID: []const u8,
 };
 
-const iBlueprintLibrary_cBlueprintSetId = struct {
+pub const iBlueprintLibrary_cBlueprintSetId = struct {
     Provider: []const u8,
     Product: []const u8,
 };
 
-const cAnimObjectRender = struct {
+pub const cAnimObjectRender = struct {
     id: u32,
     DetailLevel: i32,
     Global: bool,
@@ -97,36 +97,36 @@ const cAnimObjectRender = struct {
     Palette2Index: u8,
 };
 
-const cPosOri = struct {
+pub const cPosOri = struct {
     id: u32,
     scale: [4]f32,
     RFarMatrix: cFarMatrix,
 };
 
-const cControlContainer = struct {
+pub const cControlContainer = struct {
     id: u32,
     Time: f32,
     FrameTime: f32,
     CabEndsWithKey: []const u8,
 };
 
-const cCargoComponent = struct {
+pub const cCargoComponent = struct {
     id: u32,
     IsPreLoaded: []const u8,
     InitialLevel: f32,
 };
 
-const cEntityContainer = struct {
+pub const cEntityContainer = struct {
     id: u32,
     StaticChildrenMatrix: [16]f32,
 };
 
-const cScriptComponent = struct {
+pub const cScriptComponent = struct {
     DebugDisplay: bool,
     StateName: []const u8,
 };
 
-const cFarMatrix = struct {
+pub const cFarMatrix = struct {
     id: u32,
     Height: f32,
     RXAxis: [4]f32,
@@ -135,25 +135,25 @@ const cFarMatrix = struct {
     RFarPosition: cFarVector2,
 };
 
-const cFarVector2 = struct {
+pub const cFarVector2 = struct {
     X: cFarCoordinate,
     Z: cFarCoordinate,
 };
 
-const cFarCoordinate = struct {
+pub const cFarCoordinate = struct {
     RouteCoordinate: cRouteCoordinate,
     TileCoordinate: cTileCoordinate,
 };
 
-const cRouteCoordinate = struct {
+pub const cRouteCoordinate = struct {
     Distance: i32,
 };
 
-const cTileCoordinate = struct {
+pub const cTileCoordinate = struct {
     Distance: f32,
 };
 
-const cDriver = struct {
+pub const cDriver = struct {
     id: u32,
     FinalDestination: cDriverInstructionTarget,
     PlayerDriver: bool,
@@ -175,7 +175,7 @@ const cDriver = struct {
     UnloadedAtStart: bool,
 };
 
-const cDriverInstructionTarget = struct {
+pub const cDriverInstructionTarget = struct {
     id: u32,
     DisplayName: []const u8,
     Timetabled: bool,
@@ -207,7 +207,7 @@ const cDriverInstructionTarget = struct {
     ScenarioChainGUID: cGUID,
 };
 
-const Localisation_cUserLocalisedString = struct {
+pub const Localisation_cUserLocalisedString = struct {
     English: []const u8,
     French: []const u8,
     Italian: []const u8,
@@ -220,24 +220,24 @@ const Localisation_cUserLocalisedString = struct {
     Key: []const u8,
 };
 
-const sTimeOfDay = struct {
+pub const sTimeOfDay = struct {
     _iHour: i32,
     _iMinute: i32,
     _iSeconds: i32,
 };
 
-const cDriverInstructionContainer = struct {
+pub const cDriverInstructionContainer = struct {
     id: u32,
     DriverInstruction: DriverInstruction,
 };
 
-const DriverInstruction = union {
+pub const DriverInstruction = union {
     cTriggerInstruction: cTriggerInstruction,
     cStopAtDestination: cStopAtDestination,
     cConsistOperation: cConsistOperation,
 };
 
-const cTriggerInstruction = struct {
+pub const cTriggerInstruction = struct {
     id: u32,
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
@@ -264,7 +264,7 @@ const cTriggerInstruction = struct {
     StartTime: f32,
 };
 
-const cStopAtDestination = struct {
+pub const cStopAtDestination = struct {
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,
@@ -290,7 +290,7 @@ const cStopAtDestination = struct {
     TravelForwards: bool,
 };
 
-const cConsistOperation = struct {
+pub const cConsistOperation = struct {
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,
