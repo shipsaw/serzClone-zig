@@ -177,6 +177,7 @@ pub const cDriver = struct {
     UnloadedAtStart: bool,
 };
 
+// DONE
 pub const cDriverInstructionTarget = struct {
     id: u32,
     DisplayName: []const u8,
@@ -236,17 +237,49 @@ pub const sTimeOfDay = struct {
     _iSeconds: i32,
 };
 
+// DONE
 pub const cDriverInstructionContainer = struct {
     id: u32,
     DriverInstruction: DriverInstruction,
 };
 
+// DONE
 pub const DriverInstruction = union {
     cTriggerInstruction: cTriggerInstruction,
     cStopAtDestination: cStopAtDestination,
     cConsistOperation: cConsistOperation,
+    cPickupPassengers: cPickupPassengers,
 };
 
+// DONE
+pub const cPickupPassengers = struct {
+    id: u32,
+    ActivationLevel: i16,
+    SuccessTextToBeSavedMessage: bool,
+    FailureTextToBeSavedMessage: bool,
+    DisplayTextToBeSavedMessage: bool,
+    TriggeredText: Localisation_cUserLocalisedString,
+    UntriggeredText: Localisation_cUserLocalisedString,
+    DisplayText: Localisation_cUserLocalisedString,
+    TriggerTrainStop: bool,
+    TriggerWheelSlip: bool,
+    WheelSlipDuration: i16,
+    TriggerSound: cGUID,
+    TriggerAnimation: cGUID,
+    SecondsDelay: i16,
+    Active: bool,
+    ArriveTime: sTimeOfDay,
+    DepartTime: sTimeOfDay,
+    Condition: []const u8,
+    SuccessEvent: []const u8,
+    FailureEvent: []const u8,
+    Started: bool,
+    Satisfied: bool,
+    DeltaTarget: cDriverInstructionTarget,
+    TravelForwards: bool,
+    UnloadPassengers: bool,
+};
+// DONE
 pub const cTriggerInstruction = struct {
     id: u32,
     ActivationLevel: i16,
@@ -274,7 +307,9 @@ pub const cTriggerInstruction = struct {
     StartTime: f32,
 };
 
+// DONE
 pub const cStopAtDestination = struct {
+    id: u32,
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,
@@ -300,7 +335,9 @@ pub const cStopAtDestination = struct {
     TravelForwards: bool,
 };
 
+// DONE
 pub const cConsistOperation = struct {
+    id: u32,
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,

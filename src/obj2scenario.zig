@@ -10,6 +10,11 @@ var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 const size_limit = std.math.maxInt(u32);
 
+const NODE_TYPE = enum {
+    FF50,
+    FF56,
+};
+
 const status = struct {
     nodeList: []const n.node,
     current: usize,
@@ -34,11 +39,19 @@ fn buildModel(nodes: []const n.node) sm.cRecordSet {
     return undefined;
 }
 
+fn parseNode(s: *status) n.dataUnion {
+    defer s.current += 1;
+    return s.nodeList[s.current].ff56node.value;
+}
+
 fn parse_sTimeOfDay(s: *status) sm.sTimeOfDay {
-    const hour = s.nodeList[s.current + 1].ff56node.value._sInt32;
-    const minute = s.nodeList[s.current + 2].ff56node.value._sInt32;
-    const second = s.nodeList[s.current + 3].ff56node.value._sInt32;
-    s.current += 4;
+    s.current += 1;
+    defer s.current += 1;
+
+    const hour = parseNode(s)._sInt32;
+    const minute = parseNode(s)._sInt32;
+    const second = parseNode(s)._sInt32;
+
     return sm.sTimeOfDay{
         ._iHour = hour,
         ._iMinute = minute,
@@ -47,28 +60,32 @@ fn parse_sTimeOfDay(s: *status) sm.sTimeOfDay {
 }
 
 fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUserLocalisedString {
-    const english = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
-    const french = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
-    const italian = s.nodeList[s.current + 3].ff56node.value._cDeltaString;
-    const german = s.nodeList[s.current + 4].ff56node.value._cDeltaString;
-    const spanish = s.nodeList[s.current + 5].ff56node.value._cDeltaString;
-    const dutch = s.nodeList[s.current + 6].ff56node.value._cDeltaString;
-    const polish = s.nodeList[s.current + 7].ff56node.value._cDeltaString;
-    const russian = s.nodeList[s.current + 8].ff56node.value._cDeltaString;
+    s.current += 1;
+    defer s.current += 1;
+
+    const english = parseNode(s)._cDeltaString;
+    const french = parseNode(s)._cDeltaString;
+    const italian = parseNode(s)._cDeltaString;
+    const german = parseNode(s)._cDeltaString;
+    const spanish = parseNode(s)._cDeltaString;
+    const dutch = parseNode(s)._cDeltaString;
+    const polish = parseNode(s)._cDeltaString;
+    const russian = parseNode(s)._cDeltaString;
 
     var otherList = std.ArrayList(sm.Localization_otherLanguage).init(allocator);
-    const otherListLen = s.nodeList[s.current + 9].ff50node.children;
+    const otherListLen = s.nodeList[s.current].ff50node.children;
+    s.current += 1;
 
     var i: u32 = 0;
     while (i < otherListLen) : (i += 1) {
         const tempNode = sm.Localization_otherLanguage{
-            .LangName = s.nodeList[s.current + 10 + i].ff56node.name,
-            .Value = s.nodeList[s.current + 10 + i].ff56node.value._cDeltaString,
+            .LangName = s.nodeList[s.current + i].ff56node.name,
+            .Value = s.nodeList[s.current + i].ff56node.value._cDeltaString,
         };
         try otherList.append(tempNode);
     }
-    const key = s.nodeList[s.current + 10 + otherListLen].ff56node.value._cDeltaString;
-    s.current += 11 + otherListLen;
+    s.current += otherListLen;
+    const key = parseNode(s)._cDeltaString;
 
     return sm.Localisation_cUserLocalisedString{
         .English = english,
@@ -95,49 +112,64 @@ fn parse_cGUID(s: *status) sm.cGUID {
     };
 }
 
+fn parse_DriverInstruction(s: *status) sm.DriverInstruction {
+    const numberInstructions = s.nodeList[s.current].ff50node.children;
+    s.current += 1;
+    defer s.current += 1;
+
+    var i: u32 = 0;
+    while (i < numberInstructions) : (i += 1) {
+        switch (s.nodeList[s.current].ff50node.name) {
+            "cTriggerInstruction" => parse_cTriggerInstruction(s),
+            "cPickupPassengers" => parse_cPickupPassengers(s),
+            "cStopAtDestination" => parse_cStopAtDestination(s),
+            "cConsistOperation" => parse_cConsistOperation(s),
+        }
+    }
+}
+
 fn parse_cDriverInstructionTarget(s: *status) sm.parse_cDriverInstructionTarget {
     const idVal = s.nodeList[s.current + 0].ff50node.id;
-    const displayName = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
-    const timeTabled = s.nodeList[s.current + 2].ff56node.value._bool;
-    const performance = s.nodeList[s.current + 3].ff56node.value._sInt32;
-    const minSpeed = s.nodeList[s.current + 4].ff56node.value._sInt32;
-    const durationSecs = s.nodeList[s.current + 5].ff56node.value._sFloat32;
-    const entityName = s.nodeList[s.current + 6].ff56node.value._cDeltaString;
-    const trainOrder = s.nodeList[s.current + 7].ff56node.value._bool;
-    const operation = s.nodeList[s.current + 8].ff56node.value._cDeltaString;
-    s.current += 9;
+    s.current += 1;
+    defer s.current += 1;
+
+    const displayName = parseNode(s)._cDeltaString;
+    const timeTabled = parseNode(s)._bool;
+    const performance = parseNode(s)._sInt32;
+    const minSpeed = parseNode(s)._sInt32;
+    const durationSecs = parseNode(s)._sFloat32;
+    const entityName = parseNode(s)._cDeltaString;
+    const trainOrder = parseNode(s)._bool;
+    const operation = parseNode(s)._cDeltaString;
     const deadline = parse_sTimeOfDay(s);
 
-    const pickingUp = s.nodeList[s.current + 0].ff56node.value._cDeltaString;
-    const duration = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
-    const handleOffPath = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
-    const earliestDepartureTime = s.nodeList[s.current + 3].ff56node.value._cDeltaString;
-    const durationSet = s.nodeList[s.current + 4].ff56node.value._cDeltaString;
-    const reversingAllowed = s.nodeList[s.current + 5].ff56node.value._cDeltaString;
-    const waypoint = s.nodeList[s.current + 6].ff56node.value._cDeltaString;
-    const hidden = s.nodeList[s.current + 7].ff56node.value._cDeltaString;
-    const progressCode = s.nodeList[s.current + 8].ff56node.value._cDeltaString;
-    const arrivalTime = s.nodeList[s.current + 9].ff56node.value._cDeltaString;
-    const departureTime = s.nodeList[s.current + 10].ff56node.value._cDeltaString;
-    const tickedTime = s.nodeList[s.current + 11].ff56node.value._cDeltaString;
-    const dueTime = s.nodeList[s.current + 12].ff56node.value._cDeltaString;
+    const pickingUp = parseNode(s)._cDeltaString;
+    const duration = parseNode(s)._cDeltaString;
+    const handleOffPath = parseNode(s)._cDeltaString;
+    const earliestDepartureTime = parseNode(s)._cDeltaString;
+    const durationSet = parseNode(s)._cDeltaString;
+    const reversingAllowed = parseNode(s)._cDeltaString;
+    const waypoint = parseNode(s)._cDeltaString;
+    const hidden = parseNode(s)._cDeltaString;
+    const progressCode = parseNode(s)._cDeltaString;
+    const arrivalTime = parseNode(s)._cDeltaString;
+    const departureTime = parseNode(s)._cDeltaString;
+    const tickedTime = parseNode(s)._cDeltaString;
+    const dueTime = parseNode(s)._cDeltaString;
 
     var railVehicleNumbersList = std.ArrayList([]const u8).init(allocator);
-    const railVehicleNumbersListLen = s.nodeList[s.current + 13].ff50node.children;
+    const railVehicleNumbersListLen = s.nodeList[s.current].ff50node.children;
     var i: u32 = 0;
     while (i < railVehicleNumbersListLen) : (i += 1) {
         try railVehicleNumbersList.append(s.nodeList[s.current + 14 + i].ff56node._cDeltaString);
     }
+    s.current += 1 + railVehicleNumbersListLen;
 
-    const timingTestTime = s.nodeList[s.current + 14 + railVehicleNumbersListLen].ff56node.value._cDeltaString;
-    s.current += 15 + railVehicleNumbersListLen;
-
+    const timingTestTime = parseNode(s)._cDeltaString;
     const groupName = parse_parseLocalisation_cUserLocalisedString;
-    const showRVNumbersWithGroup = s.nodeList[s.current + 0].ff56node.value._cDeltaString;
-    const scenarioChainTarget = s.nodeList[s.current + 1].ff56node.value._cDeltaString;
-    const scenarioChainGUID = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
-
-    s.current += 3;
+    const showRVNumbersWithGroup = parseNode(s)._cDeltaString;
+    const scenarioChainTarget = parseNode(s)._cDeltaString;
+    const scenarioChainGUID = parseNode(s)._cDeltaString;
 
     return sm.cDriverInstructionTarget{
         .id = idVal,
@@ -169,6 +201,256 @@ fn parse_cDriverInstructionTarget(s: *status) sm.parse_cDriverInstructionTarget 
         .ShowRVNumbersWithGroup = showRVNumbersWithGroup,
         .ScenarioChainTarget = scenarioChainTarget,
         .ScenarioChainGUID = scenarioChainGUID,
+    };
+}
+
+fn parse_cPickupPassengers(s: *status) sm.cPickupPassengers {
+    const idVal = s.nodeList[s.current].id;
+    s.current += 1;
+    defer s.current += 1;
+
+    const activationLevel = parseNode(s)._sInt16;
+    const successTextToBeSavedMessage = parseNode(s)._bool;
+    const failureTextToBeSavedMessage = parseNode(s)._bool;
+    const displayTextToBeSavedMessage = parseNode(s)._bool;
+    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggerTrainStop = parseNode(s)._bool;
+    const triggerWheelSlip = parseNode(s)._bool;
+    const wheelSlipDuration = parseNode(s)._sInt16;
+    const triggerSound = parse_cGUID(s);
+    const triggerAnimation = parse_cGUID(s);
+    const secondsDelay = parseNode(s)._sInt16;
+    const active = parseNode(s)._bool;
+    const arriveTime = parse_sTimeOfDay(s);
+    const departTime = parse_sTimeOfDay(s);
+    const condition = parseNode(s)._cDeltaString;
+    const successEvent = parseNode(s)._cDeltaString;
+    const failureEvent = parseNode(s)._cDeltaString;
+    const started = parseNode(s)._bool;
+    const satisfied = parseNode(s)._bool;
+    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const travelForwards = parseNode(s)._bool;
+    const unloadPassengers = parseNode(s)._bool;
+
+    return sm.cPickupPassengers{
+        .id = idVal,
+        .ActivationLevel = activationLevel,
+        .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
+        .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
+        .DisplayTextToBeSavedMessage = displayTextToBeSavedMessage,
+        .TriggeredText = triggeredText,
+        .UntriggeredText = untriggeredText,
+        .DisplayText = displayText,
+        .TriggerTrainStop = triggerTrainStop,
+        .TriggerWheelSlip = triggerWheelSlip,
+        .WheelSlipDuration = wheelSlipDuration,
+        .TriggerSound = triggerSound,
+        .TriggerAnimation = triggerAnimation,
+        .SecondsDelay = secondsDelay,
+        .Active = active,
+        .ArriveTime = arriveTime,
+        .DepartTime = departTime,
+        .Condition = condition,
+        .SuccessEvent = successEvent,
+        .FailureEvent = failureEvent,
+        .Started = started,
+        .Satisfied = satisfied,
+        .DeltaTarget = deltaTarget,
+        .TravelForwards = travelForwards,
+        .UnloadPassengers = unloadPassengers,
+    };
+}
+
+fn parse_cConsistOperation(s: *status) sm.cConsistOperation {
+    const idVal = s.nodeList[s.current].id;
+    s.current += 1;
+    defer s.current += 1;
+
+    const activationLevel = parseNode(s)._sInt16;
+    const successTextToBeSavedMessage = parseNode(s)._bool;
+    const failureTextToBeSavedMessage = parseNode(s)._bool;
+    const displayTextToBeSavedMessage = parseNode(s)._bool;
+    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggerTrainStop = parseNode(s)._bool;
+    const triggerWheelSlip = parseNode(s)._bool;
+    const wheelSlipDuration = parseNode(s)._sInt16;
+    const triggerSound = parse_cGUID(s);
+    const triggerAnimation = parse_cGUID(s);
+    const secondsDelay = parseNode(s)._sInt16;
+    const active = parseNode(s)._bool;
+    const arriveTime = parse_sTimeOfDay(s);
+    const departTime = parse_sTimeOfDay(s);
+    const condition = parseNode(s)._cDeltaString;
+    const successEvent = parseNode(s)._cDeltaString;
+    const failureEvent = parseNode(s)._cDeltaString;
+    const started = parseNode(s)._bool;
+    const satisfied = parseNode(s)._bool;
+    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const operationOrder = parseNode(s)._bool;
+    const firstUpdateDone = parseNode(s)._bool;
+    const lastCompletedTargetIndex = parseNode(s)._sInt32;
+    const currentTargetIndex = parseNode(s)._sUInt32;
+    const targetCompletedTime = parseNode(s)._sFloat32;
+
+    return sm.cConsistOperation{
+        .id = idVal,
+        .ActivationLevel = activationLevel,
+        .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
+        .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
+        .DisplayTextToBeSavedMessage = displayTextToBeSavedMessage,
+        .TriggeredText = triggeredText,
+        .UntriggeredText = untriggeredText,
+        .DisplayText = displayText,
+        .TriggerTrainStop = triggerTrainStop,
+        .TriggerWheelSlip = triggerWheelSlip,
+        .WheelSlipDuration = wheelSlipDuration,
+        .TriggerSound = triggerSound,
+        .TriggerAnimation = triggerAnimation,
+        .SecondsDelay = secondsDelay,
+        .Active = active,
+        .ArriveTime = arriveTime,
+        .DepartTime = departTime,
+        .Condition = condition,
+        .SuccessEvent = successEvent,
+        .FailureEvent = failureEvent,
+        .Started = started,
+        .Satisfied = satisfied,
+        .DeltaTarget = deltaTarget,
+        .OperationOrder = operationOrder,
+        .FirstUpdateDone = firstUpdateDone,
+        .LastCompletedTargetIndex = lastCompletedTargetIndex,
+        .CurrentTargetIndex = currentTargetIndex,
+        .TargetCompletedTime = targetCompletedTime,
+    };
+}
+
+fn parse_cStopAtDestination(s: *status) sm.cStopAtDestination {
+    const idVal = s.nodeList[s.current].id;
+    s.current += 1;
+    defer s.current += 1;
+
+    const activationLevel = parseNode(s)._sInt16;
+    const successTextToBeSavedMessage = parseNode(s)._bool;
+    const failureTextToBeSavedMessage = parseNode(s)._bool;
+    const displayTextToBeSavedMessage = parseNode(s)._bool;
+    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggerTrainStop = parseNode(s)._bool;
+    const triggerWheelSlip = parseNode(s)._bool;
+    const wheelSlipDuration = parseNode(s)._sInt16;
+    const triggerSound = parse_cGUID(s);
+    const triggerAnimation = parse_cGUID(s);
+    const secondsDelay = parseNode(s)._sInt16;
+    const active = parseNode(s)._bool;
+    const arriveTime = parse_sTimeOfDay(s);
+    const departTime = parse_sTimeOfDay(s);
+    const condition = parseNode(s)._cDeltaString;
+    const successEvent = parseNode(s)._cDeltaString;
+    const failureEvent = parseNode(s)._cDeltaString;
+    const started = parseNode(s)._bool;
+    const satisfied = parseNode(s)._bool;
+    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const travelForwards = parseNode(s)._bool;
+
+    return sm.cStopAtDestination{
+        .id = idVal,
+        .ActivationLevel = activationLevel,
+        .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
+        .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
+        .DisplayTextToBeSavedMessage = displayTextToBeSavedMessage,
+        .TriggeredText = triggeredText,
+        .UntriggeredText = untriggeredText,
+        .DisplayText = displayText,
+        .TriggerTrainStop = triggerTrainStop,
+        .TriggerWheelSlip = triggerWheelSlip,
+        .WheelSlipDuration = wheelSlipDuration,
+        .TriggerSound = triggerSound,
+        .TriggerAnimation = triggerAnimation,
+        .SecondsDelay = secondsDelay,
+        .Active = active,
+        .ArriveTime = arriveTime,
+        .DepartTime = departTime,
+        .Condition = condition,
+        .SuccessEvent = successEvent,
+        .FailureEvent = failureEvent,
+        .Started = started,
+        .Satisfied = satisfied,
+        .DeltaTarget = deltaTarget,
+        .TravelForwards = travelForwards,
+    };
+}
+
+fn parse_cTriggerInstruction(s: *status) sm.cTriggerInstruction {
+    const idVal = s.nodeList[s.current].id;
+    s.current += 1;
+    defer s.current += 1;
+
+    const activationLevel = parseNode(s)._sInt16;
+    const successTextToBeSavedMessage = parseNode(s)._bool;
+    const failureTextToBeSavedMessage = parseNode(s)._bool;
+    const displayTextToBeSavedMessage = parseNode(s)._bool;
+    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggerTrainStop = parseNode(s)._bool;
+    const triggerWheelSlip = parseNode(s)._bool;
+    const wheelSlipDuration = parseNode(s)._sInt16;
+    const triggerSound = parse_cGUID(s);
+    const triggerAnimation = parse_cGUID(s);
+    const secondsDelay = parseNode(s)._sInt16;
+    const active = parseNode(s)._bool;
+    const arriveTime = parse_sTimeOfDay(s);
+    const departTime = parse_sTimeOfDay(s);
+    const condition = parseNode(s)._cDeltaString;
+    const successEvent = parseNode(s)._cDeltaString;
+    const failureEvent = parseNode(s)._cDeltaString;
+    const started = parseNode(s)._bool;
+    const satisfied = parseNode(s)._bool;
+    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const startTime = parseNode(s)._sFloat32;
+
+    return sm.cTriggerInstruction{
+        .id = idVal,
+        .ActivationLevel = activationLevel,
+        .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
+        .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
+        .DisplayTextToBeSavedMessage = displayTextToBeSavedMessage,
+        .TriggeredText = triggeredText,
+        .UntriggeredText = untriggeredText,
+        .DisplayText = displayText,
+        .TriggerTrainStop = triggerTrainStop,
+        .TriggerWheelSlip = triggerWheelSlip,
+        .WheelSlipDuration = wheelSlipDuration,
+        .TriggerSound = triggerSound,
+        .TriggerAnimation = triggerAnimation,
+        .SecondsDelay = secondsDelay,
+        .Active = active,
+        .ArriveTime = arriveTime,
+        .DepartTime = departTime,
+        .Condition = condition,
+        .SuccessEvent = successEvent,
+        .FailureEvent = failureEvent,
+        .Started = started,
+        .Satisfied = satisfied,
+        .DeltaTarget = deltaTarget,
+        .StartTime = startTime,
+    };
+}
+
+fn parse_cDriverInstructionContainer(s: *status) sm.cDriverInstructionContainer {
+    const idVal = s.nodeList[s.current].id;
+    s.current += 1;
+    defer s.current += 1;
+
+    const driverInstruction = parse_DriverInstruction(s);
+    return sm.cDriverInstructionContainer{
+        .id = idVal,
+        .DriverInstruction = driverInstruction,
     };
 }
 
@@ -208,7 +490,7 @@ test "Parse Time of Day" {
     try expectEqual(result._iHour, 1);
     try expectEqual(result._iMinute, 3);
     try expectEqual(result._iSeconds, 5);
-    try expectEqual(s.current, 4);
+    try expectEqual(s.current, 5);
 }
 
 test "Parse Localization_cUserLocalizedString" {
@@ -284,5 +566,5 @@ test "Parse Localization_cUserLocalizedString" {
     try expectEqualStrings(result.Italian, "");
     try expectEqualStrings(result.Key, "KEY VAL");
     try expectEqualStrings(result.Other[0].Value, "How");
-    try expectEqual(s.current, 12);
+    try expectEqual(s.current, 13);
 }
