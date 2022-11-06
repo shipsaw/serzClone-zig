@@ -1,13 +1,17 @@
+// TODO
 pub const cRecordSet = struct {
-    id: u32,
+    Id: u32,
     Record: Record,
 };
 
+// DONE
 pub const Record = struct {
     cConsists: []cConsist,
 };
 
+// DONE
 pub const cConsist = struct {
+    Id: u32,
     RailVehicles: []cOwnedEntity,
     FrontFollower: Network_cTrackFollower,
     RearFollower: Network_cTrackFollower,
@@ -22,6 +26,7 @@ pub const cConsist = struct {
     IgnoreProximity: bool,
 };
 
+// DONE
 pub const cOwnedEntity = struct {
     Component: Component,
     BlueprintID: iBlueprintLibrary_cAbsoluteBlueprintID,
@@ -30,6 +35,7 @@ pub const cOwnedEntity = struct {
     EntityID: cGUID,
 };
 
+// DONE
 pub const Component = struct {
     cWagon: cWagon,
     cAnimObjectRender: cAnimObjectRender,
@@ -40,8 +46,9 @@ pub const Component = struct {
     cScriptComponent: cScriptComponent,
 };
 
+// DONE
 pub const cWagon = struct {
-    id: u32,
+    Id: u32,
     PantographInfo: []const u8,
     PantographIsDirectional: bool,
     LastPantographControlValue: f32,
@@ -55,8 +62,9 @@ pub const cWagon = struct {
     InTunnel: bool,
 };
 
+// DONE
 pub const Network_cTrackFollower = struct {
-    id: u32,
+    Id: u32,
     Height: f32,
     _type: []const u8,
     Position: f32,
@@ -64,6 +72,7 @@ pub const Network_cTrackFollower = struct {
     RibbonId: cGUID,
 };
 
+// DONE
 pub const Network_cDirection = struct {
     _dir: []const u8,
 };
@@ -74,22 +83,26 @@ pub const cGUID = struct {
     DevString: []const u8,
 };
 
+// Done
 pub const cHcRVector4 = struct {
-    Element: []f32,
+    Element: [4]f32,
 };
 
+// DONE
 pub const iBlueprintLibrary_cAbsoluteBlueprintID = struct {
     BlueprintSetId: iBlueprintLibrary_cBlueprintSetId,
     BlueprintID: []const u8,
 };
 
+// DONE
 pub const iBlueprintLibrary_cBlueprintSetId = struct {
     Provider: []const u8,
     Product: []const u8,
 };
 
+// DONE
 pub const cAnimObjectRender = struct {
-    id: u32,
+    Id: u32,
     DetailLevel: i32,
     Global: bool,
     Saved: bool,
@@ -98,37 +111,44 @@ pub const cAnimObjectRender = struct {
     Palette2Index: u8,
 };
 
+// DONE
 pub const cPosOri = struct {
-    id: u32,
+    Id: u32,
     scale: [4]f32,
     RFarMatrix: cFarMatrix,
 };
 
+// DONE
 pub const cControlContainer = struct {
-    id: u32,
+    Id: u32,
     Time: f32,
     FrameTime: f32,
     CabEndsWithKey: []const u8,
 };
 
+// DONE
 pub const cCargoComponent = struct {
-    id: u32,
+    Id: u32,
     IsPreLoaded: []const u8,
     InitialLevel: f32,
 };
 
+// DONE
 pub const cEntityContainer = struct {
-    id: u32,
-    StaticChildrenMatrix: [16]f32,
+    Id: u32,
+    StaticChildrenMatrix: [][16]f32,
 };
 
+// DONE
 pub const cScriptComponent = struct {
+    Id: u32,
     DebugDisplay: bool,
     StateName: []const u8,
 };
 
+// DONE
 pub const cFarMatrix = struct {
-    id: u32,
+    Id: u32,
     Height: f32,
     RXAxis: [4]f32,
     RYAxis: [4]f32,
@@ -162,7 +182,7 @@ pub const cTileCoordinate = struct {
 // DONE
 pub const cDriver = struct {
     id: u32,
-    FinalDestination: cDriverInstructionTarget,
+    FinalDestination: ?cDriverInstructionTarget,
     PlayerDriver: bool,
     ServiceName: Localisation_cUserLocalisedString,
     InitialRV: [][]const u8,
