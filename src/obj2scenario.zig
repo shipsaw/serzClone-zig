@@ -28,7 +28,8 @@ const status = struct {
 };
 
 pub fn parse(nodes: []const n.node) ![]const u8 {
-    const scenarioModelObj = try buildModel(nodes);
+    var s = status.init(nodes);
+    const scenarioModelObj = try parse_cRecordSet(&s);
     var string = std.ArrayList(u8).init(allocator);
     try json.stringify(scenarioModelObj, .{}, string.writer());
     return string.items;
@@ -102,9 +103,15 @@ fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUs
 }
 
 fn parse_cGUID(s: *status) sm.cGUID {
-    const uuid = s.nodeList[s.current + 1].ff56node.value._sUInt64;
-    const devString = s.nodeList[s.current + 2].ff56node.value._cDeltaString;
-    s.current += 3;
+    s.current += 2;
+    defer s.current += 1;
+
+    var uuid: [2]u64 = undefined;
+    uuid[0] = parseNode(s)._sUInt64;
+    uuid[1] = parseNode(s)._sUInt64;
+    s.current += 1;
+
+    const devString = parseNode(s)._cDeltaString;
 
     return sm.cGUID{
         .UUID = uuid,
@@ -112,24 +119,34 @@ fn parse_cGUID(s: *status) sm.cGUID {
     };
 }
 
-fn parse_DriverInstruction(s: *status) sm.DriverInstruction {
+fn parse_DriverInstruction(s: *status) ![]sm.DriverInstruction {
     const numberInstructions = s.nodeList[s.current].ff50node.children;
     s.current += 1;
     defer s.current += 1;
 
     var i: u32 = 0;
+    var instructionArray = std.ArrayList(sm.DriverInstruction).init(allocator);
+
     while (i < numberInstructions) : (i += 1) {
-        switch (s.nodeList[s.current].ff50node.name) {
-            "cTriggerInstruction" => parse_cTriggerInstruction(s),
-            "cPickupPassengers" => parse_cPickupPassengers(s),
-            "cStopAtDestination" => parse_cStopAtDestination(s),
-            "cConsistOperation" => parse_cConsistOperation(s),
-            else => unreachable,
-        }
+        const currentName = s.nodeList[s.current].ff50node.name;
+        if (std.mem.eql(u8, "cTriggerInstruction", currentName)) {
+            const boxedInstruction = sm.DriverInstruction{ .cTriggerInstruction = (try parse_cTriggerInstruction(s)) };
+            try instructionArray.append(boxedInstruction);
+        } else if (std.mem.eql(u8, "cPickupPassengers", currentName)) {
+            const boxedInstruction = sm.DriverInstruction{ .cPickupPassengers = (try parse_cPickupPassengers(s)) };
+            try instructionArray.append(boxedInstruction);
+        } else if (std.mem.eql(u8, "cStopAtDestination", currentName)) {
+            const boxedInstruction = sm.DriverInstruction{ .cStopAtDestination = (try parse_cStopAtDestination(s)) };
+            try instructionArray.append(boxedInstruction);
+        } else if (std.mem.eql(u8, "cConsistOperaion", currentName)) {
+            const boxedInstruction = sm.DriverInstruction{ .cConsistOperation = (try parse_cConsistOperation(s)) };
+            try instructionArray.append(boxedInstruction);
+        } else unreachable;
     }
+    return instructionArray.items;
 }
 
-fn parse_cDriverInstructionTarget(s: *status) ?sm.parse_cDriverInstructionTarget {
+fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
     if (@TypeOf(s.nodeList[s.current + 1]) == n.ff4enode) {
         return null;
     }
@@ -148,33 +165,33 @@ fn parse_cDriverInstructionTarget(s: *status) ?sm.parse_cDriverInstructionTarget
     const operation = parseNode(s)._cDeltaString;
     const deadline = parse_sTimeOfDay(s);
 
-    const pickingUp = parseNode(s)._cDeltaString;
-    const duration = parseNode(s)._cDeltaString;
-    const handleOffPath = parseNode(s)._cDeltaString;
-    const earliestDepartureTime = parseNode(s)._cDeltaString;
-    const durationSet = parseNode(s)._cDeltaString;
-    const reversingAllowed = parseNode(s)._cDeltaString;
-    const waypoint = parseNode(s)._cDeltaString;
-    const hidden = parseNode(s)._cDeltaString;
+    const pickingUp = parseNode(s)._bool;
+    const duration = parseNode(s)._sUInt32;
+    const handleOffPath = parseNode(s)._bool;
+    const earliestDepartureTime = parseNode(s)._sFloat32;
+    const durationSet = parseNode(s)._bool;
+    const reversingAllowed = parseNode(s)._bool;
+    const waypoint = parseNode(s)._bool;
+    const hidden = parseNode(s)._bool;
     const progressCode = parseNode(s)._cDeltaString;
-    const arrivalTime = parseNode(s)._cDeltaString;
-    const departureTime = parseNode(s)._cDeltaString;
-    const tickedTime = parseNode(s)._cDeltaString;
-    const dueTime = parseNode(s)._cDeltaString;
+    const arrivalTime = parseNode(s)._sFloat32;
+    const departureTime = parseNode(s)._sFloat32;
+    const tickedTime = parseNode(s)._sFloat32;
+    const dueTime = parseNode(s)._sFloat32;
 
     var railVehicleNumbersList = std.ArrayList([]const u8).init(allocator);
     const railVehicleNumbersListLen = s.nodeList[s.current].ff50node.children;
     var i: u32 = 0;
     while (i < railVehicleNumbersListLen) : (i += 1) {
-        try railVehicleNumbersList.append(s.nodeList[s.current + 14 + i].ff56node._cDeltaString);
+        try railVehicleNumbersList.append(s.nodeList[s.current + 14 + i].ff56node.value._cDeltaString);
     }
     s.current += 1 + railVehicleNumbersListLen;
 
-    const timingTestTime = parseNode(s)._cDeltaString;
-    const groupName = parse_parseLocalisation_cUserLocalisedString;
-    const showRVNumbersWithGroup = parseNode(s)._cDeltaString;
-    const scenarioChainTarget = parseNode(s)._cDeltaString;
-    const scenarioChainGUID = parseNode(s)._cDeltaString;
+    const timingTestTime = parseNode(s)._sFloat32;
+    const groupName = try parse_parseLocalisation_cUserLocalisedString(s);
+    const showRVNumbersWithGroup = parseNode(s)._bool;
+    const scenarioChainTarget = parseNode(s)._bool;
+    const scenarioChainGUID = parse_cGUID(s);
 
     return sm.cDriverInstructionTarget{
         .id = idVal,
@@ -209,8 +226,8 @@ fn parse_cDriverInstructionTarget(s: *status) ?sm.parse_cDriverInstructionTarget
     };
 }
 
-fn parse_cPickupPassengers(s: *status) sm.cPickupPassengers {
-    const idVal = s.nodeList[s.current].id;
+fn parse_cPickupPassengers(s: *status) !sm.cPickupPassengers {
+    const idVal = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -218,9 +235,9 @@ fn parse_cPickupPassengers(s: *status) sm.cPickupPassengers {
     const successTextToBeSavedMessage = parseNode(s)._bool;
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
-    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
@@ -235,7 +252,7 @@ fn parse_cPickupPassengers(s: *status) sm.cPickupPassengers {
     const failureEvent = parseNode(s)._cDeltaString;
     const started = parseNode(s)._bool;
     const satisfied = parseNode(s)._bool;
-    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const deltaTarget = try parse_cDriverInstructionTarget(s);
     const travelForwards = parseNode(s)._bool;
     const unloadPassengers = parseNode(s)._bool;
 
@@ -268,8 +285,8 @@ fn parse_cPickupPassengers(s: *status) sm.cPickupPassengers {
     };
 }
 
-fn parse_cConsistOperation(s: *status) sm.cConsistOperation {
-    const idVal = s.nodeList[s.current].id;
+fn parse_cConsistOperation(s: *status) !sm.cConsistOperation {
+    const idVal = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -277,9 +294,9 @@ fn parse_cConsistOperation(s: *status) sm.cConsistOperation {
     const successTextToBeSavedMessage = parseNode(s)._bool;
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
-    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
@@ -294,7 +311,7 @@ fn parse_cConsistOperation(s: *status) sm.cConsistOperation {
     const failureEvent = parseNode(s)._cDeltaString;
     const started = parseNode(s)._bool;
     const satisfied = parseNode(s)._bool;
-    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const deltaTarget = try parse_cDriverInstructionTarget(s);
     const operationOrder = parseNode(s)._bool;
     const firstUpdateDone = parseNode(s)._bool;
     const lastCompletedTargetIndex = parseNode(s)._sInt32;
@@ -333,8 +350,8 @@ fn parse_cConsistOperation(s: *status) sm.cConsistOperation {
     };
 }
 
-fn parse_cStopAtDestination(s: *status) sm.cStopAtDestination {
-    const idVal = s.nodeList[s.current].id;
+fn parse_cStopAtDestination(s: *status) !sm.cStopAtDestination {
+    const idVal = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -342,9 +359,9 @@ fn parse_cStopAtDestination(s: *status) sm.cStopAtDestination {
     const successTextToBeSavedMessage = parseNode(s)._bool;
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
-    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
@@ -359,7 +376,7 @@ fn parse_cStopAtDestination(s: *status) sm.cStopAtDestination {
     const failureEvent = parseNode(s)._cDeltaString;
     const started = parseNode(s)._bool;
     const satisfied = parseNode(s)._bool;
-    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const deltaTarget = try parse_cDriverInstructionTarget(s);
     const travelForwards = parseNode(s)._bool;
 
     return sm.cStopAtDestination{
@@ -390,8 +407,8 @@ fn parse_cStopAtDestination(s: *status) sm.cStopAtDestination {
     };
 }
 
-fn parse_cTriggerInstruction(s: *status) sm.cTriggerInstruction {
-    const idVal = s.nodeList[s.current].id;
+fn parse_cTriggerInstruction(s: *status) !sm.cTriggerInstruction {
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -399,9 +416,9 @@ fn parse_cTriggerInstruction(s: *status) sm.cTriggerInstruction {
     const successTextToBeSavedMessage = parseNode(s)._bool;
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
-    const triggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const untriggeredText = parse_parseLocalisation_cUserLocalisedString(s);
-    const displayText = parse_parseLocalisation_cUserLocalisedString(s);
+    const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
+    const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
@@ -416,11 +433,11 @@ fn parse_cTriggerInstruction(s: *status) sm.cTriggerInstruction {
     const failureEvent = parseNode(s)._cDeltaString;
     const started = parseNode(s)._bool;
     const satisfied = parseNode(s)._bool;
-    const deltaTarget = parse_cDriverInstructionTarget(s);
+    const deltaTarget = try parse_cDriverInstructionTarget(s);
     const startTime = parseNode(s)._sFloat32;
 
     return sm.cTriggerInstruction{
-        .id = idVal,
+        .Id = id,
         .ActivationLevel = activationLevel,
         .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
         .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
@@ -447,26 +464,26 @@ fn parse_cTriggerInstruction(s: *status) sm.cTriggerInstruction {
     };
 }
 
-fn parse_cDriverInstructionContainer(s: *status) sm.cDriverInstructionContainer {
-    const idVal = s.nodeList[s.current].id;
+fn parse_cDriverInstructionContainer(s: *status) !sm.cDriverInstructionContainer {
+    const idVal = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
     const driverInstruction = parse_DriverInstruction(s);
     return sm.cDriverInstructionContainer{
         .id = idVal,
-        .DriverInstruction = driverInstruction,
+        .DriverInstruction = try driverInstruction,
     };
 }
 
-fn parse_cDriver(s: *status) sm.cDriver {
+fn parse_cDriver(s: *status) !sm.cDriver {
     const idVal = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
-    const finalDestination = parse_cDriverInstructionTarget(s);
+    const finalDestination = try parse_cDriverInstructionTarget(s);
     const playerDriver = parseNode(s)._bool;
-    const serviceName = parse_parseLocalisation_cUserLocalisedString(s);
+    const serviceName = try parse_parseLocalisation_cUserLocalisedString(s);
 
     var initialRVList = std.ArrayList([]const u8).init(allocator);
     const initialRVListLength = s.nodeList[s.current].ff50node.children;
@@ -474,7 +491,7 @@ fn parse_cDriver(s: *status) sm.cDriver {
     s.current += 1;
     var i: u32 = 0;
     while (i < initialRVListLength) : (i += 1) {
-        try initialRVList.append(s.nodeList[s.current].ff56node._cDeltaString);
+        try initialRVList.append(s.nodeList[s.current].ff56node.value._cDeltaString);
         s.current += 1;
     }
 
@@ -491,7 +508,7 @@ fn parse_cDriver(s: *status) sm.cDriver {
     const forcedRepath = parseNode(s)._bool;
     const offPath = parseNode(s)._bool;
     const startTriggerDistanceFromPlayerSquared = parseNode(s)._sFloat32;
-    const driverInstructionContainer = parse_cDriverInstructionContainer(s);
+    const driverInstructionContainer = try parse_cDriverInstructionContainer(s);
     const unloadedAtStart = parseNode(s)._bool;
 
     return sm.cDriver{
@@ -530,7 +547,7 @@ fn parse_cTileCoordinate(s: *status) sm.cTileCoordinate {
     s.current += 1;
     defer s.current += 1;
     const distance = parseNode(s)._sFloat32;
-    return sm.cRouteCoordinate{
+    return sm.cTileCoordinate{
         .Distance = distance,
     };
 }
@@ -542,7 +559,7 @@ fn parse_cFarCoordinate(s: *status) sm.cFarCoordinate {
     const tileCoordinate = parse_cTileCoordinate(s);
     return sm.cFarCoordinate{
         .RouteCoordinate = routeCoordinate,
-        .TileCoorinate = tileCoordinate,
+        .TileCoordinate = tileCoordinate,
     };
 }
 
@@ -551,11 +568,11 @@ fn parse_cFarVector2(s: *status) sm.cFarVector2 {
     s.current += 1;
     defer s.current += 1;
     const x = parse_cFarCoordinate(s);
-    const y = parse_cFarCoordinate(s);
-    return sm.cFarCoordinate{
+    const z = parse_cFarCoordinate(s);
+    return sm.cFarVector2{
         .Id = id,
         .X = x,
-        .Y = y,
+        .Z = z,
     };
 }
 
@@ -578,7 +595,7 @@ fn parse_Network_cTrackFollower(s: *status) sm.Network_cTrackFollower {
     const position = parseNode(s)._sFloat32;
     const direction = parse_Network_cDirection(s);
     const ribbonId = parse_cGUID(s);
-    return sm.Network_cDirection{
+    return sm.Network_cTrackFollower{
         .Id = id,
         .Height = height,
         ._type = tpe,
@@ -588,7 +605,7 @@ fn parse_Network_cTrackFollower(s: *status) sm.Network_cTrackFollower {
     };
 }
 
-fn parse_cWagon(s: *status) sm.cWagon {
+fn parse_cWagon(s: *status) !sm.cWagon {
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
 
@@ -611,7 +628,7 @@ fn parse_cWagon(s: *status) sm.cWagon {
     const followers = followerList.items;
     const totalMass = parseNode(s)._sFloat32;
     const speed = parseNode(s)._sFloat32;
-    const velocity = parse_cHcRVector4(s);
+    const velocity = try parse_cHcRVector4(s);
     const inTunnel = parseNode(s)._bool;
 
     return sm.cWagon{
@@ -630,18 +647,18 @@ fn parse_cWagon(s: *status) sm.cWagon {
     };
 }
 
-fn parse_cHcRVector4(s: *status) sm.cHcRVector4 {
+fn parse_cHcRVector4(s: *status) !sm.cHcRVector4 {
     s.current += 2;
     defer s.current += 2;
 
     var vectorList = std.ArrayList(f32).init(allocator);
     var i: u32 = 0;
     while (i < 4) : (i += 1) {
-        vectorList.append(parseNode(s)._sFloat32);
+        try vectorList.append(parseNode(s)._sFloat32);
     }
 
     return sm.cHcRVector4{
-        .Elements = vectorList.items,
+        .Element = vectorList.items,
     };
 }
 
@@ -662,22 +679,22 @@ fn parse_cScriptComponent(s: *status) sm.cScriptComponent {
 
 fn parse_cCargoComponent(s: *status) sm.cCargoComponent {
     const id = s.nodeList[s.current].ff50node.id;
-    s.current ++ 1;
+    s.current += 1;
     defer s.current += 1;
 
-    const isPreloaded = parseNode(s)._bool;
+    const isPreloaded = parseNode(s)._cDeltaString;
     const initialLevel = parseNode(s)._sFloat32;
 
     return sm.cCargoComponent{
         .Id = id,
-        .IsPreloaded = isPreloaded,
+        .IsPreLoaded = isPreloaded,
         .InitialLevel = initialLevel,
     };
 }
 
 fn parse_cControlContainer(s: *status) sm.cControlContainer {
     const id = s.nodeList[s.current].ff50node.id;
-    s.current ++ 1;
+    s.current += 1;
     defer s.current += 1;
 
     const time = parseNode(s)._sFloat32;
@@ -748,20 +765,20 @@ fn parse_cFarMatrix(s: *status) sm.cFarMatrix {
 
     const height = parseNode(s)._sFloat32;
 
-    var rxAxis = [4]f32;
-    for (s.nodeList[s.current].ff41node.values) |val, i| {
+    var rxAxis: [4]f32 = undefined;
+    for (s.nodeList[s.current].ff41node.values.items) |val, i| {
         rxAxis[i] = val._sFloat32;
     }
     s.current += 1;
 
-    var ryAxis = [4]f32;
-    for (s.nodeList[s.current].ff41node.values) |val, i| {
+    var ryAxis: [4]f32 = undefined;
+    for (s.nodeList[s.current].ff41node.values.items) |val, i| {
         ryAxis[i] = val._sFloat32;
     }
     s.current += 1;
 
-    var rzAxis = [4]f32;
-    for (s.nodeList[s.current].ff41node.values) |val, i| {
+    var rzAxis: [4]f32 = undefined;
+    for (s.nodeList[s.current].ff41node.values.items) |val, i| {
         rzAxis[i] = val._sFloat32;
     }
     s.current += 1;
@@ -783,8 +800,8 @@ fn parse_cPosOri(s: *status) sm.cPosOri {
     s.current += 1;
     defer s.current += 1;
 
-    var scale = [4]f32;
-    for (s.nodeList[s.current].ff41node.values) |val, i| {
+    var scale: [4]f32 = undefined;
+    for (s.nodeList[s.current].ff41node.values.items) |val, i| {
         scale[i] = val._sFloat32;
     }
     s.current += 1;
@@ -798,7 +815,7 @@ fn parse_cPosOri(s: *status) sm.cPosOri {
     };
 }
 
-fn parse_cEntityContainer(s: *status) sm.cEntityContainer {
+fn parse_cEntityContainer(s: *status) !sm.cEntityContainer {
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 2;
@@ -809,10 +826,10 @@ fn parse_cEntityContainer(s: *status) sm.cEntityContainer {
 
     var i: u32 = 0;
     while (i < staticChildrenMatrixLen) : (i += 1) {
-        staticChildrenMatrix.append([16]f32{undefined});
+        try staticChildrenMatrix.append([_]f32{0} ** 16);
         var j: u32 = 0;
         while (j < 16) : (j += 1) {
-            staticChildrenMatrix[i][j] = s.nodeList[s.current].ff41node.values[j]._sFloat32;
+            staticChildrenMatrix.items[i][j] = s.nodeList[s.current].ff41node.values.items[j]._sFloat32;
         }
         s.current += 1;
     }
@@ -823,16 +840,16 @@ fn parse_cEntityContainer(s: *status) sm.cEntityContainer {
     };
 }
 
-fn parse_Component(s: *status) sm.Component {
+fn parse_Component(s: *status) !sm.Component {
     s.current += 1;
     defer s.current += 1;
 
-    const wagon = parse_cWagon(s);
+    const wagon = try parse_cWagon(s);
     const animObjectRender = parse_cAnimObjectRender(s);
     const posOri = parse_cPosOri(s);
     const controlContainer = parse_cControlContainer(s);
     const cargoComponent = parse_cCargoComponent(s);
-    const entityContainer = parse_cEntityContainer(s);
+    const entityContainer = try parse_cEntityContainer(s);
     const scriptComponent = parse_cScriptComponent(s);
 
     return sm.Component{
@@ -846,17 +863,17 @@ fn parse_Component(s: *status) sm.Component {
     };
 }
 
-fn parse_cOwnedEntity(s: *status) sm.cOwnedEntity {
+fn parse_cOwnedEntity(s: *status) !sm.cOwnedEntity {
     s.current += 1;
     defer s.current += 1;
 
-    const component = parse_Component(s);
+    const component = try parse_Component(s);
     const blueprintID = parse_iBlueprintLibrary_cAbsoluteBlueprintID(s);
     const reskinBlueprintID = parse_iBlueprintLibrary_cAbsoluteBlueprintID(s);
     const name = parseNode(s)._cDeltaString;
     const entityID = parse_cGUID(s);
 
-    return sm.Component{
+    return sm.cOwnedEntity{
         .Component = component,
         .BlueprintID = blueprintID,
         .ReskinBlueprintID = reskinBlueprintID,
@@ -865,7 +882,7 @@ fn parse_cOwnedEntity(s: *status) sm.cOwnedEntity {
     };
 }
 
-fn parse_cConsist(s: *status) sm.cConsist {
+fn parse_cConsist(s: *status) !sm.cConsist {
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -876,14 +893,14 @@ fn parse_cConsist(s: *status) sm.cConsist {
 
     var i: u32 = 0;
     while (i < railVehiclesArrayLen) : (i += 1) {
-        railVehiclesArray.append(parse_cOwnedEntity(s));
+        try railVehiclesArray.append(try parse_cOwnedEntity(s));
     }
     const railVehicles = railVehiclesArray.items;
     s.current += 1;
 
     const frontFollower = parse_Network_cTrackFollower(s);
     const rearFollower = parse_Network_cTrackFollower(s);
-    const driver = parse_cDriver(s);
+    const driver = try parse_cDriver(s);
     const inPortalName = parseNode(s)._cDeltaString;
     const driverEngineIndex = parseNode(s)._sInt32;
     const platformRibbonGUID = parse_cGUID(s);
@@ -910,14 +927,14 @@ fn parse_cConsist(s: *status) sm.cConsist {
     };
 }
 
-fn parse_Record(s: *status) sm.Record {
+fn parse_Record(s: *status) !sm.Record {
     var consistsArray = std.ArrayList(sm.cConsist).init(allocator);
     const consistsArrayLen = s.nodeList[s.current].ff50node.children;
     s.current += 1;
 
     var i: u32 = 0;
     while (i < consistsArrayLen) : (i += 1) {
-        consistsArray.append(parse_cConsist(s));
+        try consistsArray.append(try parse_cConsist(s));
     }
     const consists = consistsArray.items;
     s.current += 1;
@@ -927,12 +944,12 @@ fn parse_Record(s: *status) sm.Record {
     };
 }
 
-fn parse_cRecordSet(s: *status) sm.cRecordSet {
+fn parse_cRecordSet(s: *status) !sm.cRecordSet {
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
-    const record = parse_Record(s);
+    const record = try parse_Record(s);
     return sm.cRecordSet{
         .Id = id,
         .Record = record,

@@ -79,13 +79,13 @@ pub const Network_cDirection = struct {
 
 // DONE
 pub const cGUID = struct {
-    UUID: []u64,
+    UUID: [2]u64,
     DevString: []const u8,
 };
 
 // Done
 pub const cHcRVector4 = struct {
-    Element: [4]f32,
+    Element: []f32,
 };
 
 // DONE
@@ -114,7 +114,7 @@ pub const cAnimObjectRender = struct {
 // DONE
 pub const cPosOri = struct {
     Id: u32,
-    scale: [4]f32,
+    Scale: [4]f32,
     RFarMatrix: cFarMatrix,
 };
 
@@ -265,11 +265,11 @@ pub const sTimeOfDay = struct {
 // DONE
 pub const cDriverInstructionContainer = struct {
     id: u32,
-    DriverInstruction: DriverInstruction,
+    DriverInstruction: []DriverInstruction,
 };
 
 // DONE
-pub const DriverInstruction = union {
+pub const DriverInstruction = union(enum) {
     cTriggerInstruction: cTriggerInstruction,
     cStopAtDestination: cStopAtDestination,
     cConsistOperation: cConsistOperation,
@@ -300,13 +300,14 @@ pub const cPickupPassengers = struct {
     FailureEvent: []const u8,
     Started: bool,
     Satisfied: bool,
-    DeltaTarget: cDriverInstructionTarget,
+    DeltaTarget: ?cDriverInstructionTarget,
     TravelForwards: bool,
     UnloadPassengers: bool,
 };
+
 // DONE
 pub const cTriggerInstruction = struct {
-    id: u32,
+    Id: u32,
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,
@@ -328,7 +329,7 @@ pub const cTriggerInstruction = struct {
     FailureEvent: []const u8,
     Started: bool,
     Satisfied: bool,
-    DeltaTarget: undefined,
+    DeltaTarget: ?cDriverInstructionTarget,
     StartTime: f32,
 };
 
@@ -356,7 +357,7 @@ pub const cStopAtDestination = struct {
     FailureEvent: []const u8,
     Started: bool,
     Satisfied: bool,
-    DeltaTarget: cDriverInstructionTarget,
+    DeltaTarget: ?cDriverInstructionTarget,
     TravelForwards: bool,
 };
 
@@ -384,7 +385,7 @@ pub const cConsistOperation = struct {
     FailureEvent: []const u8,
     Started: bool,
     Satisfied: bool,
-    DeltaTarget: cDriverInstructionTarget,
+    DeltaTarget: ?cDriverInstructionTarget,
     OperationOrder: bool,
     FirstUpdateDone: bool,
     LastCompletedTargetIndex: i32,
