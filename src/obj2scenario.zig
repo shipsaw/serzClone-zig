@@ -124,6 +124,7 @@ fn parse_DriverInstruction(s: *status) sm.DriverInstruction {
             "cPickupPassengers" => parse_cPickupPassengers(s),
             "cStopAtDestination" => parse_cStopAtDestination(s),
             "cConsistOperation" => parse_cConsistOperation(s),
+            else => unreachable,
         }
     }
 }
@@ -451,6 +452,106 @@ fn parse_cDriverInstructionContainer(s: *status) sm.cDriverInstructionContainer 
     return sm.cDriverInstructionContainer{
         .id = idVal,
         .DriverInstruction = driverInstruction,
+    };
+}
+
+fn parse_cDriver(s: *status) sm.cDriver {
+    const idVal = s.nodeList[s.current].ff50node.id;
+    s.current += 1;
+    defer s.current += 1;
+
+    const finalDestination = parse_cDriverInstructionTarget(s);
+    const playerDriver = parseNode(s)._bool;
+    const serviceName = parse_parseLocalisation_cUserLocalisedString(s);
+
+    var initialRVList = std.ArrayList([]const u8).init(allocator);
+    const initialRVListLength = s.nodeList[s.current].ff50node.children;
+
+    s.current += 1;
+    var i: u32 = 0;
+    while (i < initialRVListLength) : (i += 1) {
+        try initialRVList.append(s.nodeList[s.current].ff56node._cDeltaString);
+        s.current += 1;
+    }
+
+    const initialRV = initialRVList.items;
+    const startTime = parseNode(s)._sFloat32;
+    const startSpeed = parseNode(s)._sFloat32;
+    const endSpeed = parseNode(s)._sFloat32;
+    const serviceClass = parseNode(s)._sInt32;
+    const expectedPerformance = parseNode(s)._sFloat32;
+    const playerControlled = parseNode(s)._bool;
+    const priorPathingStatus = parseNode(s)._cDeltaString;
+    const pathingStatus = parseNode(s)._cDeltaString;
+    const repathIn = parseNode(s)._sFloat32;
+    const forcedRepath = parseNode(s)._bool;
+    const offPath = parseNode(s)._bool;
+    const startTriggerDistanceFromPlayerSquared = parseNode(s)._sFloat32;
+    const driverInstructionContainer = parse_cDriverInstructionContainer(s);
+    const unloadedAtStart = parseNode(s)._bool;
+
+    return sm.cDriver{
+        .id = idVal,
+        .FinalDestination = finalDestination,
+        .PlayerDriver = playerDriver,
+        .ServiceName = serviceName,
+        .InitialRV = initialRV,
+        .StartTime = startTime,
+        .StartSpeed = startSpeed,
+        .EndSpeed = endSpeed,
+        .ServiceClass = serviceClass,
+        .ExpectedPerformance = expectedPerformance,
+        .PlayerControlled = playerControlled,
+        .PriorPathingStatus = priorPathingStatus,
+        .PathingStatus = pathingStatus,
+        .RepathIn = repathIn,
+        .ForcedRepath = forcedRepath,
+        .OffPath = offPath,
+        .StartTriggerDistanceFromPlayerSquared = startTriggerDistanceFromPlayerSquared,
+        .DriverInstructionContainer = driverInstructionContainer,
+        .UnloadedAtStart = unloadedAtStart,
+    };
+}
+
+fn parse_cRouteCoordinate(s: *status) sm.cRouteCoordinate {
+    s.current += 1;
+    defer s.current += 1;
+    const distance = parseNode(s)._sInt32;
+    return sm.cRouteCoordinate{
+        .Distance = distance,
+    };
+}
+
+fn parse_cTileCoordinate(s: *status) sm.cTileCoordinate {
+    s.current += 1;
+    defer s.current += 1;
+    const distance = parseNode(s)._sFloat32;
+    return sm.cRouteCoordinate{
+        .Distance = distance,
+    };
+}
+
+fn parse_cFarCoordinate(s: *status) sm.cFarCoordinate {
+    s.current += 1;
+    defer s.current += 1;
+    const routeCoordinate = parse_cRouteCoordinate(s);
+    const tileCoordinate = parse_cTileCoordinate(s);
+    return sm.cFarCoordinate{
+        .RouteCoordinate = routeCoordinate,
+        .TileCoorinate = tileCoordinate,
+    };
+}
+
+fn parse_cFarVector2(s: *status) sm.cFarVector2 {
+    const id = s.nodeList[s.current].ff50node.id;
+    s.current += 1;
+    defer s.current += 1;
+    const x = parse_cFarCoordinate(s);
+    const y = parse_cFarCoordinate(s);
+    return sm.cFarCoordinate{
+        .Id = id,
+        .X = x,
+        .Y = y,
     };
 }
 

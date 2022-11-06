@@ -136,31 +136,36 @@ pub const cFarMatrix = struct {
     RFarPosition: cFarVector2,
 };
 
+// DONE
 pub const cFarVector2 = struct {
+    Id: u32,
     X: cFarCoordinate,
     Z: cFarCoordinate,
 };
 
-// TODO TEST
+// DONE
 pub const cFarCoordinate = struct {
     RouteCoordinate: cRouteCoordinate,
     TileCoordinate: cTileCoordinate,
 };
 
+// DONE
 pub const cRouteCoordinate = struct {
     Distance: i32,
 };
 
+// DONE
 pub const cTileCoordinate = struct {
     Distance: f32,
 };
 
+// DONE
 pub const cDriver = struct {
     id: u32,
     FinalDestination: cDriverInstructionTarget,
     PlayerDriver: bool,
     ServiceName: Localisation_cUserLocalisedString,
-    InitialRV: [3][]const u8,
+    InitialRV: [][]const u8,
     StartTime: f32,
     StartSpeed: f32,
     EndSpeed: f32,
