@@ -37,13 +37,19 @@ pub const cOwnedEntity = struct {
 
 // DONE
 pub const Component = struct {
-    cWagon: cWagon,
+    Vehicle: Vehicle,
     cAnimObjectRender: cAnimObjectRender,
     cPosOri: cPosOri,
+    cEngineSimContainer: ?u32,
     cControlContainer: cControlContainer,
-    cCargoComponent: cCargoComponent,
+    cCargoComponent: ?cCargoComponent,
     cEntityContainer: cEntityContainer,
     cScriptComponent: cScriptComponent,
+};
+
+pub const Vehicle = union(enum) {
+    cWagon: cWagon,
+    cEngine: cEngine,
 };
 
 // DONE
@@ -58,8 +64,27 @@ pub const cWagon = struct {
     Followers: []Network_cTrackFollower,
     TotalMass: f32,
     Speed: f32,
-    Velocity: cHcRVector4,
+    Velocity: ?cHcRVector4,
     InTunnel: bool,
+};
+
+pub const cEngine = struct {
+    Id: u32,
+    PantographInfo: []const u8,
+    PantographIsDirectional: bool,
+    LastPantographControlValue: f32,
+    Flipped: bool,
+    UniqueNumber: []const u8,
+    GUID: []const u8,
+    Followers: []Network_cTrackFollower,
+    TotalMass: f32,
+    Speed: f32,
+    Velocity: ?cHcRVector4,
+    InTunnel: bool,
+    DisabledEngine: bool,
+    AWSTimer: f32,
+    AWSExpired: bool,
+    TPWSDistance: f32,
 };
 
 // DONE
@@ -130,7 +155,7 @@ pub const cControlContainer = struct {
 pub const cCargoComponent = struct {
     Id: u32,
     IsPreLoaded: []const u8,
-    InitialLevel: f32,
+    InitialLevel: []f32,
 };
 
 // DONE
