@@ -548,17 +548,17 @@ fn parse_cDriverInstructionContainer(s: *status) !sm.cDriverInstructionContainer
 
 fn parse_cDriver(s: *status) !?sm.cDriver {
     std.debug.print("\nBEGIN cDriver\n", .{});
-    switch (s.nodeList[s.current]) {
+    switch (s.nodeList[s.current + 1]) {
         .ff4enode => {
-            s.current += 1;
+            s.current += 3;
             return null;
         },
         .ff50node => {
             std.debug.print("\nBEGIN cDriver\n", .{});
             std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
             const idVal = s.nodeList[s.current].ff50node.id;
-            s.current += 1;
-            defer s.current += 1;
+            s.current += 2;
+            defer s.current += 2;
             const finalDestination = try parse_cDriverInstructionTarget(s);
 
             const playerDriver = parseNode(s)._bool;
@@ -620,9 +620,9 @@ fn parse_cDriver(s: *status) !?sm.cDriver {
 
 fn parse_cRouteCoordinate(s: *status) sm.cRouteCoordinate {
     std.debug.print("\nBEGIN cRouteCoordinate\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    s.current += 2;
+    defer s.current += 2;
     const distance = parseNode(s)._sInt32;
     return sm.cRouteCoordinate{
         .Distance = distance,
@@ -631,9 +631,9 @@ fn parse_cRouteCoordinate(s: *status) sm.cRouteCoordinate {
 
 fn parse_cTileCoordinate(s: *status) sm.cTileCoordinate {
     std.debug.print("\nBEGIN cTileCoordinate\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    s.current += 2;
+    defer s.current += 2;
     const distance = parseNode(s)._sFloat32;
     return sm.cTileCoordinate{
         .Distance = distance,
@@ -642,17 +642,12 @@ fn parse_cTileCoordinate(s: *status) sm.cTileCoordinate {
 
 fn parse_cFarCoordinate(s: *status) sm.cFarCoordinate {
     std.debug.print("\nBEGIN cFarCoordinate\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    s.current += 2;
+    defer s.current += 2;
 
-    s.current += 1;
     const routeCoordinate = parse_cRouteCoordinate(s);
-    s.current += 1;
-
-    s.current += 1;
     const tileCoordinate = parse_cTileCoordinate(s);
-    s.current += 1;
 
     return sm.cFarCoordinate{
         .RouteCoordinate = routeCoordinate,
@@ -662,18 +657,13 @@ fn parse_cFarCoordinate(s: *status) sm.cFarCoordinate {
 
 fn parse_cFarVector2(s: *status) sm.cFarVector2 {
     std.debug.print("\nBEGIN cFarVector2\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    const id = s.nodeList[s.current].ff50node.id;
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    const id = s.nodeList[s.current + 1].ff50node.id;
+    s.current += 2;
+    defer s.current += 2;
 
-    s.current += 1;
     const x = parse_cFarCoordinate(s);
-    s.current += 1;
-
-    s.current += 1;
     const z = parse_cFarCoordinate(s);
-    s.current += 1;
 
     return sm.cFarVector2{
         .Id = id,
@@ -684,9 +674,9 @@ fn parse_cFarVector2(s: *status) sm.cFarVector2 {
 
 fn parse_Network_cDirection(s: *status) sm.Network_cDirection {
     std.debug.print("\nBEGIN Network_cDirection\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    s.current += 2;
+    defer s.current += 2;
     const dir = parseNode(s)._cDeltaString;
     return sm.Network_cDirection{
         ._dir = dir,
@@ -695,19 +685,15 @@ fn parse_Network_cDirection(s: *status) sm.Network_cDirection {
 
 fn parse_Network_cTrackFollower(s: *status) sm.Network_cTrackFollower {
     std.debug.print("\nBEGIN Network_cTrackFollower\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    const id = s.nodeList[s.current].ff50node.id;
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    const id = s.nodeList[s.current + 1].ff50node.id;
+    s.current += 2;
+    defer s.current += 2;
 
     const height = parseNode(s)._sFloat32;
     const tpe = parseNode(s)._cDeltaString;
     const position = parseNode(s)._sFloat32;
-
-    s.current += 1;
     const direction = parse_Network_cDirection(s);
-    s.current += 1;
-
     const ribbonId = parse_cGUID(s);
 
     return sm.Network_cTrackFollower{
@@ -750,17 +736,16 @@ fn parse_cEngine(s: *status) !sm.cEngine {
     s.current += 1;
     var i: u32 = 0;
     while (i < followerListLen) : (i += 1) {
+        s.current -= 1;
         try followerList.append(parse_Network_cTrackFollower(s));
+        s.current -= 1;
     }
     s.current += 1;
 
     const followers = followerList.items;
     const totalMass = parseNode(s)._sFloat32;
     const speed = parseNode(s)._sFloat32;
-
-    s.current += 1;
     const velocity = try parse_cHcRVector4(s);
-    s.current += 1;
 
     const inTunnel = parseNode(s)._bool;
     const disabledEngine = parseNode(s)._bool;
@@ -807,17 +792,16 @@ fn parse_cWagon(s: *status) !sm.cWagon {
     s.current += 1;
     var i: u32 = 0;
     while (i < followerListLen) : (i += 1) {
+        s.current -= 1;
         try followerList.append(parse_Network_cTrackFollower(s));
+        s.current -= 1;
     }
     s.current += 1;
 
     const followers = followerList.items;
     const totalMass = parseNode(s)._sFloat32;
     const speed = parseNode(s)._sFloat32;
-
-    s.current += 1;
     const velocity = try parse_cHcRVector4(s);
-    s.current += 1;
 
     const inTunnel = parseNode(s)._bool;
 
@@ -840,11 +824,11 @@ fn parse_cWagon(s: *status) !sm.cWagon {
 fn parse_cHcRVector4(s: *status) !?sm.cHcRVector4 {
     std.debug.print("\nBEGIN cHcRVector4\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    if (s.nodeList[s.current].ff50node.children == 0) {
+    if (s.nodeList[s.current + 1].ff50node.children == 0) {
         return null;
     }
-    s.current += 2;
-    defer s.current += 2;
+    s.current += 3;
+    defer s.current += 3;
 
     var vectorList = std.ArrayList(f32).init(allocator);
     var i: u32 = 0;
@@ -947,9 +931,9 @@ fn parse_cAnimObjectRender(s: *status) sm.cAnimObjectRender {
 
 fn parse_iBlueprintLibrary_cBlueprintSetId(s: *status) sm.iBlueprintLibrary_cBlueprintSetId {
     std.debug.print("\nBEGIN iBlueprintLibrary_cBlueprintSetId\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    s.current += 2;
+    defer s.current += 2;
 
     const provider = parseNode(s)._cDeltaString;
     const product = parseNode(s)._cDeltaString;
@@ -962,14 +946,11 @@ fn parse_iBlueprintLibrary_cBlueprintSetId(s: *status) sm.iBlueprintLibrary_cBlu
 
 fn parse_iBlueprintLibrary_cAbsoluteBlueprintID(s: *status) sm.iBlueprintLibrary_cAbsoluteBlueprintID {
     std.debug.print("\nBEGIN iBlueprintLibrary_cAbsoluteBlueprintID\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    s.current += 2;
+    defer s.current += 2;
 
-    s.current += 1;
     const blueprintSetId = parse_iBlueprintLibrary_cBlueprintSetId(s);
-    s.current += 1;
-
     const blueprintID = parseNode(s)._cDeltaString;
 
     return sm.iBlueprintLibrary_cAbsoluteBlueprintID{
@@ -980,10 +961,10 @@ fn parse_iBlueprintLibrary_cAbsoluteBlueprintID(s: *status) sm.iBlueprintLibrary
 
 fn parse_cFarMatrix(s: *status) sm.cFarMatrix {
     std.debug.print("\nBEGIN cFarMatrix\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    const id = s.nodeList[s.current].ff50node.id;
-    s.current += 1;
-    defer s.current += 1;
+    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
+    const id = s.nodeList[s.current + 1].ff50node.id;
+    s.current += 2;
+    defer s.current += 2;
 
     const height = parseNode(s)._sFloat32;
 
@@ -1005,9 +986,7 @@ fn parse_cFarMatrix(s: *status) sm.cFarMatrix {
     }
     s.current += 1;
 
-    s.current += 1;
     const rFarPosition = parse_cFarVector2(s);
-    s.current += 1;
 
     return sm.cFarMatrix{
         .Id = id,
@@ -1032,9 +1011,7 @@ fn parse_cPosOri(s: *status) sm.cPosOri {
     }
     s.current += 1;
 
-    s.current += 1;
     const rFarMatrix = parse_cFarMatrix(s);
-    s.current += 1;
 
     return sm.cPosOri{
         .Id = id,
@@ -1172,14 +1149,8 @@ fn parse_cOwnedEntity(s: *status) !sm.cOwnedEntity {
 
     const component = try parse_Component(s);
 
-    s.current += 1;
     const blueprintID = parse_iBlueprintLibrary_cAbsoluteBlueprintID(s);
-    s.current += 1;
-
-    s.current += 1;
     const reskinBlueprintID = parse_iBlueprintLibrary_cAbsoluteBlueprintID(s);
-    s.current += 1;
-
     const name = parseNode(s)._cDeltaString;
     const entityID = parse_cGUID(s);
 
@@ -1210,28 +1181,15 @@ fn parse_cConsist(s: *status) !sm.cConsist {
     const railVehicles = railVehiclesArray.items;
     s.current += 1;
 
-    s.current += 1;
     const frontFollower = parse_Network_cTrackFollower(s);
-    s.current += 1;
-
-    s.current += 1;
     const rearFollower = parse_Network_cTrackFollower(s);
-    s.current += 1;
-
-    s.current += 1;
     const driver = try parse_cDriver(s);
-    s.current += 1;
-
     const inPortalName = parseNode(s)._cDeltaString;
     const driverEngineIndex = parseNode(s)._sInt32;
     const platformRibbonGUID = parse_cGUID(s);
     const platformTimeRemaining = parseNode(s)._sFloat32;
     const maxPermissableSpeed = parseNode(s)._sFloat32;
-
-    s.current += 1;
     const currentDirection = parse_Network_cDirection(s);
-    s.current += 1;
-
     const ignorePhysicsFrames = parseNode(s)._sInt32;
     const ignoreProximity = parseNode(s)._bool;
 
