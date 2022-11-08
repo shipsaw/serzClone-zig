@@ -230,18 +230,12 @@ fn processU64(s: *status) dataUnion {
 fn processSFloat32(s: *status) !dataUnion {
     defer s.current += 4;
     const val = @bitCast(f32, std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little));
-    // if (std.mem.eql(u8, s.source[s.current .. s.current + 4], &[_]u8{ 0x00, 0x00, 0x00, 0x80 })) {
-    //     return dataUnion{ ._cDeltaString = &[_]u8{ '(', '-', '0', ')' } };
-    // }
     return dataUnion{ ._sFloat32 = val };
 }
 
 fn processCDeltaString(s: *status) !dataUnion {
     var result = std.ArrayList(u8).init(allocator);
     const str = try identifier(s, stringContext.VALUE);
-    if (str.len > 0 and std.ascii.isDigit(str[0])) {
-        try result.append('_');
-    }
     try result.appendSlice(str);
     return dataUnion{ ._cDeltaString = result.items };
 }
