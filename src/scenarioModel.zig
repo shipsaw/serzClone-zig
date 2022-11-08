@@ -36,20 +36,40 @@ pub const cOwnedEntity = struct {
 };
 
 // DONE
-pub const Component = struct {
-    Vehicle: Vehicle,
+pub const Component = union(enum) {
+    PassWagon: PassWagon,
+    CargoWagon: CargoWagon,
+    Engine: Engine,
+};
+
+pub const PassWagon = struct {
+    cWagon: cWagon,
     cAnimObjectRender: cAnimObjectRender,
     cPosOri: cPosOri,
-    cEngineSimContainer: ?u32,
     cControlContainer: cControlContainer,
-    cCargoComponent: ?cCargoComponent,
     cEntityContainer: cEntityContainer,
     cScriptComponent: cScriptComponent,
 };
 
-pub const Vehicle = union(enum) {
+pub const CargoWagon = struct {
     cWagon: cWagon,
+    cAnimObjectRender: cAnimObjectRender,
+    cPosOri: cPosOri,
+    cControlContainer: cControlContainer,
+    cCargoComponent: cCargoComponent,
+    cEntityContainer: cEntityContainer,
+    cScriptComponent: cScriptComponent,
+};
+
+pub const Engine = struct {
     cEngine: cEngine,
+    cAnimObjectRender: cAnimObjectRender,
+    cPosOri: cPosOri,
+    cEngineSimContainer: u32,
+    cControlContainer: cControlContainer,
+    cEntityContainer: cEntityContainer,
+    cScriptComponent: cScriptComponent,
+    cCargoComponent: cCargoComponent,
 };
 
 // DONE
@@ -382,7 +402,7 @@ pub const cStopAtDestination = struct {
     FailureEvent: []const u8,
     Started: bool,
     Satisfied: bool,
-    DeltaTarget: ?cDriverInstructionTarget,
+    DeltaTarget: ?[]cDriverInstructionTarget,
     TravelForwards: bool,
 };
 
