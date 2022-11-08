@@ -48,8 +48,8 @@ fn parseNode(s: *status) n.dataUnion {
 fn parse_sTimeOfDay(s: *status) sm.sTimeOfDay {
     std.debug.print("\nBEGIN sTimeOfDay\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    s.current += 2;
+    defer s.current += 2;
 
     const hour = parseNode(s)._sInt32;
     const minute = parseNode(s)._sInt32;
@@ -65,8 +65,8 @@ fn parse_sTimeOfDay(s: *status) sm.sTimeOfDay {
 fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUserLocalisedString {
     std.debug.print("\nBEGIN Localization_cUserLocalizedString\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 1;
-    defer s.current += 1;
+    s.current += 2;
+    defer s.current += 2;
 
     const english = parseNode(s)._cDeltaString;
     const french = parseNode(s)._cDeltaString;
@@ -109,8 +109,9 @@ fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUs
 fn parse_cGUID(s: *status) sm.cGUID {
     std.debug.print("\nBEGIN cGUID\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    s.current += 2;
-    defer s.current += 1;
+    // TODO: Add UUID Area
+    s.current += 3;
+    defer s.current += 2;
 
     var uuid: [2]u64 = undefined;
     uuid[0] = parseNode(s)._sUInt64;
@@ -156,6 +157,8 @@ fn parse_DriverInstruction(s: *status) ![]sm.DriverInstruction {
 
 fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
     std.debug.print("\nBEGIN cDriverInstructionTarget\n", .{});
+    s.current += 1;
+    defer s.current += 1;
     switch (s.nodeList[s.current]) {
         .ff4enode => {
             s.current += 1;
@@ -178,11 +181,7 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
             const entityName = parseNode(s)._cDeltaString;
             const trainOrder = parseNode(s)._bool;
             const operation = parseNode(s)._cDeltaString;
-
-            s.current += 1;
             const deadline = parse_sTimeOfDay(s);
-            s.current += 1;
-
             const pickingUp = parseNode(s)._bool;
             const duration = parseNode(s)._sUInt32;
             const handleOffPath = parseNode(s)._bool;
@@ -208,16 +207,11 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
 
             const timingTestTime = parseNode(s)._sFloat32;
 
-            s.current += 1;
             const groupName = try parse_parseLocalisation_cUserLocalisedString(s);
-            s.current += 1;
 
             const showRVNumbersWithGroup = parseNode(s)._bool;
             const scenarioChainTarget = parseNode(s)._bool;
-
-            s.current += 1;
             const scenarioChainGUID = parse_cGUID(s);
-            s.current += 1;
 
             return sm.cDriverInstructionTarget{
                 .id = idVal,
@@ -266,52 +260,28 @@ fn parse_cPickupPassengers(s: *status) !sm.cPickupPassengers {
     const successTextToBeSavedMessage = parseNode(s)._bool;
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
-
-    s.current += 1;
     const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
 
-    s.current += 1;
     const triggerSound = parse_cGUID(s);
-    s.current += 1;
-
-    s.current += 1;
     const triggerAnimation = parse_cGUID(s);
-    s.current += 1;
 
     const secondsDelay = parseNode(s)._sInt16;
     const active = parseNode(s)._bool;
 
-    s.current += 1;
     const arriveTime = parse_sTimeOfDay(s);
-    s.current += 1;
-
-    s.current += 1;
     const departTime = parse_sTimeOfDay(s);
-    s.current += 1;
 
     const condition = parseNode(s)._cDeltaString;
     const successEvent = parseNode(s)._cDeltaString;
     const failureEvent = parseNode(s)._cDeltaString;
     const started = parseNode(s)._bool;
     const satisfied = parseNode(s)._bool;
-
-    s.current += 1;
     const deltaTarget = try parse_cDriverInstructionTarget(s);
-    s.current += 1;
-
     const travelForwards = parseNode(s)._bool;
     const unloadPassengers = parseNode(s)._bool;
 
@@ -356,51 +326,29 @@ fn parse_cConsistOperation(s: *status) !sm.cConsistOperation {
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
 
-    s.current += 1;
     const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
 
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
 
-    s.current += 1;
     const triggerSound = parse_cGUID(s);
-    s.current += 1;
-
-    s.current += 1;
     const triggerAnimation = parse_cGUID(s);
-    s.current += 1;
 
     const secondsDelay = parseNode(s)._sInt16;
     const active = parseNode(s)._bool;
 
-    s.current += 1;
     const arriveTime = parse_sTimeOfDay(s);
-    s.current += 1;
-
-    s.current += 1;
     const departTime = parse_sTimeOfDay(s);
-    s.current += 1;
 
     const condition = parseNode(s)._cDeltaString;
     const successEvent = parseNode(s)._cDeltaString;
     const failureEvent = parseNode(s)._cDeltaString;
     const started = parseNode(s)._bool;
     const satisfied = parseNode(s)._bool;
-
-    s.current += 1;
     const deltaTarget = try parse_cDriverInstructionTarget(s);
-    s.current += 1;
-
     const operationOrder = parseNode(s)._bool;
     const firstUpdateDone = parseNode(s)._bool;
     const lastCompletedTargetIndex = parseNode(s)._sInt32;
@@ -451,40 +399,21 @@ fn parse_cStopAtDestination(s: *status) !sm.cStopAtDestination {
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
 
-    s.current += 1;
     const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
 
-    s.current += 1;
     const triggerSound = parse_cGUID(s);
-    s.current += 1;
-
-    s.current += 1;
     const triggerAnimation = parse_cGUID(s);
-    s.current += 1;
 
     const secondsDelay = parseNode(s)._sInt16;
     const active = parseNode(s)._bool;
 
-    s.current += 1;
     const arriveTime = parse_sTimeOfDay(s);
-    s.current += 1;
-
-    s.current += 1;
     const departTime = parse_sTimeOfDay(s);
-    s.current += 1;
 
     const condition = parseNode(s)._cDeltaString;
     const successEvent = parseNode(s)._cDeltaString;
@@ -498,7 +427,9 @@ fn parse_cStopAtDestination(s: *status) !sm.cStopAtDestination {
 
     var i: u32 = 0;
     while (i < driverInstructionListLen) : (i += 1) {
+        s.current -= 1;
         try driverInstructionList.append((try parse_cDriverInstructionTarget(s)).?);
+        s.current -= 1;
     }
     s.current += 1;
     const deltaTarget = driverInstructionList.items;
@@ -544,41 +475,21 @@ fn parse_cTriggerInstruction(s: *status) !sm.cTriggerInstruction {
     const successTextToBeSavedMessage = parseNode(s)._bool;
     const failureTextToBeSavedMessage = parseNode(s)._bool;
     const displayTextToBeSavedMessage = parseNode(s)._bool;
-
-    s.current += 1;
     const triggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const untriggeredText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
-    s.current += 1;
     const displayText = try parse_parseLocalisation_cUserLocalisedString(s);
-    s.current += 1;
-
     const triggerTrainStop = parseNode(s)._bool;
     const triggerWheelSlip = parseNode(s)._bool;
     const wheelSlipDuration = parseNode(s)._sInt16;
 
-    s.current += 1;
     const triggerSound = parse_cGUID(s);
-    s.current += 1;
-
-    s.current += 1;
     const triggerAnimation = parse_cGUID(s);
-    s.current += 1;
 
     const secondsDelay = parseNode(s)._sInt16;
     const active = parseNode(s)._bool;
 
-    s.current += 1;
     const arriveTime = parse_sTimeOfDay(s);
-    s.current += 1;
-
-    s.current += 1;
     const departTime = parse_sTimeOfDay(s);
-    s.current += 1;
 
     const condition = parseNode(s)._cDeltaString;
     const successEvent = parseNode(s)._cDeltaString;
@@ -586,9 +497,7 @@ fn parse_cTriggerInstruction(s: *status) !sm.cTriggerInstruction {
     const started = parseNode(s)._bool;
     const satisfied = parseNode(s)._bool;
 
-    s.current += 1;
     const deltaTarget = try parse_cDriverInstructionTarget(s);
-    s.current += 1;
 
     const startTime = parseNode(s)._sFloat32;
 
@@ -650,16 +559,11 @@ fn parse_cDriver(s: *status) !?sm.cDriver {
             const idVal = s.nodeList[s.current].ff50node.id;
             s.current += 1;
             defer s.current += 1;
-
-            s.current += 1;
             const finalDestination = try parse_cDriverInstructionTarget(s);
-            s.current += 1;
 
             const playerDriver = parseNode(s)._bool;
 
-            s.current += 1;
             const serviceName = try parse_parseLocalisation_cUserLocalisedString(s);
-            s.current += 1;
 
             var initialRVList = std.ArrayList([]const u8).init(allocator);
             const initialRVListLength = s.nodeList[s.current].ff50node.children;
@@ -804,9 +708,7 @@ fn parse_Network_cTrackFollower(s: *status) sm.Network_cTrackFollower {
     const direction = parse_Network_cDirection(s);
     s.current += 1;
 
-    s.current += 1;
     const ribbonId = parse_cGUID(s);
-    s.current += 1;
 
     return sm.Network_cTrackFollower{
         .Id = id,
@@ -1279,10 +1181,7 @@ fn parse_cOwnedEntity(s: *status) !sm.cOwnedEntity {
     s.current += 1;
 
     const name = parseNode(s)._cDeltaString;
-
-    s.current += 1;
     const entityID = parse_cGUID(s);
-    s.current += 1;
 
     return sm.cOwnedEntity{
         .Component = component,
@@ -1325,11 +1224,7 @@ fn parse_cConsist(s: *status) !sm.cConsist {
 
     const inPortalName = parseNode(s)._cDeltaString;
     const driverEngineIndex = parseNode(s)._sInt32;
-
-    s.current += 1;
     const platformRibbonGUID = parse_cGUID(s);
-    s.current += 1;
-
     const platformTimeRemaining = parseNode(s)._sFloat32;
     const maxPermissableSpeed = parseNode(s)._sFloat32;
 
