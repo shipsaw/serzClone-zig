@@ -457,11 +457,14 @@ fn parse_cPickupPassengers(s: *status, nde: sm.cPickupPassengers) !void {
     try append_ff56nodeT("FailureEvent");
     try append_ff56nodeT("Started");
     try append_ff56nodeT("Satisfied");
+
     try append_ff50nodeT("DeltaTarget", 0, 1);
     try parse_cDriverInstructionTarget(s, nde.DeltaTarget);
     try append_ff70nodeT("DeltaTarget");
+
     try append_ff56nodeT("TravelForwards");
     try append_ff56nodeT("UnloadPassengers");
+    try append_ff70nodeT("cPickupPassengers");
 }
 
 fn parse_cConsistOperation(s: *status, nde: sm.cConsistOperation) !void {
@@ -521,6 +524,8 @@ fn parse_cConsistOperation(s: *status, nde: sm.cConsistOperation) !void {
     try append_ff56nodeT("LastCompletedTargetIndex");
     try append_ff56nodeT("CurrentTargetIndex");
     try append_ff56nodeT("TargetCompletedTime");
+
+    try append_ff70nodeT("cConsistOperations");
 }
 
 fn parse_cStopAtDestination(s: *status, nde: sm.cStopAtDestination) !void {
@@ -576,6 +581,8 @@ fn parse_cStopAtDestination(s: *status, nde: sm.cStopAtDestination) !void {
     try append_ff70nodeT("DeltaTarget");
 
     try append_ff56nodeT("TravelForwards");
+
+    try append_ff70nodeT("cStopAtDestination");
 }
 
 fn parse_cTriggerInstruction(s: *status, sm.cTriggerInstruction) !void {
@@ -631,12 +638,13 @@ fn parse_cTriggerInstruction(s: *status, sm.cTriggerInstruction) !void {
     try append_ff70nodeT("DeltaTarget");
 
     try append_ff56nodeT("StartTime");
+    try append_ff70nodeT("cTriggerInstruction");
 }
 
 fn parse_cDriverInstructionContainer(s: *status, nde: sm.cDriverInstructionContainer) !sm.cDriverInstructionContainer {
     try append_ff50nodeT("cDriverInstructionContainer", nde.Id, 1);
     try parse_DriverInstruction(s, nde.DriverInstruction);
-    try append_ff70nodeT("cDriverInstructionContainer")
+    try append_ff70nodeT("cDriverInstructionContainer");
 }
 
 fn parse_cDriver(s: *status, nde: sm.cDriver) !void {
@@ -738,7 +746,168 @@ fn parse_Network_cTrackFollower(s: *status, nde: sm.Network_cTrackFollower) !voi
     try append_ff70nodeT("Network::cTrackFollower");
 }
 
-fn parse_vehicle(s: *status, nde: sm.Vehicle) !void {
+fn parse_PassWagon(s: *status, nde: sm.PassWagon) !void {
+    try append_ff50nodeT("Component", nde.Id, 6);
+
+    try parse_cWagon(s, nde.cWagon);
+    try parse_cAnimObjectRender(s, nde.cAnimObjectRender);
+    try parse_cPosOri(s, nde.cPosOri);
+    try parse_cControlContainer(s, nde.cControlContainer);
+    try parse_cEntityContainer(s, nde.cEntityContainer);
+    try parse_cScriptComponent(s, nde.cScriptComponent);
+
+    try append_ff70nodeT("Component");
+}
+
+fn parse_CargoWagon(s: *status, nde: sm.CargoWagon) !void {
+    try append_ff50nodeT("Component", nde.Id, 7);
+
+    try parse_cWagon(s, nde.cWagon);
+    try parse_cAnimObjectRender(s, nde.cAnimObjectRender);
+    try parse_cPosOri(s, nde.cPosOri);
+    try parse_cControlContainer(s, nde.cControlContainer);
+    try parse_cCargoComponent(s, nde.cCargoComponent);
+    try parse_cEntityContainer(s, nde.cEntityContainer);
+    try parse_cScriptComponent(s, nde.cScriptComponent);
+
+    try append_ff70nodeT("Component");
+}
+fn parse_Engine(s: *status, nde: sm.Engine) !void {
+    try append_ff50nodeT("Component", nde.Id, 7);
+
+    try parse_cEngine(s, nde.cEngine);
+    try parse_cAnimObjectRender(s, nde.cAnimObjectRender);
+    try parse_cPosOri(s, nde.cPosOri);
+    try parse_cEngineSimContainer(s, nde.cEngineSimContainer);
+    try parse_cControlContainer(s, nde.cControlContainer);
+    try parse_cEntityContainer(s, nde.cEntityContainer);
+    try parse_cScriptComponent(s, nde.cScriptComponent);
+    try parse_cCargoComponent(s, nde.cCargoComponent);
+
+    try append_ff70nodeT("Component");
+}
+
+fn parse_cWagon(s: *status, nde: sm.cWagon) !void {
+    append_ff50nodeT("cWagon", nde.Id, 11);
+    try append_ff56nodeT("PantographInfo");
+    try append_ff56nodeT("PantographIsDirectional");
+    try append_ff56nodeT("LastPantographControlValue");
+    try append_ff56nodeT("Flipped");
+    try append_ff56nodeT("UniqueNumber");
+    try append_ff56nodeT("GUID");
+
+    try append_ff50nodeT("Followers", 0, nde.Followers.len);
+    for (nde.Followers) |follower| {
+        parse_Network_cTrackFollower(s, follower);
+    }
+    try append_ff70nodeT("Followers");
+
+    try append_ff56nodeT("TotalMass");
+    try append_ff56nodeT("Speed");
+
+    try append_ff50nodeT("Velocity", 0, 1);
+    try parse_cHcRVector4(s, nde.Velocity);
+    try append_ff70nodeT("Velocity");
+
+    try append_ff56nodeT("InTunnel");
+    
+    try append_ff70nodeT("cWagon");
+}
+
+fn parse_cCargoComponent(s: *status, nde: sm.cCargoComponent) !void {
+    try append_ff50nodeT("cCargoComponent", nde.Id, 2);
+    try append_ff56nodeT("IsPreLoaded");
+    
+    try append_ff50nodeT("InitialLevel", 0, nde.InitialLevel.len);
+    for (nde.InitialLevel) |Val| {
+        append_eNode(Val, "sFloat32");
+    }
+    try append_ff70nodeT("InitialLevel");
+
+    try append_ff70nodeT("Network::cDirection");
+}
+
+fn parse_cControlContainer(s: *status, nde: sm.cControlContainer) !void {
+    try append_ff50nodeT("cControlContainer", nde.Id, 3);
+
+    try append_ff56nodeT("Time");
+    try append_ff56nodeT("FrameTime");
+    try append_ff56nodeT("CabEndWithKey");
+    
+    try append_ff70nodeT("cControlContainer");
+}
+
+fn parse_cAnimObjectRender(s: *status, nde: sm.cAnimObjectRender) !void {
+    try append_ff50nodeT("cAnimObjectRender", nde.Id, 6);
+
+    try append_ff56nodeT("DetailLevel");
+    try append_ff56nodeT("Global");
+    try append_ff56nodeT("Saved");
+    try append_ff56nodeT("Palette0Index");
+    try append_ff56nodeT("Palette1Index");
+    try append_ff56nodeT("Palette2Index");
+
+    try append_ff70nodeT("cAnimObjectRender");
+}
+
+fn parse_iBlueprintLibrary_cBlueprintSetId(s: *status, nde: sm.iBlueprintLibrary_cBlueprintSetId) !void {
+    try append_ff50nodeT("iBlueprintLibrary_cBlueprintSetId", 0, 2);
+
+    try append_ff56nodeT("Provider");
+    try append_ff56nodeT("Product");
+
+    try append_ff70nodeT("iBlueprintLibrary_cBlueprintSetId");
+}
+
+fn parse_iBlueprintLibrary_cAbsoluteBlueprintID(s: *status, nde: sm.iBlueprintLibrary_cAbsoluteBlueprintID) !void {
+    try append_ff50nodeT("iBlueprintLibrary_cAbsoluteBlueprintID", 0, 2);
+
+    try append_ff50nodeT("BlueprintSetID", 0, 1);
+    try parse_iBlueprintLibrary_cBlueprintSetId(s, nde.BlueprintSetId);
+    try append_ff70nodeT("BlueprintSetID");
+
+    try append_ff56nodeT("BlueprintID");
+
+    try append_ff70nodeT("iBlueprintLibrary_cAbsoluteBlueprintID");
+}
+
+fn parse_cFarMatrix(s: *status, nde: sm.cFarMatrix) !void {
+    try append_ff50nodeT("cFarMatrix", nde.Id, 5);
+    try append_ff56nodeT("Height");
+    try append_ff56nodeT("RXAxis");
+    try append_ff56nodeT("RYAxis");
+    try append_ff56nodeT("RZAxis");
+
+    try append_ff50nodeT("RFarPosition", 0, 1);
+    try parse_cFarVector2(s, nde.RFarPosition);
+    try append_ff70nodeT("RFarPosition");
+
+    try append_ff70nodeT("cFarMatrix");
+}
+
+fn parse_cPosOri(s: *status, nde: sm.cPosOri) !void {
+    try append_ff50nodeT("cPosOri", nde.Id, 2);
+
+    try append_ff56nodeT("Scale");
+
+    try append_ff50nodeT("RFarMatrix", 0, 1);
+    try parse_cFarMatrix(s, nde.RFarMatrix);
+    try append_ff70nodeT("RFarMatrix");
+
+    try append_ff70nodeT("cPosOri");
+}
+
+fn parse_cEntityContainer(s: *status, nde: sm.cEntityContainer) !void {
+    try append_ff50nodeT("cEntityContainer", nde.Id, 1);
+
+    try append_ff50nodeT("StaticChildrenMatrix", 0, 1);
+    // TODO: FF41 NODE
+    try append_ff70nodeT("StaticChildrenMatrix");
+
+    try append_ff70nodeT("cEntityContainer");
+}
+
+fn parse_Component(s: *status, nde: sm.Component) !void {
     switch (nde) {
         .PassWagon => parse_PassengerWagon(s, nde),
         .CargoWagon => parse_CargoWagon(s, nde),
@@ -746,55 +915,89 @@ fn parse_vehicle(s: *status, nde: sm.Vehicle) !void {
     }
 }
 
-fn parse_PassWagon(s: *status, nde: sm.cEngine) !void {
-}
-
-fn parse_CargoWagon(s: *status, nde: sm.cEngine) !void {
-}
-fn parse_Engine(s: *status, nde: sm.cEngine) !void {
-}
-
-fn parse_cWagon(s: *status, nde: sm.cWagon) !void {
-}
-
-fn parse_cCargoComponent(s: *status, nde: sm.cCargoComponent) !void {
-}
-
-fn parse_cControlContainer(s: *status, nde: m.cControlContainer) !void {
-}
-
-fn parse_cAnimObjectRender(s: *status, nde: m.cAnimObjectRender) !void {
-}
-
-fn parse_iBlueprintLibrary_cBlueprintSetId(s: *status, nde: m.iBlueprintLibrary_cBlueprintSetId) !void {
-}
-
-fn parse_iBlueprintLibrary_cAbsoluteBlueprintID(s: *status, nde: m.iBlueprintLibrary_cAbsoluteBlueprintID) !void {
-}
-
-fn parse_cFarMatrix(s: *status, nde: m.cFarMatrix) !void {
-}
-
-fn parse_cPosOri(s: *status, nde: m.cPosOri) !void {
-}
-
-fn parse_cEntityContainer(s: *status, nde: sm.cEntityContainer) !void {
-}
-
-fn parse_Component(s: *status, nde: sm.Component) !void {
-}
 
 fn parse_cEngineSimContainer(s: *status, nde: 32) !void {
+    // TODO: This might not be empty?
+    try append_ff50nodeT("cEngineSimContainer", nde.Id, 0);
+    try append_ff70nodeT("cEngineSimContainer");
 }
 
 fn parse_cOwnedEntity(s: *status, nde: sm.cOwnedEntity) !void {
+    try append_ff50nodeT("cOwnedEntity", nde.Id, 5);
+
+    parse_Component(s, nde.Component);
+
+    try append_ff50nodeT("BlueprintID", 0, 1);
+    try parse_iBlueprintLibrary_cAbsoluteBlueprintID(s, nde.BlueprintID);
+    try append_ff70nodeT("BlueprintID");
+
+    try append_ff50nodeT("ReskinBlueprintID", 0, 1);
+    try parse_iBlueprintLibrary_cAbsoluteBlueprintID(s, nde.ReskinBlueprintID);
+    try append_ff70nodeT("ReskinBlueprintID");
+
+    try append_ff56nodeT("Name");
+
+    try append_ff50nodeT("EntityID", 0, 1);
+    try parse_cGUID(s, nde.EntityID);
+    try append_ff70nodeT("EntityID");
+
+    try append_ff70nodeT("cOwnedEntity");
 }
 
 fn parse_cConsist(s: *status, nde: sm.cConsist) !void {
+    try append_ff50nodeT("cConsist", nde.Id, 12);
+
+    try append_ff50nodeT("RailVehicles", 0, nde.RailVehicles.len);
+    for (nde.RailVehicles) |vehicle| {
+        parse_cOwnedEntity(s, vehicle);
+    }
+    try append_ff70nodeT("RailVehicles");
+
+    try append_ff50nodeT("FrontFollower", 0, 1);
+    try parse_Network_cTrackFollower(s, nde.FrontFollower);
+    try append_ff70nodeT("FrontFollower");
+
+    try append_ff50nodeT("RearFollower", 0, 1);
+    try parse_Network_cTrackFollower(s, nde.RearFollower);
+    try append_ff70nodeT("RearFollower");
+
+    try append_ff50nodeT("Driver", 0, 1);
+    try parse_cDriver(s, nde.Driver);
+    try append_ff70nodeT("Driver");
+
+    try append_ff56nodeT("InPortalName");
+    try append_ff56nodeT("DriverEngineIndex");
+
+    try append_ff50nodeT("PlatformRibbonGUID", 0, 1);
+    try parse_cGUID(s, nde.PlatformRibbonGUID);
+    try append_ff70nodeT("PlatformRibbonGUID");
+
+    try append_ff56nodeT("PlatformTimeRemaining");
+    try append_ff56nodeT("MaxPermissableSpeed");
+
+    try append_ff50nodeT("CurrentDirection", 0, 1);
+    try parse_Network_cDirection(s, nde.CurrentDirection);
+    try append_ff70nodeT("CurrentDirection");
+
+    try append_ff56nodeT("IgnorePhysicsFrames");
+    try append_ff56nodeT("IgnoreProximity");
+
+    try append_ff70nodeT("cConsist");
 }
 
 fn parse_Record(s: *status, nde: sm.Record) !void {
+    try append_ff50nodeT("Record", 0, 1);
+
+    for (nde.cConsists) |consist| {
+        parse_cConsist(s, consist);
+    }
+    try append_ff70nodeT("Record");
 }
 
 fn parse_cRecordSet(s: *status, nde: sm.cRecordSet) !void {
+    try append_ff50nodeT("cRecordSet", 0, 1);
+
+    parse_Record(s, nde.cRecordSet);
+
+    try append_ff70nodeT("cRecordSet");
 }
