@@ -169,7 +169,7 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
         },
         .ff50node => {
             std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-            const idVal = s.nodeList[s.current + 0].ff50node.id;
+            const id = s.nodeList[s.current + 0].ff50node.id;
             s.current += 1;
             defer s.current += 1;
 
@@ -214,7 +214,7 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
             const scenarioChainGUID = parse_cGUID(s);
 
             return sm.cDriverInstructionTarget{
-                .id = idVal,
+                .Id = id,
                 .DisplayName = displayName,
                 .Timetabled = timeTabled,
                 .Performance = performance,
@@ -252,7 +252,7 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
 fn parse_cPickupPassengers(s: *status) !sm.cPickupPassengers {
     std.debug.print("\nBEGIN cPickupPassengers\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    const idVal = s.nodeList[s.current].ff50node.id;
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -286,7 +286,7 @@ fn parse_cPickupPassengers(s: *status) !sm.cPickupPassengers {
     const unloadPassengers = parseNode(s)._bool;
 
     return sm.cPickupPassengers{
-        .id = idVal,
+        .Id = id,
         .ActivationLevel = activationLevel,
         .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
         .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
@@ -317,7 +317,7 @@ fn parse_cPickupPassengers(s: *status) !sm.cPickupPassengers {
 fn parse_cConsistOperation(s: *status) !sm.cConsistOperation {
     std.debug.print("\nBEGIN cConsistOperations\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    const idVal = s.nodeList[s.current].ff50node.id;
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -356,7 +356,7 @@ fn parse_cConsistOperation(s: *status) !sm.cConsistOperation {
     const targetCompletedTime = parseNode(s)._sFloat32;
 
     return sm.cConsistOperation{
-        .id = idVal,
+        .Id = id,
         .ActivationLevel = activationLevel,
         .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
         .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
@@ -390,7 +390,7 @@ fn parse_cConsistOperation(s: *status) !sm.cConsistOperation {
 fn parse_cStopAtDestination(s: *status) !sm.cStopAtDestination {
     std.debug.print("\nBEGIN cStopAtDestinations\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    const idVal = s.nodeList[s.current].ff50node.id;
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -437,7 +437,7 @@ fn parse_cStopAtDestination(s: *status) !sm.cStopAtDestination {
     const travelForwards = parseNode(s)._bool;
 
     return sm.cStopAtDestination{
-        .id = idVal,
+        .Id = id,
         .ActivationLevel = activationLevel,
         .SuccessTextToBeSavedMessage = successTextToBeSavedMessage,
         .FailureTextToBeSavedMessage = failureTextToBeSavedMessage,
@@ -532,7 +532,7 @@ fn parse_cTriggerInstruction(s: *status) !sm.cTriggerInstruction {
 fn parse_cDriverInstructionContainer(s: *status) !sm.cDriverInstructionContainer {
     std.debug.print("\nBEGIN cDriverInstructionContainer\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-    const idVal = s.nodeList[s.current].ff50node.id;
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -541,7 +541,7 @@ fn parse_cDriverInstructionContainer(s: *status) !sm.cDriverInstructionContainer
     s.current += 1;
 
     return sm.cDriverInstructionContainer{
-        .id = idVal,
+        .Id = id,
         .DriverInstruction = try driverInstruction,
     };
 }
@@ -556,7 +556,7 @@ fn parse_cDriver(s: *status) !?sm.cDriver {
         .ff50node => {
             std.debug.print("\nBEGIN cDriver\n", .{});
             std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
-            const idVal = s.nodeList[s.current].ff50node.id;
+            const id = s.nodeList[s.current].ff50node.id;
             s.current += 2;
             defer s.current += 2;
             const finalDestination = try parse_cDriverInstructionTarget(s);
@@ -593,7 +593,7 @@ fn parse_cDriver(s: *status) !?sm.cDriver {
             const unloadedAtStart = parseNode(s)._bool;
 
             return sm.cDriver{
-                .id = idVal,
+                .Id = id,
                 .FinalDestination = finalDestination,
                 .PlayerDriver = playerDriver,
                 .ServiceName = serviceName,

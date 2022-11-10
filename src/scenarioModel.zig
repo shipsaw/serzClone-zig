@@ -226,7 +226,7 @@ pub const cTileCoordinate = struct {
 
 // DONE
 pub const cDriver = struct {
-    id: u32,
+    Id: u32,
     FinalDestination: ?cDriverInstructionTarget,
     PlayerDriver: bool,
     ServiceName: Localisation_cUserLocalisedString,
@@ -249,7 +249,7 @@ pub const cDriver = struct {
 
 // DONE
 pub const cDriverInstructionTarget = struct {
-    id: u32,
+    Id: u32,
     DisplayName: []const u8,
     Timetabled: bool,
     Performance: i32,
@@ -323,7 +323,7 @@ pub const DriverInstruction = union(enum) {
 
 // DONE
 pub const cPickupPassengers = struct {
-    id: u32,
+    Id: u32,
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,
@@ -380,7 +380,7 @@ pub const cTriggerInstruction = struct {
 
 // DONE
 pub const cStopAtDestination = struct {
-    id: u32,
+    Id: u32,
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,
@@ -408,7 +408,7 @@ pub const cStopAtDestination = struct {
 
 // DONE
 pub const cConsistOperation = struct {
-    id: u32,
+    Id: u32,
     ActivationLevel: i16,
     SuccessTextToBeSavedMessage: bool,
     FailureTextToBeSavedMessage: bool,

@@ -2,6 +2,7 @@ const std = @import("std");
 const binParser = @import("bin2obj.zig");
 const objParser = @import("obj2scenario.zig");
 const jsonParser = @import("json2bin.zig");
+//const jsonParser = @import("scenario2bin.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
