@@ -1381,6 +1381,7 @@ fn ParseInternalErrorImpl(comptime T: type, comptime inferred_types: []const typ
                 MissingField,
             } || SkipValueError || TokenStream.Error;
             for (structInfo.fields) |field| {
+                @setEvalBranchQuota(15000);
                 errors = errors || ParseInternalErrorImpl(field.field_type, inferred_types ++ [_]type{T});
             }
             return errors;
@@ -1520,6 +1521,7 @@ fn parseInternal(
             var fields_seen = [_]bool{false} ** structInfo.fields.len;
             errdefer {
                 inline for (structInfo.fields) |field, i| {
+                    @setEvalBranchQuota(15000);
                     if (fields_seen[i] and !field.is_comptime) {
                         parseFree(field.field_type, @field(r, field.name), options);
                     }

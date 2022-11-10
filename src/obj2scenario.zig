@@ -1062,6 +1062,7 @@ fn parse_Component(s: *status) !sm.Component {
 fn parse_PassWagon(s: *status) !sm.Component {
     std.debug.print("\nBEGIN PassWagon\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -1073,6 +1074,7 @@ fn parse_PassWagon(s: *status) !sm.Component {
     const scriptComponent = parse_cScriptComponent(s);
 
     return sm.Component{ .PassWagon = sm.PassWagon{
+        .Id = id,
         .cWagon = wagon,
         .cAnimObjectRender = animObjectRender,
         .cPosOri = posOri,
@@ -1085,6 +1087,7 @@ fn parse_PassWagon(s: *status) !sm.Component {
 fn parse_CargoWagon(s: *status) !sm.Component {
     std.debug.print("\nBEGIN CargoWagon\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -1097,6 +1100,7 @@ fn parse_CargoWagon(s: *status) !sm.Component {
     const scriptComponent = parse_cScriptComponent(s);
 
     return sm.Component{ .CargoWagon = sm.CargoWagon{
+        .Id = id,
         .cWagon = wagon,
         .cAnimObjectRender = animObjectRender,
         .cPosOri = posOri,
@@ -1110,6 +1114,7 @@ fn parse_CargoWagon(s: *status) !sm.Component {
 fn parse_Engine(s: *status) !sm.Component {
     std.debug.print("\nBEGIN Engine\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -1123,6 +1128,7 @@ fn parse_Engine(s: *status) !sm.Component {
     const cargoComponent = try parse_cCargoComponent(s);
 
     return sm.Component{ .Engine = sm.Engine{
+        .Id = id,
         .cEngine = engine,
         .cAnimObjectRender = animObjectRender,
         .cPosOri = posOri,
@@ -1144,6 +1150,7 @@ fn parse_cEngineSimContainer(s: *status) u32 {
 fn parse_cOwnedEntity(s: *status) !sm.cOwnedEntity {
     std.debug.print("\nBEGIN cOwnedEntity\n", .{});
     std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
+    const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -1155,6 +1162,7 @@ fn parse_cOwnedEntity(s: *status) !sm.cOwnedEntity {
     const entityID = parse_cGUID(s);
 
     return sm.cOwnedEntity{
+        .Id = id,
         .Component = component,
         .BlueprintID = blueprintID,
         .ReskinBlueprintID = reskinBlueprintID,

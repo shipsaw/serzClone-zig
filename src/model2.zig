@@ -28,7 +28,6 @@ pub const cConsist = struct {
 
 // DONE
 pub const cOwnedEntity = struct {
-    Id: u32,
     Component: Component,
     BlueprintID: iBlueprintLibrary_cAbsoluteBlueprintID,
     ReskinBlueprintID: iBlueprintLibrary_cAbsoluteBlueprintID,
@@ -44,7 +43,6 @@ pub const Component = union(enum) {
 };
 
 pub const PassWagon = struct {
-    Id: u32,
     cWagon: cWagon,
     cAnimObjectRender: cAnimObjectRender,
     cPosOri: cPosOri,
@@ -54,7 +52,6 @@ pub const PassWagon = struct {
 };
 
 pub const CargoWagon = struct {
-    Id: u32,
     cWagon: cWagon,
     cAnimObjectRender: cAnimObjectRender,
     cPosOri: cPosOri,
@@ -65,7 +62,6 @@ pub const CargoWagon = struct {
 };
 
 pub const Engine = struct {
-    Id: u32,
     cEngine: cEngine,
     cAnimObjectRender: cAnimObjectRender,
     cPosOri: cPosOri,
