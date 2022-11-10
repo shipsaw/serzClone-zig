@@ -127,6 +127,10 @@ const status = struct {
         return result;
     }
 
+    fn append_ff41Node(self: *status, data: anytype, name: []const u8) !void {
+        try self.result.appendSlice(try convertNode(self, try make_ff41Node(data, name)));
+    }
+
     fn append_ff50Node(self: *status, name: []const u8, id: u32, children: usize) !void {
         const childrenCast = @intCast(u32, children);
         try self.result.appendSlice(try convertNode(self, make_ff50Node(name, id, childrenCast)));
@@ -137,18 +141,19 @@ const status = struct {
     }
 
     fn append_eNode56(self: *status, value: anytype, typeStr: []const u8) !void {
+        std.debug.print("\n\n{s}\n\n", .{typeStr});
         const tempNode = n.node{ .ff56node = n.ff56node{ .name = "e", .dType = n.dataTypeMap.get(typeStr).?, .value = boxDataUnionType(value) } };
         try self.result.appendSlice(try convertNode(self, tempNode));
     }
 
-    fn append_eNode41(self: *status, value: anytype, typeStr: []const u8) !void {
-        var valuesList = std.ArrayList(n.dataUnion).init(allocator);
-        for (value) |val| {
-            try valuesList.append(boxDataUnionType(val));
-        }
-        const tempNode = n.node{ .ff41node = n.ff41node{ .name = "e", .numElements = @intCast(u8, valuesList.items.len), .dType = n.dataTypeMap.get(typeStr).?, .values = valuesList } };
-        try self.result.appendSlice(try convertNode(self, tempNode));
-    }
+    //     fn append_eNode41(self: *status, value: anytype, typeStr: []const u8) !void {
+    //         var valuesList = std.ArrayList(n.dataUnion).init(allocator);
+    //         for (value) |val| {
+    //             try valuesList.append(boxDataUnionType(val));
+    //         }
+    //         const tempNode = n.node{ .ff41node = n.ff41node{ .name = "e", .numElements = @intCast(u8, valuesList.items.len), .dType = n.dataTypeMap.get(typeStr).?, .values = valuesList } };
+    //         try self.result.appendSlice(try convertNode(self, tempNode));
+    //     }
 
     fn append_ff70Node(self: *status, name: []const u8) !void {
         try self.result.appendSlice(try convertNode(self, make_ff70Node(name)));
@@ -170,8 +175,8 @@ pub fn parse(inputString: []const u8) ![]const u8 {
     var stream = json.TokenStream.init(inputString);
     var rootNode = try json.parse(sm.cRecordSet, &stream, .{ .allocator = allocator });
     var parserStatus = try status.init();
-    try parse_cRecordSet(&parserStatus, rootNode);
     try addPrelude(&parserStatus);
+    try parse_cRecordSet(&parserStatus, rootNode);
     //try walkNodes(&parserStatus);
     return parserStatus.result.items;
 }
@@ -300,6 +305,7 @@ fn boxDataUnionType(val: anytype) n.dataUnion {
 }
 
 fn getDataUnionType(val: anytype) n.dataType {
+    std.debug.print("{any}\n", .{@TypeOf(val)});
     return switch (@TypeOf(val)) {
         []const u8 => n.dataType._cDeltaString,
         bool => n.dataType._bool,
@@ -327,6 +333,17 @@ fn getDataUnionStr(val: anytype) []const u8 {
     };
 }
 
+fn make_ff41Node(values: anytype, name: []const u8) !n.node {
+    std.debug.print("HEY HEY {any}\n", .{@TypeOf(values[0])});
+    const dataUnionType = getDataUnionType(values[0]);
+    var valuesArray = std.ArrayList(n.dataUnion).init(allocator);
+    for (values) |val| {
+        try valuesArray.append(boxDataUnionType(val));
+    }
+
+    return n.node{ .ff41node = n.ff41node{ .name = name, .numElements = @intCast(u8, values.len), .dType = dataUnionType, .values = valuesArray } };
+}
+
 fn make_ff50Node(name: []const u8, id: u32, children: u32) n.node {
     return n.node{ .ff50node = n.ff50node{ .name = name, .id = id, .children = children } };
 }
@@ -344,38 +361,38 @@ fn make_ff70Node(name: []const u8) n.node {
 //////////////////////////// NEW ////////////////////////////////////
 fn parse_sTimeOfDay(s: *status, nde: sm.sTimeOfDay) !void {
     try s.append_ff50Node("sTimeOfDay", 0, 3);
-    try s.append_ff56Node(nde, "_iHour");
-    try s.append_ff56Node(nde, "_iMinute");
-    try s.append_ff56Node(nde, "_iSeconds");
+    try s.append_ff56Node(nde._iHour, "_iHour");
+    try s.append_ff56Node(nde._iMinute, "_iMinute");
+    try s.append_ff56Node(nde._iSeconds, "_iSeconds");
     try s.append_ff70Node("sTimeOfDay");
 }
 
 fn parse_parseLocalisation_cUserLocalisedString(s: *status, nde: sm.Localisation_cUserLocalisedString) !void {
     try s.append_ff50Node("Localisation_cUserLocalisedString", 0, 10);
-    try s.append_ff56Node(nde, "English");
-    try s.append_ff56Node(nde, "French");
-    try s.append_ff56Node(nde, "Italian");
-    try s.append_ff56Node(nde, "German");
-    try s.append_ff56Node(nde, "Spanish");
-    try s.append_ff56Node(nde, "Dutch");
-    try s.append_ff56Node(nde, "Polish");
-    try s.append_ff56Node(nde, "Russian");
+    try s.append_ff56Node(nde.English, "English");
+    try s.append_ff56Node(nde.French, "French");
+    try s.append_ff56Node(nde.Italian, "Italian");
+    try s.append_ff56Node(nde.German, "German");
+    try s.append_ff56Node(nde.Spanish, "Spanish");
+    try s.append_ff56Node(nde.Dutch, "Dutch");
+    try s.append_ff56Node(nde.Polish, "Polish");
+    try s.append_ff56Node(nde.Russian, "Russian");
 
     // TODO: Other Logic
     try s.append_ff50Node("Other", 0, 0);
     try s.append_ff70Node("Other");
 
-    try s.append_ff56Node(nde, "Key");
+    try s.append_ff56Node(nde.Key, "Key");
     try s.append_ff70Node("Localisation_cUserLocalisedString");
 }
 
 fn parse_cGUID(s: *status, nde: sm.cGUID) !void {
     try s.append_ff50Node("cGUID", 0, 0);
     try s.append_ff50Node("UUID", 0, 0);
-    try s.append_eNode56(nde.UUID[0], "sUint64");
-    try s.append_eNode56(nde.UUID[1], "sUint64");
+    try s.append_eNode56(nde.UUID[0], "sUInt64");
+    try s.append_eNode56(nde.UUID[1], "sUInt64");
     try s.append_ff70Node("UUID");
-    try s.append_ff56Node(nde, "DevString");
+    try s.append_ff56Node(nde.DevString, "DevString");
     try s.append_ff70Node("cGUID");
 }
 
@@ -911,7 +928,7 @@ fn parse_cHcRVector4(s: *status, nde: ?sm.cHcRVector4) !void {
 
 fn parse_cCargoComponent(s: *status, nde: sm.cCargoComponent) !void {
     try s.append_ff50Node("cCargoComponent", nde.Id, 2);
-    try s.append_ff56Node(nde, "IsPreLoaded");
+    try s.append_ff56Node(nde.IsPreLoaded, "IsPreLoaded");
 
     try s.append_ff50Node("InitialLevel", 0, nde.InitialLevel.len);
     for (nde.InitialLevel) |Val| {
@@ -969,9 +986,9 @@ fn parse_iBlueprintLibrary_cAbsoluteBlueprintID(s: *status, nde: sm.iBlueprintLi
 fn parse_cFarMatrix(s: *status, nde: sm.cFarMatrix) !void {
     try s.append_ff50Node("cFarMatrix", nde.Id, 5);
     try s.append_ff56Node(nde.Height, "Height");
-    try s.append_ff56Node(nde.RXAxis, "RXAxis");
-    try s.append_ff56Node(nde.RYAxis, "RYAxis");
-    try s.append_ff56Node(nde.RZAxis, "RZAxis");
+    try s.append_ff41Node(nde.RXAxis, "RXAxis");
+    try s.append_ff41Node(nde.RYAxis, "RYAxis");
+    try s.append_ff41Node(nde.RZAxis, "RZAxis");
 
     try s.append_ff50Node("RFarPosition", 0, 1);
     try parse_cFarVector2(s, nde.RFarPosition);
@@ -983,7 +1000,8 @@ fn parse_cFarMatrix(s: *status, nde: sm.cFarMatrix) !void {
 fn parse_cPosOri(s: *status, nde: sm.cPosOri) !void {
     try s.append_ff50Node("cPosOri", nde.Id, 2);
 
-    try s.append_ff56Node(nde.Scale, "Scale");
+    try s.append_ff41Node(nde.Scale, "Scale");
+    try s.append_ff41Node(nde.Scale, "Scale");
 
     try s.append_ff50Node("RFarMatrix", 0, 1);
     try parse_cFarMatrix(s, nde.RFarMatrix);
@@ -995,8 +1013,10 @@ fn parse_cPosOri(s: *status, nde: sm.cPosOri) !void {
 fn parse_cEntityContainer(s: *status, nde: sm.cEntityContainer) !void {
     try s.append_ff50Node("cEntityContainer", nde.Id, 1);
 
-    try s.append_ff50Node("StaticChildrenMatrix", 0, 1);
-    try s.append_eNode41(nde.StaticChildrenMatrix, "sFloat32");
+    try s.append_ff50Node("StaticChildrenMatrix", 0, nde.StaticChildrenMatrix.len);
+    for (nde.StaticChildrenMatrix) |row| {
+        try s.append_ff41Node(row, "e");
+    }
     try s.append_ff70Node("StaticChildrenMatrix");
 
     try s.append_ff70Node("cEntityContainer");

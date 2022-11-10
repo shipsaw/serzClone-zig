@@ -46,8 +46,6 @@ fn parseNode(s: *status) n.dataUnion {
 }
 
 fn parse_sTimeOfDay(s: *status) sm.sTimeOfDay {
-    std.debug.print("\nBEGIN sTimeOfDay\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     s.current += 2;
     defer s.current += 2;
 
@@ -63,8 +61,6 @@ fn parse_sTimeOfDay(s: *status) sm.sTimeOfDay {
 }
 
 fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUserLocalisedString {
-    std.debug.print("\nBEGIN Localization_cUserLocalizedString\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     s.current += 2;
     defer s.current += 2;
 
@@ -107,8 +103,6 @@ fn parse_parseLocalisation_cUserLocalisedString(s: *status) !sm.Localisation_cUs
 }
 
 fn parse_cGUID(s: *status) sm.cGUID {
-    std.debug.print("\nBEGIN cGUID\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     // TODO: Add UUID Area
     s.current += 3;
     defer s.current += 2;
@@ -127,8 +121,6 @@ fn parse_cGUID(s: *status) sm.cGUID {
 }
 
 fn parse_DriverInstruction(s: *status) ![]sm.DriverInstruction {
-    std.debug.print("\nBEGIN DriverInstruction\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const numberInstructions = s.nodeList[s.current].ff50node.children;
     s.current += 1;
     defer s.current += 1;
@@ -156,7 +148,6 @@ fn parse_DriverInstruction(s: *status) ![]sm.DriverInstruction {
 }
 
 fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
-    std.debug.print("\nBEGIN cDriverInstructionTarget\n", .{});
     s.current += 1;
     defer s.current += 1;
     switch (s.nodeList[s.current]) {
@@ -168,7 +159,6 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
             return null;
         },
         .ff50node => {
-            std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
             const id = s.nodeList[s.current + 0].ff50node.id;
             s.current += 1;
             defer s.current += 1;
@@ -250,8 +240,6 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
 }
 
 fn parse_cPickupPassengers(s: *status) !sm.cPickupPassengers {
-    std.debug.print("\nBEGIN cPickupPassengers\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -315,8 +303,6 @@ fn parse_cPickupPassengers(s: *status) !sm.cPickupPassengers {
 }
 
 fn parse_cConsistOperation(s: *status) !sm.cConsistOperation {
-    std.debug.print("\nBEGIN cConsistOperations\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -388,8 +374,6 @@ fn parse_cConsistOperation(s: *status) !sm.cConsistOperation {
 }
 
 fn parse_cStopAtDestination(s: *status) !sm.cStopAtDestination {
-    std.debug.print("\nBEGIN cStopAtDestinations\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -465,8 +449,6 @@ fn parse_cStopAtDestination(s: *status) !sm.cStopAtDestination {
 }
 
 fn parse_cTriggerInstruction(s: *status) !sm.cTriggerInstruction {
-    std.debug.print("\nBEGIN cTriggerInstruction\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -530,8 +512,6 @@ fn parse_cTriggerInstruction(s: *status) !sm.cTriggerInstruction {
 }
 
 fn parse_cDriverInstructionContainer(s: *status) !sm.cDriverInstructionContainer {
-    std.debug.print("\nBEGIN cDriverInstructionContainer\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -547,15 +527,12 @@ fn parse_cDriverInstructionContainer(s: *status) !sm.cDriverInstructionContainer
 }
 
 fn parse_cDriver(s: *status) !?sm.cDriver {
-    std.debug.print("\nBEGIN cDriver\n", .{});
     switch (s.nodeList[s.current + 1]) {
         .ff4enode => {
             s.current += 3;
             return null;
         },
         .ff50node => {
-            std.debug.print("\nBEGIN cDriver\n", .{});
-            std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
             const id = s.nodeList[s.current].ff50node.id;
             s.current += 2;
             defer s.current += 2;
@@ -619,8 +596,6 @@ fn parse_cDriver(s: *status) !?sm.cDriver {
 }
 
 fn parse_cRouteCoordinate(s: *status) sm.cRouteCoordinate {
-    std.debug.print("\nBEGIN cRouteCoordinate\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     s.current += 2;
     defer s.current += 2;
     const distance = parseNode(s)._sInt32;
@@ -630,8 +605,6 @@ fn parse_cRouteCoordinate(s: *status) sm.cRouteCoordinate {
 }
 
 fn parse_cTileCoordinate(s: *status) sm.cTileCoordinate {
-    std.debug.print("\nBEGIN cTileCoordinate\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     s.current += 2;
     defer s.current += 2;
     const distance = parseNode(s)._sFloat32;
@@ -641,8 +614,6 @@ fn parse_cTileCoordinate(s: *status) sm.cTileCoordinate {
 }
 
 fn parse_cFarCoordinate(s: *status) sm.cFarCoordinate {
-    std.debug.print("\nBEGIN cFarCoordinate\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     s.current += 2;
     defer s.current += 2;
 
@@ -656,8 +627,6 @@ fn parse_cFarCoordinate(s: *status) sm.cFarCoordinate {
 }
 
 fn parse_cFarVector2(s: *status) sm.cFarVector2 {
-    std.debug.print("\nBEGIN cFarVector2\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     const id = s.nodeList[s.current + 1].ff50node.id;
     s.current += 2;
     defer s.current += 2;
@@ -673,8 +642,6 @@ fn parse_cFarVector2(s: *status) sm.cFarVector2 {
 }
 
 fn parse_Network_cDirection(s: *status) sm.Network_cDirection {
-    std.debug.print("\nBEGIN Network_cDirection\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     s.current += 2;
     defer s.current += 2;
     const dir = parseNode(s)._cDeltaString;
@@ -684,8 +651,6 @@ fn parse_Network_cDirection(s: *status) sm.Network_cDirection {
 }
 
 fn parse_Network_cTrackFollower(s: *status) sm.Network_cTrackFollower {
-    std.debug.print("\nBEGIN Network_cTrackFollower\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     const id = s.nodeList[s.current + 1].ff50node.id;
     s.current += 2;
     defer s.current += 2;
@@ -718,8 +683,6 @@ fn parse_vehicle(s: *status) !sm.Vehicle {
 }
 
 fn parse_cEngine(s: *status) !sm.cEngine {
-    std.debug.print("\nBEGIN cEngine\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -774,8 +737,6 @@ fn parse_cEngine(s: *status) !sm.cEngine {
 }
 
 fn parse_cWagon(s: *status) !sm.cWagon {
-    std.debug.print("\nBEGIN cWagon\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -822,8 +783,6 @@ fn parse_cWagon(s: *status) !sm.cWagon {
 }
 
 fn parse_cHcRVector4(s: *status) !?sm.cHcRVector4 {
-    std.debug.print("\nBEGIN cHcRVector4\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     if (s.nodeList[s.current + 1].ff50node.children == 0) {
         return null;
     }
@@ -842,8 +801,6 @@ fn parse_cHcRVector4(s: *status) !?sm.cHcRVector4 {
 }
 
 fn parse_cScriptComponent(s: *status) sm.cScriptComponent {
-    std.debug.print("\nBEGIN cScriptComponent\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -859,8 +816,6 @@ fn parse_cScriptComponent(s: *status) sm.cScriptComponent {
 }
 
 fn parse_cCargoComponent(s: *status) !sm.cCargoComponent {
-    std.debug.print("\nBEGIN cCargoComponent\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -886,8 +841,6 @@ fn parse_cCargoComponent(s: *status) !sm.cCargoComponent {
 }
 
 fn parse_cControlContainer(s: *status) sm.cControlContainer {
-    std.debug.print("\nBEGIN cControlContainer\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -905,8 +858,6 @@ fn parse_cControlContainer(s: *status) sm.cControlContainer {
 }
 
 fn parse_cAnimObjectRender(s: *status) sm.cAnimObjectRender {
-    std.debug.print("\nBEGIN cAnimObjectRender\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -930,8 +881,6 @@ fn parse_cAnimObjectRender(s: *status) sm.cAnimObjectRender {
 }
 
 fn parse_iBlueprintLibrary_cBlueprintSetId(s: *status) sm.iBlueprintLibrary_cBlueprintSetId {
-    std.debug.print("\nBEGIN iBlueprintLibrary_cBlueprintSetId\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     s.current += 2;
     defer s.current += 2;
 
@@ -945,8 +894,6 @@ fn parse_iBlueprintLibrary_cBlueprintSetId(s: *status) sm.iBlueprintLibrary_cBlu
 }
 
 fn parse_iBlueprintLibrary_cAbsoluteBlueprintID(s: *status) sm.iBlueprintLibrary_cAbsoluteBlueprintID {
-    std.debug.print("\nBEGIN iBlueprintLibrary_cAbsoluteBlueprintID\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     s.current += 2;
     defer s.current += 2;
 
@@ -960,8 +907,6 @@ fn parse_iBlueprintLibrary_cAbsoluteBlueprintID(s: *status) sm.iBlueprintLibrary
 }
 
 fn parse_cFarMatrix(s: *status) sm.cFarMatrix {
-    std.debug.print("\nBEGIN cFarMatrix\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current + 1].ff50node.name});
     const id = s.nodeList[s.current + 1].ff50node.id;
     s.current += 2;
     defer s.current += 2;
@@ -999,8 +944,6 @@ fn parse_cFarMatrix(s: *status) sm.cFarMatrix {
 }
 
 fn parse_cPosOri(s: *status) sm.cPosOri {
-    std.debug.print("\nBEGIN cPosOri\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -1021,8 +964,6 @@ fn parse_cPosOri(s: *status) sm.cPosOri {
 }
 
 fn parse_cEntityContainer(s: *status) !sm.cEntityContainer {
-    std.debug.print("\nBEGIN cEntityContainer\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 2;
@@ -1048,8 +989,6 @@ fn parse_cEntityContainer(s: *status) !sm.cEntityContainer {
 }
 
 fn parse_Component(s: *status) !sm.Component {
-    std.debug.print("\nBEGIN Component\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const childCount = s.nodeList[s.current].ff50node.children;
     return switch (childCount) {
         6 => try parse_PassWagon(s),
@@ -1060,8 +999,6 @@ fn parse_Component(s: *status) !sm.Component {
 }
 
 fn parse_PassWagon(s: *status) !sm.Component {
-    std.debug.print("\nBEGIN PassWagon\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -1085,8 +1022,6 @@ fn parse_PassWagon(s: *status) !sm.Component {
 }
 
 fn parse_CargoWagon(s: *status) !sm.Component {
-    std.debug.print("\nBEGIN CargoWagon\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -1112,8 +1047,6 @@ fn parse_CargoWagon(s: *status) !sm.Component {
 }
 
 fn parse_Engine(s: *status) !sm.Component {
-    std.debug.print("\nBEGIN Engine\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -1141,15 +1074,11 @@ fn parse_Engine(s: *status) !sm.Component {
 }
 
 fn parse_cEngineSimContainer(s: *status) u32 {
-    std.debug.print("\nBEGIN cEngineSimContainer\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     defer s.current += 2;
     return s.nodeList[s.current].ff50node.id;
 }
 
 fn parse_cOwnedEntity(s: *status) !sm.cOwnedEntity {
-    std.debug.print("\nBEGIN cOwnedEntity\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -1172,8 +1101,6 @@ fn parse_cOwnedEntity(s: *status) !sm.cOwnedEntity {
 }
 
 fn parse_cConsist(s: *status) !sm.cConsist {
-    std.debug.print("\nBEGIN cConsist\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
@@ -1219,8 +1146,6 @@ fn parse_cConsist(s: *status) !sm.cConsist {
 }
 
 fn parse_Record(s: *status) !sm.Record {
-    std.debug.print("\nBEGIN Record\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     var consistsArray = std.ArrayList(sm.cConsist).init(allocator);
     const consistsArrayLen = s.nodeList[s.current].ff50node.children;
     s.current += 1;
@@ -1238,8 +1163,6 @@ fn parse_Record(s: *status) !sm.Record {
 }
 
 fn parse_cRecordSet(s: *status) !sm.cRecordSet {
-    std.debug.print("\nBEGIN cRecordSet\n", .{});
-    std.debug.print("NODE NAME: {s}\n", .{s.nodeList[s.current].ff50node.name});
     const id = s.nodeList[s.current].ff50node.id;
     s.current += 1;
     defer s.current += 1;
