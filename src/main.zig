@@ -120,7 +120,7 @@ fn compareResults(expectedBytes: []const u8, actualBytes: []const u8) !void {
                 std.debug.print("ACTUAL(full):   {d},\n", .{actualVal});
 
                 std.debug.print("EXPECTED:\n", .{});
-                var j = if (i < 25) i else 25;
+                var j = if (i < 60) i else 60;
                 while (j > 0) : (j -= 1) {
                     std.debug.print("{X} ", .{expectedBytes[i - j]});
                 }
@@ -128,12 +128,12 @@ fn compareResults(expectedBytes: []const u8, actualBytes: []const u8) !void {
                 std.debug.print("({X}) ", .{expectedBytes[i]});
 
                 var k: u8 = 1;
-                while (k < 26) : (k += 1) {
+                while (k < 60) : (k += 1) {
                     std.debug.print("{X} ", .{expectedBytes[i + k]});
                 }
 
                 std.debug.print("\nACTUAL:\n", .{});
-                j = if (i < 25) i else 25;
+                j = if (i < 60) i else 60;
                 while (j > 0) : (j -= 1) {
                     std.debug.print("{X} ", .{actualBytes[i - j]});
                 }
@@ -141,7 +141,7 @@ fn compareResults(expectedBytes: []const u8, actualBytes: []const u8) !void {
                 std.debug.print("({X}) ", .{actualBytes[i]});
 
                 k = 1;
-                while (k < 26) : (k += 1) {
+                while (k < 60) : (k += 1) {
                     std.debug.print("{X} ", .{actualBytes[i + k]});
                 }
                 std.debug.print("\n", .{});

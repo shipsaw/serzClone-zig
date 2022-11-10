@@ -191,7 +191,7 @@ fn parse_cDriverInstructionTarget(s: *status) !?sm.cDriverInstructionTarget {
             s.current += 1;
             var i: u32 = 0;
             while (i < railVehicleNumbersListLen) : (i += 1) {
-                try railVehicleNumbersList.append(s.nodeList[s.current].ff56node.value._cDeltaString);
+                try railVehicleNumbersList.append(s.nodeList[s.current + i].ff56node.value._cDeltaString);
             }
             s.current += (1 + railVehicleNumbersListLen);
 
@@ -512,7 +512,7 @@ fn parse_cTriggerInstruction(s: *status) !sm.cTriggerInstruction {
 }
 
 fn parse_cDriverInstructionContainer(s: *status) !sm.cDriverInstructionContainer {
-    const id = s.nodeList[s.current].ff50node.id;
+    const id = s.nodeList[s.current + 1].ff50node.id;
     s.current += 1;
     defer s.current += 1;
 
@@ -533,7 +533,7 @@ fn parse_cDriver(s: *status) !?sm.cDriver {
             return null;
         },
         .ff50node => {
-            const id = s.nodeList[s.current].ff50node.id;
+            const id = s.nodeList[s.current + 1].ff50node.id;
             s.current += 2;
             defer s.current += 2;
             const finalDestination = try parse_cDriverInstructionTarget(s);
@@ -847,13 +847,13 @@ fn parse_cControlContainer(s: *status) sm.cControlContainer {
 
     const time = parseNode(s)._sFloat32;
     const frameTime = parseNode(s)._sFloat32;
-    const cabEndsWithKey = parseNode(s)._cDeltaString;
+    const cabEndWithKey = parseNode(s)._cDeltaString;
 
     return sm.cControlContainer{
         .Id = id,
         .Time = time,
         .FrameTime = frameTime,
-        .CabEndsWithKey = cabEndsWithKey,
+        .CabEndWithKey = cabEndWithKey,
     };
 }
 

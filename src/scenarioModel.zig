@@ -172,7 +172,7 @@ pub const cControlContainer = struct {
     Id: u32,
     Time: f32,
     FrameTime: f32,
-    CabEndsWithKey: []const u8,
+    CabEndWithKey: []const u8,
 };
 
 // DONE
