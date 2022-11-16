@@ -444,7 +444,6 @@ fn parse_cDriverInstructionTarget(s: *status, nde: ?sm.cDriverInstructionTarget)
 
     try s.append_ff50Node("RailVehicleNumber", 0, nde.?.RailVehicleNumber.len);
     for (nde.?.RailVehicleNumber) |num| {
-        std.debug.print("{s}\n", .{num});
         try s.append_eNode56(num, "cDeltaString");
     }
     try s.append_ff70Node("RailVehicleNumber");
