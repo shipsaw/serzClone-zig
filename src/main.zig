@@ -22,13 +22,27 @@ pub fn main() !void {
     var inFile = try std.fs.cwd().openFile(args[1], .{});
     defer inFile.close();
 
-    var inputFileNameArray = std.mem.split(u8, args[1], ".");
-    var outFileArray = std.ArrayList(u8).init(allocator);
-    try outFileArray.appendSlice(inputFileNameArray.first());
+    var inputFileNameArray = std.mem.tokenize(u8, args[1], ".\\/");
 
-    if (std.mem.eql(u8, inputFileNameArray.rest(), "bin")) {
+    var filePathArray = std.ArrayList([]const u8).init(allocator);
+    while (true) {
+        const tempSlice = inputFileNameArray.next();
+        if (tempSlice != null) {
+            try filePathArray.append(tempSlice.?);
+        } else {
+            break;
+        }
+    }
+    inputFileNameArray.reset();
+    const fileExtension = filePathArray.items[filePathArray.items.len - 1];
+    const fileName = filePathArray.items[filePathArray.items.len - 2];
+
+    var outFileArray = std.ArrayList(u8).init(allocator);
+    try outFileArray.appendSlice(fileName);
+
+    if (std.mem.eql(u8, fileExtension, "bin")) {
         try outFileArray.appendSlice(".json");
-    } else if (std.mem.eql(u8, inputFileNameArray.rest(), "json")) {
+    } else if (std.mem.eql(u8, fileExtension, "json")) {
         try outFileArray.appendSlice(".bin");
     } else unreachable;
     var outFileName = if (args.len > 2) args[2] else outFileArray.items;
@@ -39,11 +53,11 @@ pub fn main() !void {
     defer outFile.close();
 
     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
-    if (std.mem.eql(u8, inputFileNameArray.rest(), "bin")) {
+    if (std.mem.eql(u8, fileExtension, "bin")) {
         const nodes = (try binParser.parse(inputBytes));
         const jsonResult = try objParser.parse(nodes);
         try outFile.writeAll(jsonResult);
-    } else if (std.mem.eql(u8, inputFileNameArray.rest(), "json")) {
+    } else if (std.mem.eql(u8, fileExtension, "json")) {
         const binResult = try jsonParser.parse(inputBytes);
         try outFile.writeAll(binResult);
     } else {
