@@ -12,10 +12,12 @@ const size_limit = std.math.maxInt(u32);
 pub fn main() !void {
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
-    if (args.len < 2 or args.len > 3) {
-        std.debug.print("Usage: zigSerz input_filename [output_filename]\n", .{});
+    if (args.len < 2 or args.len > 4) {
+        std.debug.print("Usage: zigSerz input_filename [output_filename] [-s]\n", .{});
         std.os.exit(1);
     }
+    const simpleOutput = std.mem.eql(u8, args[args.len - 1], "-s");
+    const customOutputName = args.len == 3 and !simpleOutput;
 
     var inFile = try std.fs.cwd().openFile(args[1], .{});
     defer inFile.close();
@@ -43,7 +45,7 @@ pub fn main() !void {
     } else if (std.mem.eql(u8, fileExtension, "xml")) {
         try outFileArray.appendSlice(".bin");
     } else unreachable;
-    var outFileName = if (args.len > 2) args[2] else outFileArray.items;
+    var outFileName = if (customOutputName) args[2] else outFileArray.items;
     const outFile = try std.fs.cwd().createFile(
         outFileName,
         .{ .read = true },
@@ -53,7 +55,10 @@ pub fn main() !void {
     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
     if (std.mem.eql(u8, fileExtension, "bin")) {
         const nodes = (try binParser.parse(inputBytes));
-        const xmlResult = try objParser.parseComplete(nodes);
+        // const xmlResult = try objParser.parseSimple(nodes);
+        const xmlResult = if (simpleOutput) 
+            try objParser.parseSimple(nodes) 
+            else try objParser.parseComplete(nodes);
         try outFile.writeAll(xmlResult);
     // } else if (std.mem.eql(u8, fileExtension, "xml")) {
     //     const binResult = try jsonParser.parse(inputBytes);
