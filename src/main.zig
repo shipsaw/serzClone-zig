@@ -53,7 +53,7 @@ pub fn main() !void {
     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
     if (std.mem.eql(u8, fileExtension, "bin")) {
         const nodes = (try binParser.parse(inputBytes));
-        const xmlResult = try objParser.parse(nodes);
+        const xmlResult = try objParser.parseComplete(nodes);
         try outFile.writeAll(xmlResult);
     // } else if (std.mem.eql(u8, fileExtension, "xml")) {
     //     const binResult = try jsonParser.parse(inputBytes);
