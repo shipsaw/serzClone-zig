@@ -12,6 +12,7 @@ const dataTypeMap = std.AutoHashMap(nde.dataType, []const u8);
 pub fn parse(nodes: []const nde.node) ![]const u8 {
     var outputString = std.ArrayList(u8).init(allocator);
     var sw = outputString.writer();
+    try sw.writeAll("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
     var dTypeMap = dataTypeMap.init(allocator);
     try initDtypeMap(&dTypeMap);
     var tabs: usize = 0;
@@ -20,8 +21,8 @@ pub fn parse(nodes: []const nde.node) ![]const u8 {
             .ff41node => |n| {
                 try printTabs(tabs, sw);
                 try std.fmt.format(sw, "<{s}", .{n.name});
-                try std.fmt.format(sw, " numElements:\"{d}\">", .{n.numElements});
-                try std.fmt.format(sw, " elementType:\"{s}\">", .{dTypeMap.get(n.dType).?});
+                try std.fmt.format(sw, " numElements=\"{d}\">", .{n.numElements});
+                try std.fmt.format(sw, " elementType=\"{s}\">", .{dTypeMap.get(n.dType).?});
 
                 var i:u32 = 0;
                 while (i < n.numElements) : (i += 1) {
@@ -40,7 +41,7 @@ pub fn parse(nodes: []const nde.node) ![]const u8 {
             .ff50node => |n| {
                 try printTabs(tabs, sw);
                 try std.fmt.format(sw, "<{s}", .{n.name});
-                try std.fmt.format(sw, " id:\"{d}\">\n", .{n.id});
+                try std.fmt.format(sw, " id=\"{d}\">\n", .{n.id});
                 tabs += 1;
             },
             .ff52node => |n| {
@@ -52,7 +53,7 @@ pub fn parse(nodes: []const nde.node) ![]const u8 {
             .ff56node => |n| {
                 try printTabs(tabs, sw);
                 try std.fmt.format(sw, "<{s}", .{n.name});
-                try std.fmt.format(sw, " type:\"{s}\">", .{dTypeMap.get(n.dType).?});
+                try std.fmt.format(sw, " type=\"{s}\">", .{dTypeMap.get(n.dType).?});
                 try printValue(n.value, sw);
                 try std.fmt.format(sw, "</{s}>\n", .{n.name});
             },

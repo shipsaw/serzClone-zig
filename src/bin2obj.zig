@@ -151,18 +151,19 @@ fn identifier(s: *status, ctx: stringContext) ![]const u8 {
         }
         var str = s.source[s.current..(s.current + strLen)];
         if (ctx == stringContext.NAME) { // Replace '-' with '::' in names only
-            for (str) |c| {
-                if (c == '-') {
-                    try retArray.appendSlice("::");
+            for (str) |_, i| {
+                if (str[i] == ':' and str[i+1] == ':') {
+                    try retArray.appendSlice("-");
+                    i += 1;
                 } else {
-                    try retArray.append(c);
+                    try retArray.append(str[i]);
                 }
             }
         } else {
             try retArray.appendSlice(str);
         }
 
-        try s.stringMap.append(str);
+        try s.stringMap.append(retArray.items);
         defer s.current += strLen;
 
         return retArray.items;
@@ -300,8 +301,9 @@ fn processFF56(s: *status) !ff56node {
 }
 
 fn processFF70(s: *status) !ff70node {
-    const nodeStr = processU16(s);
-    const nodeName = s.stringMap.items[nodeStr];
+    // const nodeStr = processU16(s);
+    const nodeName = try identifier(s, stringContext.NAME);
+    // const nodeName = s.stringMap.items[nodeStr];
     return ff70node{
         .name = nodeName,
     };
