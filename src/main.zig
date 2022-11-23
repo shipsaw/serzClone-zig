@@ -1,8 +1,6 @@
 const std = @import("std");
 const binParser = @import("bin2obj.zig");
-const objParser = @import("obj2scenario.zig");
-//const jsonParser = @import("json2bin.zig");
-const jsonParser = @import("scenario2bin.zig");
+const objParser = @import("obj2xml.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
@@ -41,8 +39,8 @@ pub fn main() !void {
     try outFileArray.appendSlice(fileName);
 
     if (std.mem.eql(u8, fileExtension, "bin")) {
-        try outFileArray.appendSlice(".json");
-    } else if (std.mem.eql(u8, fileExtension, "json")) {
+        try outFileArray.appendSlice(".xml");
+    } else if (std.mem.eql(u8, fileExtension, "xml")) {
         try outFileArray.appendSlice(".bin");
     } else unreachable;
     var outFileName = if (args.len > 2) args[2] else outFileArray.items;
@@ -55,11 +53,11 @@ pub fn main() !void {
     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
     if (std.mem.eql(u8, fileExtension, "bin")) {
         const nodes = (try binParser.parse(inputBytes));
-        const jsonResult = try objParser.parse(nodes);
-        try outFile.writeAll(jsonResult);
-    } else if (std.mem.eql(u8, fileExtension, "json")) {
-        const binResult = try jsonParser.parse(inputBytes);
-        try outFile.writeAll(binResult);
+        const xmlResult = try objParser.parse(nodes);
+        try outFile.writeAll(xmlResult);
+    // } else if (std.mem.eql(u8, fileExtension, "xml")) {
+    //     const binResult = try jsonParser.parse(inputBytes);
+    //     try outFile.writeAll(binResult);
     } else {
         unreachable;
     }
@@ -83,23 +81,23 @@ pub fn main() !void {
 //     try compareResults(inputBytes, binResult);
 // }
 
-test "bin -> json -> bin test: Scenario.bin" {
-    // Original Scenario with ff43 node
-    var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioWff43.bin", .{});
-    defer inFile43.close();
-    var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
+// test "bin -> json -> bin test: Scenario.bin" {
+//     // Original Scenario with ff43 node
+//     var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioWff43.bin", .{});
+//     defer inFile43.close();
+//     var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
 
-    // Scenario parsed by serz
-    var inFile = try std.fs.cwd().openFile("testFiles/ScenarioAfterSerz.bin", .{});
-    defer inFile.close();
-    var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
+//     // Scenario parsed by serz
+//     var inFile = try std.fs.cwd().openFile("testFiles/ScenarioAfterSerz.bin", .{});
+//     defer inFile.close();
+//     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
 
-    const nodes = (try binParser.parse(inputBytes43));
-    const jsonResult = try objParser.parse(nodes);
-    const binResult = try jsonParser.parse(jsonResult);
+//     const nodes = (try binParser.parse(inputBytes43));
+//     const jsonResult = try objParser.parse(nodes);
+//     // const binResult = try jsonParser.parse(jsonResult);
 
-    try compareResults(inputBytes, binResult);
-}
+//     try compareResults(inputBytes, binResult);
+// }
 
 // test "bin -> json -> bin test: ScenarioNetworkProperties.bin" {
 //     // Original Scenario with ff43 node
