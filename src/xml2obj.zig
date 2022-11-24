@@ -41,13 +41,9 @@ const status = struct {
     source: std.mem.TokenIterator(u8),
     stringMap: strMapType,
     lineMap: lineMapType,
-    dataTypeMap: dataTypeMap,
-    resultWriter: std.ArrayList(u8).Writer,
+    result: std.ArrayList(u8),
 
-    fn init(src: std.mem.TokenIterator(u8)) !status {
-        var resultList = std.ArrayList(u8).init(allocator);
-        var dTypeMap = dataTypeMap.init(allocator);
-        try initDtypeMap(&dTypeMap);
+    fn init(src: std.mem.TokenIterator(u8)) status {
 
         return status{
             .current = 1,
@@ -58,8 +54,7 @@ const status = struct {
                 .posMap = std.AutoHashMap(u8, []const u8).init(allocator),
                 .currentPos = 0,
             },
-            .dataTypeMap = dTypeMap,
-            .resultWriter = resultList.writer(),
+            .result = std.ArrayList(u8).init(allocator),
         };
     }
 
@@ -82,13 +77,13 @@ const status = struct {
         }
     }
 
-    fn checkLineMap(self: *status, node: n.node) !?u8 {
+    fn checkLineMap(self: *status, node: n.node, dtm: *dataTypeMap) !?u8 {
         var nodeAsStr = std.ArrayList(u8).init(allocator);
         switch (node) {
             .ff41node => |nde| {
                 try nodeAsStr.appendSlice(ff41);
                 try nodeAsStr.appendSlice(nde.name);
-                try nodeAsStr.appendSlice(self.dataTypeMap.get(nde.dType).?);
+                try nodeAsStr.appendSlice(dtm.get(nde.dType).?);
             },
             .ff50node => |nde| {
                 try nodeAsStr.appendSlice(ff50);
@@ -101,7 +96,7 @@ const status = struct {
             .ff56node => |nde| {
                 try nodeAsStr.appendSlice(ff56);
                 try nodeAsStr.appendSlice(nde.name);
-                try nodeAsStr.appendSlice(self.dataTypeMap.get(nde.dType).?);
+                try nodeAsStr.appendSlice(dtm.get(nde.dType).?);
             },
             .ff70node => |nde| {
                 try nodeAsStr.appendSlice(ff70);
@@ -131,46 +126,96 @@ const status = struct {
 };
 
 pub fn parse(inputString: []const u8) ![]const u8 {
-    var inputNodes = std.mem.tokenize(u8, inputString, "\n");
+    var inputNodes = std.mem.tokenize(u8, inputString, "\n\t");
     _ = inputNodes.next().?; // Ignore descriptor line
-    var parserStatus = try status.init(inputNodes);
+    var parserStatus = status.init(inputNodes);
 
-    var currentNode = inputNodes.next();
-    while (currentNode != null) : (currentNode = inputNodes.next()) {
+    var dTypeMap = dataTypeMap.init(allocator);
+    try initDtypeMap(&dTypeMap);
+
+    try parseNodes(&parserStatus, &dTypeMap);
+    return parserStatus.result.items;
+}
+
+fn parseNodes(s: *status, dtm: *dataTypeMap) !void {
+    var rw = s.result.writer();
+    var currentNode = s.source.next();
+    try addPrelude(s);
+    
+    while (currentNode != null) : (currentNode = s.source.next()) {
         const tempNode = try convert2node(currentNode.?);
-        try parserStatus.resultWriter.writeAll(try node2string(&parserStatus, tempNode));
+        const tempString = try node2string(s, tempNode, dtm);
+        try rw.writeAll(tempString);
     }
-    try addPrelude(&parserStatus);
-    return "";
 }
 
 fn addPrelude(s: *status) !void {
-    try s.resultWriter.writeAll(serz);
-    try s.resultWriter.writeAll(unknown);
+    var rw = s.result.writer();
+    try rw.writeAll(serz);
+    try rw.writeAll(unknown);
 }
 
 fn convert2node(line: []const u8) !n.node {
-    const nodeSections = std.mem.tokenize(u8, line, "<>");
-    if (nodeSections.buffer.len == 1) { // Can be ff4e, ff50, ff70
-        return n.node{ .ff4enode = n.ff4enode{} };
+    var nodeSections = std.mem.tokenize(u8, line, "<>");
+    if (nodeSections.peek().?[0] == '/') {
+        return n.node{ .ff70node = n.ff70node{ .name = nodeSections.next().?[1..]} };
+    } else if (std.mem.eql(u8, nodeSections.peek().?, "nil/")) {
+        return n.node{ .ff4enode = n.ff4enode{}};
     } else {
-        return n.node{ .ff4enode = n.ff4enode{} };
+        var attrsAndVals = std.mem.tokenize(u8, nodeSections.next().?, " =\"");
+        const name = attrsAndVals.next().?;
+        if (std.mem.eql(u8, attrsAndVals.peek().?, "id")) {
+            _ = attrsAndVals.next();
+            const id = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
+            _ = attrsAndVals.next();
+            const children = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
+            const newNode = n.ff50node{ .name = name, .id = id, .children = children};
+            return n.node{ .ff50node = newNode};
+        } else if (std.mem.eql(u8, attrsAndVals.peek().?, "value")) {
+            _ = attrsAndVals.next();
+            const value = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
+            const newNode = n.ff52node{ .name = name, .value = value };
+            return n.node{ .ff52node = newNode};
+        } else if (std.mem.eql(u8, attrsAndVals.peek().?, "type")) {
+            _ = attrsAndVals.next();
+            const dType = n.dataTypeMap.get(attrsAndVals.next().?).?;
+            const value = try convertToDataUnion(dType, nodeSections.next().?);
+            const newNode = n.ff56node{ .name = name, .dType = dType, .value = value};
+            return n.node{ .ff56node = newNode};
+        } else if (std.mem.eql(u8, attrsAndVals.peek().?, "numElements")) {
+            var valuesList = std.ArrayList(n.dataUnion).init(allocator);
+            _ = attrsAndVals.next();
+            const numElements = try std.fmt.parseInt(u8, attrsAndVals.next().?, 0);
+            _ = attrsAndVals.next();
+            const dType = n.dataTypeMap.get(attrsAndVals.next().?).?;
+            
+            var values = std.mem.tokenize(u8, nodeSections.next().?, " ");
+            var i: usize = 0;
+            while (i < numElements) : (i += 1) {
+                try valuesList.append(try convertToDataUnion(dType, values.next().?));
+            }
+
+            const newNode = n.ff41node{ .name = name, .numElements = numElements, .dType = dType, .values = valuesList};
+            return n.node{ .ff41node = newNode};
+        }
+        return n.node{ .ff4enode = n.ff4enode{}};
     }
 }
 
-fn node2string(s: *status, node: n.node) ![]const u8 {
+fn node2string(s: *status, node: n.node, dtm: *dataTypeMap) ![]const u8 {
+    var rw = s.result.writer();
     var result = std.ArrayList(u8).init(allocator);
     var isSavedLine = false;
 
-    const savedLine = try s.checkLineMap(node);
+    const savedLine = try s.checkLineMap(node, dtm);
     if (savedLine != null) {
-        try s.resultWriter.writeByte(savedLine.?);
+        try rw.writeByte(savedLine.?);
         isSavedLine = true;
     }
 
     switch (node) {
         .ff56node => |nde| {
-            const dTypeString = s.dataTypeMap.get(nde.dType).?;
+            const dTypeString = dtm.get(nde.dType).?;
             if (isSavedLine == false) {
                 try result.appendSlice(ff56);
                 try result.appendSlice(try s.checkStringMap(nde.name, stringContext.NAME));
@@ -186,7 +231,7 @@ fn node2string(s: *status, node: n.node) ![]const u8 {
             try result.appendSlice(&std.mem.toBytes(nde.value));
         },
         .ff41node => |nde| {
-            const dTypeString = s.dataTypeMap.get(nde.dType).?;
+            const dTypeString = dtm.get(nde.dType).?;
             if (isSavedLine == false) {
                 try result.appendSlice(ff41);
                 try result.appendSlice(try s.checkStringMap(nde.name, stringContext.NAME));
@@ -220,6 +265,41 @@ fn node2string(s: *status, node: n.node) ![]const u8 {
     return result.items;
 }
 
+fn convertToDataUnion(dType: n.dataType, val: []const u8) !n.dataUnion {
+    switch (dType) {
+        ._bool => {
+            const convBool = if (val[0] == '0') true else false;
+            return n.dataUnion{ ._bool = convBool };
+        },
+        ._sUInt8 => {
+            const convVal = try std.fmt.parseInt(u8, val, 0);
+            return n.dataUnion{ ._sUInt8 = convVal };
+        },
+        ._sInt16 => {
+            const convVal = try std.fmt.parseInt(i16, val, 0);
+            return n.dataUnion{ ._sInt16 = convVal };
+        },
+        ._sInt32 => {
+            const convVal = try std.fmt.parseInt(i32, val, 0);
+            return n.dataUnion{ ._sInt32 = convVal };
+        },
+        ._sUInt32 => {
+            const convVal = try std.fmt.parseInt(u32, val, 0);
+            return n.dataUnion{ ._sUInt32 = convVal };
+        },
+        ._sFloat32 => {
+            const convVal = try std.fmt.parseFloat(f32, val);
+            return n.dataUnion{ ._sFloat32 = convVal };
+        },
+        ._sUInt64 => {
+            const convVal = try std.fmt.parseInt(u64, val, 0);
+            return n.dataUnion{ ._sUInt64 = convVal };
+        },
+        ._cDeltaString => {
+            return n.dataUnion{ ._cDeltaString = val };
+        },
+    }
+}
 fn convertDataUnion(s: *status, data: n.dataUnion, expectedType: []const u8) ![]const u8 {
     var returnSlice = std.ArrayList(u8).init(allocator);
     switch (data) {
