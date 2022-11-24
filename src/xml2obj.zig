@@ -7,6 +7,7 @@ const expectEqual = std.testing.expectEqual;
 var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocator = arena.allocator();
 const size_limit = std.math.maxInt(u32);
+const dataTypeMap = std.AutoHashMap(n.dataType, []const u8);
 
 const serz = &[_]u8{ 'S', 'E', 'R', 'Z' };
 const unknown = &[_]u8{ 0x00, 0x00, 0x01, 0x00 };
@@ -40,10 +41,14 @@ const status = struct {
     source: std.mem.TokenIterator(u8),
     stringMap: strMapType,
     lineMap: lineMapType,
+    dataTypeMap: dataTypeMap,
     resultWriter: std.ArrayList(u8).Writer,
 
-    fn init(src: std.mem.TokenIterator(u8)) status {
+    fn init(src: std.mem.TokenIterator(u8)) !status {
         var resultList = std.ArrayList(u8).init(allocator);
+        var dTypeMap = dataTypeMap.init(allocator);
+        try initDtypeMap(&dTypeMap);
+
         return status{
             .current = 1,
             .source = src,
@@ -53,6 +58,7 @@ const status = struct {
                 .posMap = std.AutoHashMap(u8, []const u8).init(allocator),
                 .currentPos = 0,
             },
+            .dataTypeMap = dTypeMap,
             .resultWriter = resultList.writer(),
         };
     }
@@ -76,32 +82,32 @@ const status = struct {
         }
     }
 
-    fn checkLineMap(self: *status, node: n.textNode) !?u8 {
+    fn checkLineMap(self: *status, node: n.node) !?u8 {
         var nodeAsStr = std.ArrayList(u8).init(allocator);
         switch (node) {
-            .ff41NodeT => |nde| {
+            .ff41node => |nde| {
                 try nodeAsStr.appendSlice(ff41);
                 try nodeAsStr.appendSlice(nde.name);
-                try nodeAsStr.appendSlice(nde.dType);
+                try nodeAsStr.appendSlice(self.dataTypeMap.get(nde.dType).?);
             },
-            .ff50NodeT => |nde| {
+            .ff50node => |nde| {
                 try nodeAsStr.appendSlice(ff50);
                 try nodeAsStr.appendSlice(nde.name);
             },
-            .ff52NodeT => |nde| {
+            .ff52node => |nde| {
                 try nodeAsStr.appendSlice(ff52);
                 try nodeAsStr.appendSlice(nde.name);
             },
-            .ff56NodeT => |nde| {
+            .ff56node => |nde| {
                 try nodeAsStr.appendSlice(ff56);
                 try nodeAsStr.appendSlice(nde.name);
-                try nodeAsStr.appendSlice(nde.dType);
+                try nodeAsStr.appendSlice(self.dataTypeMap.get(nde.dType).?);
             },
-            .ff70NodeT => |nde| {
+            .ff70node => |nde| {
                 try nodeAsStr.appendSlice(ff70);
                 try nodeAsStr.appendSlice(nde.name);
             },
-            .ff4eNodeT => {
+            .ff4enode => {
                 try nodeAsStr.appendSlice(ff4e);
             },
         }
@@ -125,8 +131,15 @@ const status = struct {
 };
 
 pub fn parse(inputString: []const u8) ![]const u8 {
-    const inputNodes = std.mem.tokenize(u8, inputString, "\n"); // Ignore descriptor line
-    var parserStatus = status.init(inputNodes);
+    var inputNodes = std.mem.tokenize(u8, inputString, "\n");
+    _ = inputNodes.next().?; // Ignore descriptor line
+    var parserStatus = try status.init(inputNodes);
+
+    var currentNode = inputNodes.next();
+    while (currentNode != null) : (currentNode = inputNodes.next()) {
+        const tempNode = try convert2node(currentNode.?);
+        try parserStatus.resultWriter.writeAll(try node2string(&parserStatus, tempNode));
+    }
     try addPrelude(&parserStatus);
     return "";
 }
@@ -139,7 +152,9 @@ fn addPrelude(s: *status) !void {
 fn convert2node(line: []const u8) !n.node {
     const nodeSections = std.mem.tokenize(u8, line, "<>");
     if (nodeSections.buffer.len == 1) { // Can be ff4e, ff50, ff70
-        return n.ff4enode{};
+        return n.node{ .ff4enode = n.ff4enode{} };
+    } else {
+        return n.node{ .ff4enode = n.ff4enode{} };
     }
 }
 
@@ -149,55 +164,56 @@ fn node2string(s: *status, node: n.node) ![]const u8 {
 
     const savedLine = try s.checkLineMap(node);
     if (savedLine != null) {
-        try s.result.append(savedLine.?);
+        try s.resultWriter.writeByte(savedLine.?);
         isSavedLine = true;
     }
 
     switch (node) {
-        .ff56NodeT => |ff56node| {
+        .ff56node => |nde| {
+            const dTypeString = s.dataTypeMap.get(nde.dType).?;
             if (isSavedLine == false) {
                 try result.appendSlice(ff56);
-                try result.appendSlice(try s.checkStringMap(ff56node.name, stringContext.NAME));
-                try result.appendSlice(try s.checkStringMap(ff56node.dType, stringContext.VALUE));
+                try result.appendSlice(try s.checkStringMap(nde.name, stringContext.NAME));
+                try result.appendSlice(try s.checkStringMap(dTypeString, stringContext.VALUE));
             }
-            try result.appendSlice(try convertDataUnion(s, ff56node.value, ff56node.dType));
+            try result.appendSlice(try convertDataUnion(s, nde.value, dTypeString));
         },
-        .ff52NodeT => |ff52node| {
+        .ff52node => |nde| {
             if (isSavedLine == false) {
                 try result.appendSlice(ff52);
-                try result.appendSlice(try s.checkStringMap(ff52node.name, stringContext.NAME));
+                try result.appendSlice(try s.checkStringMap(nde.name, stringContext.NAME));
             }
-            try result.appendSlice(&std.mem.toBytes(ff52node.value));
+            try result.appendSlice(&std.mem.toBytes(nde.value));
         },
-        .ff41NodeT => |ff41node| {
+        .ff41node => |nde| {
+            const dTypeString = s.dataTypeMap.get(nde.dType).?;
             if (isSavedLine == false) {
                 try result.appendSlice(ff41);
-                try result.appendSlice(try s.checkStringMap(ff41node.name, stringContext.NAME));
-                try result.appendSlice(try s.checkStringMap(ff41node.dType, stringContext.DTYPE));
+                try result.appendSlice(try s.checkStringMap(nde.name, stringContext.NAME));
+                try result.appendSlice(try s.checkStringMap(dTypeString, stringContext.DTYPE));
             }
-            try result.append(ff41node.numElements);
-            for (ff41node.values) |val| {
-                try result.appendSlice(try convertDataUnion(s, val, ff41node.dType));
+            try result.append(nde.numElements);
+            for (nde.values.items) |val| {
+                try result.appendSlice(try convertDataUnion(s, val, dTypeString));
             }
         },
-        .ff4eNodeT => {
+        .ff4enode => {
             if (isSavedLine == false) {
                 try result.appendSlice(ff4e);
             }
         },
-        .ff50NodeT => |ff50node| {
-            const numChildren = @truncate(u32, @bitCast(u64, ff50node.children.len));
+        .ff50node => |nde| {
             if (isSavedLine == false) {
                 try result.appendSlice(ff50);
-                try result.appendSlice(try s.checkStringMap(ff50node.name, stringContext.NAME));
+                try result.appendSlice(try s.checkStringMap(nde.name, stringContext.NAME));
             }
-            try result.appendSlice(&std.mem.toBytes(ff50node.id));
-            try result.appendSlice(&std.mem.toBytes(numChildren));
+            try result.appendSlice(&std.mem.toBytes(nde.id));
+            try result.appendSlice(&std.mem.toBytes(nde.children));
         },
-        .ff70NodeT => |ff70node| {
+        .ff70node => |nde| {
             if (isSavedLine == false) {
                 try result.appendSlice(ff70);
-                try result.appendSlice(try s.checkStringMap(ff70node.name, stringContext.NAME));
+                try result.appendSlice(try s.checkStringMap(nde.name, stringContext.NAME));
             }
         },
     }
@@ -237,4 +253,15 @@ fn convertDataUnion(s: *status, data: n.dataUnion, expectedType: []const u8) ![]
         },
     }
     return returnSlice.items;
+}
+
+fn initDtypeMap(dTypeMap: *dataTypeMap) !void {
+    try dTypeMap.put(n.dataType._bool, "bool");
+    try dTypeMap.put(n.dataType._sUInt8, "sUInt8");
+    try dTypeMap.put(n.dataType._sInt16, "sInt16");
+    try dTypeMap.put(n.dataType._sInt32, "sInt32");
+    try dTypeMap.put(n.dataType._sUInt32, "sUInt32");
+    try dTypeMap.put(n.dataType._sUInt64, "sUInt64");
+    try dTypeMap.put(n.dataType._sFloat32, "sFloat32");
+    try dTypeMap.put(n.dataType._cDeltaString, "cDeltaString");
 }
