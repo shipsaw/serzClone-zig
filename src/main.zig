@@ -1,5 +1,6 @@
 const std = @import("std");
 const binParser = @import("bin2obj.zig");
+const xmlParser = @import("xml2obj.zig");
 const objParser = @import("obj2xml.zig");
 const n = @import("node.zig");
 const expect = std.testing.expect;
@@ -17,7 +18,7 @@ pub fn main() !void {
         std.os.exit(1);
     }
     const simpleOutput = std.mem.eql(u8, args[args.len - 1], "-s");
-    const customOutputName = args.len == 3 and !simpleOutput;
+    const customOutputName = (args.len == 3 and !simpleOutput) or (args.len == 4 and simpleOutput);
 
     var inFile = try std.fs.cwd().openFile(args[1], .{});
     defer inFile.close();
@@ -60,9 +61,9 @@ pub fn main() !void {
             try objParser.parseSimple(nodes) 
             else try objParser.parseComplete(nodes);
         try outFile.writeAll(xmlResult);
-    // } else if (std.mem.eql(u8, fileExtension, "xml")) {
-    //     const binResult = try jsonParser.parse(inputBytes);
-    //     try outFile.writeAll(binResult);
+    } else if (std.mem.eql(u8, fileExtension, "xml")) {
+        const binResult = try xmlParser.parse(inputBytes);
+        try outFile.writeAll(binResult);
     } else {
         unreachable;
     }
