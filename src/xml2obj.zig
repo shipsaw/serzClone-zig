@@ -90,6 +90,7 @@ const status = struct {
                 try nodeAsStr.appendSlice(nde.name);
             },
             .ff52node => |nde| {
+                std.debug.print("{s}\n", .{nde.name});
                 try nodeAsStr.appendSlice(ff52);
                 try nodeAsStr.appendSlice(nde.name);
             },
@@ -164,18 +165,17 @@ fn convert2node(line: []const u8) !n.node {
     } else {
         var attrsAndVals = std.mem.tokenize(u8, nodeSections.next().?, " =\"");
         const name = attrsAndVals.next().?;
-        if (std.mem.eql(u8, attrsAndVals.peek().?, "id")) {
+        if (attrsAndVals.peek() == null) {
+            const value = try std.fmt.parseInt(u32, nodeSections.peek().?, 0);
+            const newNode = n.ff52node{ .name = name, .value = value };
+            return n.node{ .ff52node = newNode};
+        } else if (std.mem.eql(u8, attrsAndVals.peek().?, "id")) {
             _ = attrsAndVals.next();
             const id = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
             _ = attrsAndVals.next();
             const children = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
             const newNode = n.ff50node{ .name = name, .id = id, .children = children};
             return n.node{ .ff50node = newNode};
-        } else if (std.mem.eql(u8, attrsAndVals.peek().?, "value")) {
-            _ = attrsAndVals.next();
-            const value = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
-            const newNode = n.ff52node{ .name = name, .value = value };
-            return n.node{ .ff52node = newNode};
         } else if (std.mem.eql(u8, attrsAndVals.peek().?, "type")) {
             _ = attrsAndVals.next();
             const dType = n.dataTypeMap.get(attrsAndVals.next().?).?;
@@ -344,4 +344,90 @@ fn initDtypeMap(dTypeMap: *dataTypeMap) !void {
     try dTypeMap.put(n.dataType._sUInt64, "sUInt64");
     try dTypeMap.put(n.dataType._sFloat32, "sFloat32");
     try dTypeMap.put(n.dataType._cDeltaString, "cDeltaString");
+}
+
+test "Convert to node, ff41" {
+    // Arrange
+    const inputLine = "<Scale numElements=\"4\" elementType=\"sFloat32\">1.0000000 2.0000000 3.0000000 4.0000000</Scale>";
+    var valuesArray = std.ArrayList(n.dataUnion).init(allocator);
+    try valuesArray.append(n.dataUnion{ ._sFloat32 = 1 });
+    try valuesArray.append(n.dataUnion{ ._sFloat32 = 2 });
+    try valuesArray.append(n.dataUnion{ ._sFloat32 = 3 });
+    try valuesArray.append(n.dataUnion{ ._sFloat32 = 4 });
+    const expectedNode = n.node{ .ff41node = n.ff41node{ 
+        .name = "Scale", 
+        .numElements = 4, 
+        .dType = n.dataType._sFloat32,
+        .values = valuesArray } };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+    try expectEqualSlices(u8, expectedNode.ff41node.name, actual.ff41node.name);
+    try expectEqual(expectedNode.ff41node.numElements, actual.ff41node.numElements);
+    try expectEqual(expectedNode.ff41node.dType, actual.ff41node.dType);
+    try expectEqual(expectedNode.ff41node.values.items[0], actual.ff41node.values.items[0]);
+    try expectEqual(expectedNode.ff41node.values.items[1], actual.ff41node.values.items[1]);
+    try expectEqual(expectedNode.ff41node.values.items[2], actual.ff41node.values.items[2]);
+    try expectEqual(expectedNode.ff41node.values.items[3], actual.ff41node.values.items[3]);
+}
+
+test "Convert to node, ff4e" {
+    // Arrange
+    const inputLine = "<nil/>";
+    const expectedNode = n.node{ .ff4enode = n.ff4enode{} };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+
+    try expectEqual(expectedNode, actual);
+}
+
+test "Convert to node, ff50" {
+    // Arrange
+	const inputLine = "<cConsist id=\"514373264\" children=\"12\">";
+    const expectedNode = n.node{ .ff50node = n.ff50node{ 
+        .name = "cConsist", 
+        .id = 514373264,
+        .children = 12,
+    } };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+    try expectEqualSlices(u8, expectedNode.ff50node.name, actual.ff50node.name);
+    try expectEqual(expectedNode.ff50node.id, actual.ff50node.id);
+    try expectEqual(expectedNode.ff50node.children, actual.ff50node.children);
+}
+
+test "Convert to node, ff52" {
+    // Arrange
+	const inputLine = "<cOwnedEntity>526466256</cOwnedEntity>";
+    const expectedNode = n.node{ .ff52node = n.ff52node{ 
+        .name = "cOwnedEntity", 
+        .value = 526466256,
+    } };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+    try expectEqualSlices(u8, expectedNode.ff52node.name, actual.ff52node.name);
+    try expectEqual(expectedNode.ff52node.value, actual.ff52node.value);
+}
+
+test "Convert to node, ff56" {
+    // Arrange
+	const inputLine = "<Palette2Index type=\"sUInt8\">252</Palette2Index>";
+    const expectedNode = n.node{ .ff56node = n.ff56node{ 
+        .name = "Palette2Index", 
+        .dType = n.dataType._sUInt8,
+        .value = n.dataUnion{ ._sUInt8 = 252 } } };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+    try expectEqualSlices(u8, expectedNode.ff56node.name, actual.ff56node.name);
+    try expectEqual(expectedNode.ff56node.dType, actual.ff56node.dType);
+    try expectEqual(expectedNode.ff56node.value._sUInt8, actual.ff56node.value._sUInt8);
 }
