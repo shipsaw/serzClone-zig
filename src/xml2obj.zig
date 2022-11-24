@@ -431,3 +431,16 @@ test "Convert to node, ff56" {
     try expectEqual(expectedNode.ff56node.dType, actual.ff56node.dType);
     try expectEqual(expectedNode.ff56node.value._sUInt8, actual.ff56node.value._sUInt8);
 }
+
+test "Convert to node, ff70" {
+    // Arrange
+	const inputLine = "</Property>";
+    const expectedNode = n.node{ .ff70node = n.ff70node{ 
+        .name = "Property",
+    } };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+    try expectEqualSlices(u8, expectedNode.ff70node.name, actual.ff70node.name);
+}
