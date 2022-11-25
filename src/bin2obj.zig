@@ -144,13 +144,14 @@ fn identifier(s: *status, ctx: stringContext) ![]const u8 {
         s.current += 2;
 
         const strLen = std.mem.readIntSlice(u32, s.source[s.current..], std.builtin.Endian.Little);
+
         s.current += 4;
 
-        if (s.current + strLen > s.source.len) {
-            return errors.InvalidNodeType;
-        }
         var str = s.source[s.current..(s.current + strLen)];
         if (ctx == stringContext.NAME) { // Replace '-' with '::' in names only
+            if (strLen == 0) {
+                try retArray.appendSlice("e");
+            }
             for (str) |_, i| {
                 if (str[i] == ':' and str[i+1] == ':') {
                     try retArray.appendSlice("-");
@@ -171,7 +172,9 @@ fn identifier(s: *status, ctx: stringContext) ![]const u8 {
     const strIdx = std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
     s.current += 2;
 
-    return s.stringMap.items[strIdx];
+    const savedName = s.stringMap.items[strIdx];
+
+    return if (ctx == stringContext.NAME and savedName.len == 0) "e" else savedName;
 }
 
 fn processData(s: *status, dType: dataType) !dataUnion {
@@ -190,9 +193,9 @@ fn processData(s: *status, dType: dataType) !dataUnion {
 fn processBool(s: *status) !dataUnion {
     defer s.current += 1;
     return switch (s.source[s.current]) {
-        1 => dataUnion{ ._bool = true },
         0 => dataUnion{ ._bool = false },
-        else => errors.InvalidNodeType,
+        else => dataUnion{ ._bool = true },
+        // else => errors.InvalidNodeType,
     };
 }
 
@@ -288,9 +291,6 @@ fn processFF56(s: *status) !ff56node {
     const nodeName = try identifier(s, stringContext.NAME);
     const dTypeString = try identifier(s, stringContext.DTYPE);
     const dType = n.dataTypeMap.get(dTypeString);
-    if (dType == null) {
-        std.debug.print("\nMissing type: {s}\n", .{dTypeString});
-    }
     const data = try processData(s, dType.?);
 
     return ff56node{

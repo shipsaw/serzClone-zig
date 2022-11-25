@@ -179,7 +179,9 @@ fn convert2node(line: []const u8) !n.node {
         } else if (std.mem.eql(u8, attrsAndVals.peek().?, "type")) {
             _ = attrsAndVals.next();
             const dType = n.dataTypeMap.get(attrsAndVals.next().?).?;
-            const value = try convertToDataUnion(dType, nodeSections.next().?);
+            const value = if (nodeSections.peek() == null)
+                try convertToDataUnion(dType, "")
+                else try convertToDataUnion(dType, nodeSections.next().?);
             const newNode = n.ff56node{ .name = name, .dType = dType, .value = value};
             return n.node{ .ff56node = newNode};
         } else if (std.mem.eql(u8, attrsAndVals.peek().?, "numElements")) {
@@ -434,6 +436,22 @@ test "Convert to node, ff56" {
     try expectEqualSlices(u8, expectedNode.ff56node.name, actual.ff56node.name);
     try expectEqual(expectedNode.ff56node.dType, actual.ff56node.dType);
     try expectEqual(expectedNode.ff56node.value._sUInt8, actual.ff56node.value._sUInt8);
+}
+
+test "Convert to node, ff56 with empty string" {
+    // Arrange
+	const inputLine = "<Palette1Index type=\"cDeltaString\"/>";
+    const expectedNode = n.node{ .ff56node = n.ff56node{ 
+        .name = "Palette1Index", 
+        .dType = n.dataType._cDeltaString,
+        .value = n.dataUnion{ ._cDeltaString = "" } } };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+    try expectEqualSlices(u8, expectedNode.ff56node.name, actual.ff56node.name);
+    try expectEqual(expectedNode.ff56node.dType, actual.ff56node.dType);
+    try expectEqual(expectedNode.ff56node.value._cDeltaString.len, actual.ff56node.value._cDeltaString.len);
 }
 
 test "Convert to node, ff70" {

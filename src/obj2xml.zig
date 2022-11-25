@@ -56,9 +56,14 @@ pub fn parseSimple(nodes: []const nde.node) ![]const u8 {
             .ff56node => |n| {
                 try printTabs(tabs, sw);
                 try std.fmt.format(sw, "<{s}", .{n.name});
-                try std.fmt.format(sw, " type=\"{s}\">", .{dTypeMap.get(n.dType).?});
-                try printValue(n.value, sw);
-                try std.fmt.format(sw, "</{s}>\n", .{n.name});
+                try std.fmt.format(sw, " type=\"{s}\"", .{dTypeMap.get(n.dType).?});
+                if (n.dType == nde.dataType._cDeltaString and n.value._cDeltaString.len == 0) {
+                    try sw.writeAll("/>\n");
+                } else {
+                    try sw.writeByte('>');
+                    try printValue(n.value, sw);
+                    try std.fmt.format(sw, "</{s}>\n", .{n.name});
+                }
             },
             .ff70node => |n| {
                 tabs -= 1;
@@ -136,12 +141,15 @@ pub fn parseComplete(nodes: []const nde.node) ![]const u8 {
                         try std.fmt.format(sw, "{X:0>2}", .{c});
                     }
                     try sw.writeAll("\" d:precision=\"string\">");
-                } else {
-                    try sw.writeByte('>');
                 }
 
-                try printValue(n.value, sw);
-                try std.fmt.format(sw, "</{s}>\n", .{n.name});
+                if (n.dType == nde.dataType._cDeltaString and n.value._cDeltaString.len == 0) {
+                    try sw.writeAll("/>\n");
+                } else {
+                    try sw.writeByte('>');
+                    try printValue(n.value, sw);
+                    try std.fmt.format(sw, "</{s}>\n", .{n.name});
+                }
             },
             .ff70node => |n| {
                 tabs -= 1;

@@ -87,23 +87,23 @@ test "bin -> xml -> bin test: InitalSave.bin" {
     try compareResults(inputBytes, binResult);
 }
 
-// test "bin -> json -> bin test: Scenario.bin" {
-//     // Original Scenario with ff43 node
-//     var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioWff43.bin", .{});
-//     defer inFile43.close();
-//     var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
+test "bin -> xml -> bin test: Scenario.bin" {
+    // Original Scenario with ff43 node
+    var inFile43 = try std.fs.cwd().openFile("testFiles/ScenarioBeforeSerz.bin", .{});
+    defer inFile43.close();
+    var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
 
-//     // Scenario parsed by serz
-//     var inFile = try std.fs.cwd().openFile("testFiles/ScenarioAfterSerz.bin", .{});
-//     defer inFile.close();
-//     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
+    // Scenario parsed by serz
+    var inFile = try std.fs.cwd().openFile("testFiles/ScenarioAfterSerz.bin", .{});
+    defer inFile.close();
+    var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
 
-//     const nodes = (try binParser.parse(inputBytes43));
-//     const jsonResult = try objParser.parse(nodes);
-//     // const binResult = try jsonParser.parse(jsonResult);
+    const nodes = (try binParser.parse(inputBytes43));
+    const xmlResult = try objParser.parseSimple(nodes);
+    const binResult = try xmlParser.parse(xmlResult);
 
-//     try compareResults(inputBytes, binResult);
-// }
+    try compareResults(inputBytes, binResult);
+}
 
 // test "bin -> json -> bin test: ScenarioNetworkProperties.bin" {
 //     // Original Scenario with ff43 node
