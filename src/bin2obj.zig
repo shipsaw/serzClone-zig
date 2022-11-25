@@ -149,9 +149,6 @@ fn identifier(s: *status, ctx: stringContext) ![]const u8 {
 
         var str = s.source[s.current..(s.current + strLen)];
         if (ctx == stringContext.NAME) { // Replace '-' with '::' in names only
-            if (strLen == 0) {
-                try retArray.appendSlice("e");
-            }
             for (str) |_, i| {
                 if (str[i] == ':' and str[i+1] == ':') {
                     try retArray.appendSlice("-");
@@ -167,7 +164,7 @@ fn identifier(s: *status, ctx: stringContext) ![]const u8 {
         try s.stringMap.append(retArray.items);
         defer s.current += strLen;
 
-        return retArray.items;
+        return if (ctx == stringContext.NAME and retArray.items.len == 0) "e" else retArray.items;
     }
     const strIdx = std.mem.readIntSlice(u16, s.source[s.current..], std.builtin.Endian.Little);
     s.current += 2;
