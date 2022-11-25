@@ -631,6 +631,20 @@ test "ff56 parsing" {
     try expect(ff56.value._bool == expected.value._bool);
 }
 
+test "ff56 parsing, empty name" {
+    // Arrange
+    var statusStruct = status.init(&[_]u8{ 0xff, 0xff, 0, 0, 0, 0, 0xff, 0xff, 4, 0, 0, 0, 'b', 'o', 'o', 'l', 1 });
+    const expected = ff56node{ .name = "e", .dType = dataType._bool, .value = dataUnion{ ._bool = true } };
+
+    // Act
+    const ff56 = try processFF56(&statusStruct);
+
+    // Assert
+    try expectEqualStrings(ff56.name, expected.name);
+    try expect(statusStruct.stringMap.items[0].len == 0); // 'e' is substituted for empty name but not added to saved string list
+    try expect(ff56.value._bool == expected.value._bool);
+}
+
 test "ff70 parsing" {
     // Arrange
     const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
