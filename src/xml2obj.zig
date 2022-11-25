@@ -159,12 +159,12 @@ fn addPrelude(s: *status) !void {
 fn convert2node(line: []const u8) !n.node {
     var nodeSections = std.mem.tokenize(u8, line, "<>");
     if (nodeSections.peek().?[0] == '/') {
-        return n.node{ .ff70node = n.ff70node{ .name = nodeSections.next().?[1..]} };
+        return n.node{ .ff70node = n.ff70node{ .name = try removeDash(nodeSections.next().?[1..])} };
     } else if (std.mem.eql(u8, nodeSections.peek().?, "nil/")) {
         return n.node{ .ff4enode = n.ff4enode{}};
     } else {
         var attrsAndVals = std.mem.tokenize(u8, nodeSections.next().?, " =\"");
-        const name = attrsAndVals.next().?;
+        const name = try removeDash(attrsAndVals.next().?);
         if (attrsAndVals.peek() == null) {
             const value = try std.fmt.parseInt(u32, nodeSections.peek().?, 0);
             const newNode = n.ff52node{ .name = name, .value = value };
@@ -200,6 +200,10 @@ fn convert2node(line: []const u8) !n.node {
         }
         return n.node{ .ff4enode = n.ff4enode{}};
     }
+}
+
+fn removeDash(name: []const u8) ![]const u8 {
+    return (try std.mem.replaceOwned(u8, allocator, name, "-", "::"));
 }
 
 fn node2string(s: *status, node: n.node, dtm: *dataTypeMap) ![]const u8 {
@@ -268,7 +272,7 @@ fn node2string(s: *status, node: n.node, dtm: *dataTypeMap) ![]const u8 {
 fn convertToDataUnion(dType: n.dataType, val: []const u8) !n.dataUnion {
     switch (dType) {
         ._bool => {
-            const convBool = if (val[0] == '0') true else false;
+            const convBool = if (val[0] == '1') true else false;
             return n.dataUnion{ ._bool = convBool };
         },
         ._sUInt8 => {
@@ -443,4 +447,21 @@ test "Convert to node, ff70" {
     const actual = try convert2node(inputLine);
     // Assert
     try expectEqualSlices(u8, expectedNode.ff70node.name, actual.ff70node.name);
+}
+
+test "Convert to node, ff50 with -" {
+    // Arrange
+	const inputLine = "<cCon-sist id=\"514373264\" children=\"12\">";
+    const expectedNode = n.node{ .ff50node = n.ff50node{ 
+        .name = "cCon::sist", 
+        .id = 514373264,
+        .children = 12,
+    } };
+
+    // Act
+    const actual = try convert2node(inputLine);
+    // Assert
+    try expectEqualSlices(u8, expectedNode.ff50node.name, actual.ff50node.name);
+    try expectEqual(expectedNode.ff50node.id, actual.ff50node.id);
+    try expectEqual(expectedNode.ff50node.children, actual.ff50node.children);
 }

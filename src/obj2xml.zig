@@ -119,7 +119,9 @@ pub fn parseComplete(nodes: []const nde.node) ![]const u8 {
                 try printTabs(tabs, sw);
                 try sw.writeByte('<');
                 try sw.writeAll(n.name);
-                try sw.writeAll(">\n");
+                try sw.writeAll(" d:type=\"ref\">");
+                try printValue(nde.dataUnion{ ._sUInt32 = n.value} , sw);
+                try std.fmt.format(sw, "</{s}>\n", .{n.name});
             },
             .ff56node => |n| {
                 try printTabs(tabs, sw);

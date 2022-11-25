@@ -517,7 +517,6 @@ test "sFloat32 data" {
     var statusStruct_1234 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xa4, 0x70, 0x45, 0xc1 }); // -1234
     var statusStruct_s1 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x4c, 0xc3, 0xc6, 0xc0 }); // -1234
     var statusStruct_s2 = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0xe4, 0x65, 0xfd, 0x3e }); // -1234
-    var statusStructNegZero = status.init(&[_]u8{ 255, 255, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x00, 0x00, 0x00, 0x80 }); // -1234
 
     // Act
     const dType12345 = n.dataTypeMap.get(try identifier(&statusStruct12345, stringContext.NAME)).?;
@@ -532,9 +531,6 @@ test "sFloat32 data" {
     const dType_s2 = n.dataTypeMap.get(try identifier(&statusStruct_s2, stringContext.NAME)).?;
     const data_s2 = try processData(&statusStruct_s2, dType_s2);
 
-    const dType_negZero = n.dataTypeMap.get(try identifier(&statusStructNegZero, stringContext.NAME)).?;
-    const data_negZero = try processData(&statusStructNegZero, dType_negZero);
-
     // Assert
     try std.testing.expect(@as(dataType, data12345) == dataType._sFloat32);
 
@@ -542,7 +538,6 @@ test "sFloat32 data" {
     try expect(data_1234._sFloat32 == -12.34);
     try expect(data_s1._sFloat32 == -6.21134);
     try expect(data_s2._sFloat32 == 0.4949180);
-    try expectEqualStrings(data_negZero._cDeltaString, "(-0)");
 
     try expect(statusStruct12345.peek() == 0); // current is left at correct position
 }
@@ -684,29 +679,4 @@ test "parse function" {
 
     try expectEqualStrings(result[1].ff56node.name, expected[1].ff56node.name);
     try expect(result[1].ff56node.value._bool == expected[1].ff56node.value._bool);
-}
-
-test "parse function, negative zero" {
-    // Arrange
-    const SERZ = &[_]u8{ 'S', 'E', 'R', 'Z' };
-    const unknownU32 = &[_]u8{ 0, 0, 1, 0 };
-    const ff50bytes = &[_]u8{ 0xff, 0x50, 0xff, 0xff, 5, 0, 0, 0, 'f', 'i', 'r', 's', 't', 0xa4, 0xfa, 0x5c, 0x16, 1, 0, 0, 0 };
-    const ff56bytes = &[_]u8{ 0xff, 0x56, 0xff, 0xff, 3, 0, 0, 0, 's', 'n', 'd', 0xff, 0xff, 8, 0, 0, 0, 's', 'F', 'l', 'o', 'a', 't', '3', '2', 0x00, 0x00, 0x00, 0x80 };
-    var testBytes = SERZ ++ unknownU32 ++ ff50bytes ++ ff56bytes;
-
-    const expected = &[_]node{
-        node{ .ff50node = ff50node{ .name = "first", .id = 375192228, .children = 1 } },
-        node{ .ff56node = ff56node{ .name = "snd", .dType = dataType._sFloat32, .value = dataUnion{ ._cDeltaString = "(-0)" } } },
-    };
-
-    // Act
-    const result = try parse(testBytes);
-
-    // Assert
-    try expectEqualStrings(result[0].ff50node.name, expected[0].ff50node.name);
-    try expect(result[0].ff50node.id == expected[0].ff50node.id);
-    try expect(result[0].ff50node.children == expected[0].ff50node.children);
-
-    try expectEqualStrings(result[1].ff56node.name, expected[1].ff56node.name);
-    try expectEqualStrings(result[1].ff56node.value._cDeltaString, expected[1].ff56node.value._cDeltaString);
 }

@@ -69,23 +69,23 @@ pub fn main() !void {
     }
 }
 
-// test "bin -> json -> bin test: InitalSave.bin" {
-//     // Original Scenario with ff43 node
-//     var inFile43 = try std.fs.cwd().openFile("testFiles/InitialSave.bin", .{});
-//     defer inFile43.close();
-//     var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
-//
-//     // Scenario parsed by serz
-//     var inFile = try std.fs.cwd().openFile("testFiles/InitialSaveAfterSerz.bin", .{});
-//     defer inFile.close();
-//     var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
-//
-//     const nodes = (try binParser.parse(inputBytes43));
-//     const jsonResult = try objParser.parse(nodes);
-//     const binResult = try jsonParser.parse(jsonResult);
-//
-//     try compareResults(inputBytes, binResult);
-// }
+test "bin -> xml -> bin test: InitalSave.bin" {
+    // Original Scenario with ff43 node
+    var inFile43 = try std.fs.cwd().openFile("testFiles/InitialSaveBeforeSerz.bin", .{});
+    defer inFile43.close();
+    var inputBytes43 = try inFile43.readToEndAlloc(allocator, size_limit);
+
+    // Scenario parsed by serz
+    var inFile = try std.fs.cwd().openFile("testFiles/InitialSaveAfterSerz.bin", .{});
+    defer inFile.close();
+    var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
+
+    const nodes = (try binParser.parse(inputBytes43));
+    const xmlResult = try objParser.parseSimple(nodes);
+    const binResult = try xmlParser.parse(xmlResult);
+
+    try compareResults(inputBytes, binResult);
+}
 
 // test "bin -> json -> bin test: Scenario.bin" {
 //     // Original Scenario with ff43 node
