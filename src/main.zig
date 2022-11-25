@@ -11,61 +11,21 @@ var allocator = arena.allocator();
 const size_limit = std.math.maxInt(u32);
 
 pub fn main() !void {
-    const args = try std.process.argsAlloc(allocator);
-    defer std.process.argsFree(allocator, args);
-    if (args.len < 2 or args.len > 4) {
-        std.debug.print("Usage: zigSerz input_filename [output_filename] [-s]\n", .{});
-        std.os.exit(1);
+    var stdIn = std.io.getStdIn().reader();
+    var stdOut = std.io.getStdOut().writer();
+
+    var inputBytes = try stdIn.readAllAlloc(allocator, 10485760);
+    for (inputBytes[0..30]) |byte| {
+        std.debug.print("{x} ", .{byte});
     }
-    const simpleOutput = std.mem.eql(u8, args[args.len - 1], "-s");
-    const customOutputName = (args.len == 3 and !simpleOutput) or (args.len == 4 and simpleOutput);
-
-    var inFile = try std.fs.cwd().openFile(args[1], .{});
-    defer inFile.close();
-
-    var inputFileNameArray = std.mem.tokenize(u8, args[1], ".\\/");
-
-    var filePathArray = std.ArrayList([]const u8).init(allocator);
-    while (true) {
-        const tempSlice = inputFileNameArray.next();
-        if (tempSlice != null) {
-            try filePathArray.append(tempSlice.?);
-        } else {
-            break;
-        }
-    }
-    inputFileNameArray.reset();
-    const fileExtension = filePathArray.items[filePathArray.items.len - 1];
-    const fileName = filePathArray.items[filePathArray.items.len - 2];
-
-    var outFileArray = std.ArrayList(u8).init(allocator);
-    try outFileArray.appendSlice(fileName);
-
-    if (std.mem.eql(u8, fileExtension, "bin")) {
-        try outFileArray.appendSlice(".xml");
-    } else if (std.mem.eql(u8, fileExtension, "xml")) {
-        try outFileArray.appendSlice(".bin");
-    } else unreachable;
-    var outFileName = if (customOutputName) args[2] else outFileArray.items;
-    const outFile = try std.fs.cwd().createFile(
-        outFileName,
-        .{ .read = true },
-    );
-    defer outFile.close();
-
-    var inputBytes = try inFile.readToEndAlloc(allocator, size_limit);
-    if (std.mem.eql(u8, fileExtension, "bin")) {
+        std.debug.print("\n", .{});
+    if (std.mem.eql(u8, inputBytes[0..4], "SERZ")) {
         const nodes = (try binParser.parse(inputBytes));
-        // const xmlResult = try objParser.parseSimple(nodes);
-        const xmlResult = if (simpleOutput) 
-            try objParser.parseSimple(nodes) 
-            else try objParser.parseComplete(nodes);
-        try outFile.writeAll(xmlResult);
-    } else if (std.mem.eql(u8, fileExtension, "xml")) {
-        const binResult = try xmlParser.parse(inputBytes);
-        try outFile.writeAll(binResult);
+        const xmlResult = try objParser.parseComplete(nodes);
+        try stdOut.writeAll(xmlResult);
     } else {
-        unreachable;
+        const binResult = try xmlParser.parse(inputBytes);
+        try stdOut.writeAll(binResult);
     }
 }
 
