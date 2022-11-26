@@ -86,7 +86,11 @@ pub fn parseComplete(nodes: []const nde.node) ![]const u8 {
     tabs += 1;
     try std.fmt.format(sw, "<{s}", .{nodes[0].ff50node.name});
     try std.fmt.format(sw, " xmlns:d=\"http://www.kuju.com/TnT/2003/Delta\" d:version=\"1.0\"", .{});
-    try std.fmt.format(sw, " d:id=\"{d}\">\n", .{nodes[0].ff50node.id});
+    if (nodes[0].ff50node.id == 0) {
+        try sw.writeAll(">\n");
+    } else {
+        try std.fmt.format(sw, " d:id=\"{d}\">\n", .{nodes[0].ff50node.id});
+    }
 
     for (nodes[1..]) |node| {
         switch (node) {
