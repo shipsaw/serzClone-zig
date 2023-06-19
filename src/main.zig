@@ -57,9 +57,10 @@ pub fn main() !void {
     if (std.mem.eql(u8, fileExtension, "bin")) {
         const nodes = (try binParser.parse(inputBytes));
         // const xmlResult = try objParser.parseSimple(nodes);
-        const xmlResult = if (simpleOutput) 
-            try objParser.parseSimple(nodes) 
-            else try objParser.parseComplete(nodes);
+        const xmlResult = if (simpleOutput)
+            try objParser.parseSimple(nodes)
+        else
+            try objParser.parseComplete(nodes);
         try outFile.writeAll(xmlResult);
     } else if (std.mem.eql(u8, fileExtension, "xml")) {
         const binResult = try xmlParser.parse(inputBytes);
@@ -124,7 +125,7 @@ test "bin -> xml -> bin test: ScenarioNetworkProperties.bin" {
 }
 
 fn compareResults(expectedBytes: []const u8, actualBytes: []const u8) !void {
-    for (expectedBytes) |inputByte, i| {
+    for (expectedBytes, 0..) |inputByte, i| {
         if (actualBytes[i] != inputByte) {
             const expectedVal = @bitCast(f32, std.mem.readIntSlice(i32, expectedBytes[i..], std.builtin.Endian.Little));
             const actualVal = @bitCast(f32, std.mem.readIntSlice(i32, actualBytes[i..], std.builtin.Endian.Little));

@@ -149,10 +149,10 @@ fn identifier(s: *status, ctx: stringContext) ![]const u8 {
 
         var str = s.source[s.current..(s.current + strLen)];
         if (ctx == stringContext.NAME) { // Replace '-' with '::' in names only
-            for (str) |_, i| {
-                if (str[i] == ':' and str[i+1] == ':') {
+            for (str, 0..) |_, i| {
+                if (str[i] == ':' and str[i + 1] == ':') {
                     try retArray.appendSlice("-");
-                    i += 1;
+                    // i += 1;
                 } else {
                     try retArray.append(str[i]);
                 }
@@ -599,7 +599,7 @@ test "ff41 parsing" {
     // Assert
     try expectEqualStrings(result.name, expected.name);
     try expect(result.numElements == expected.numElements);
-    for (result.values.items) |value, i| {
+    for (result.values.items, 0..) |value, i| {
         try expect(value._sInt32 == expected.values.items[i]._sInt32);
     }
 }

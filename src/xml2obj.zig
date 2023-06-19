@@ -38,13 +38,12 @@ const lineMapType = struct {
 
 const status = struct {
     current: usize,
-    source: std.mem.TokenIterator(u8),
+    source: std.mem.TokenIterator(u8, std.mem.DelimiterType.any),
     stringMap: strMapType,
     lineMap: lineMapType,
     result: std.ArrayList(u8),
 
-    fn init(src: std.mem.TokenIterator(u8)) status {
-
+    fn init(src: std.mem.TokenIterator(u8, std.mem.DelimiterType.any)) status {
         return status{
             .current = 1,
             .source = src,
@@ -142,7 +141,7 @@ fn parseNodes(s: *status, dtm: *dataTypeMap) !void {
     var rw = s.result.writer();
     var currentNode = s.source.next();
     try addPrelude(s);
-    
+
     while (currentNode != null) : (currentNode = s.source.next()) {
         const tempNode = try convert2node(currentNode.?);
         const tempString = try node2string(s, tempNode, dtm);
@@ -159,48 +158,49 @@ fn addPrelude(s: *status) !void {
 fn convert2node(line: []const u8) !n.node {
     var nodeSections = std.mem.tokenize(u8, line, "<>");
     if (nodeSections.peek().?[0] == '/') {
-        return n.node{ .ff70node = n.ff70node{ .name = try removeDash(nodeSections.next().?[1..])} };
+        return n.node{ .ff70node = n.ff70node{ .name = try removeDash(nodeSections.next().?[1..]) } };
     } else if (std.mem.eql(u8, nodeSections.peek().?, "nil/")) {
-        return n.node{ .ff4enode = n.ff4enode{}};
+        return n.node{ .ff4enode = n.ff4enode{} };
     } else {
         var attrsAndVals = std.mem.tokenize(u8, nodeSections.next().?, " =\"");
         const name = try removeDash(attrsAndVals.next().?);
         if (attrsAndVals.peek() == null) {
             const value = try std.fmt.parseInt(u32, nodeSections.peek().?, 0);
             const newNode = n.ff52node{ .name = name, .value = value };
-            return n.node{ .ff52node = newNode};
+            return n.node{ .ff52node = newNode };
         } else if (std.mem.eql(u8, attrsAndVals.peek().?, "id")) {
             _ = attrsAndVals.next();
             const id = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
             _ = attrsAndVals.next();
             const children = try std.fmt.parseInt(u32, attrsAndVals.next().?, 0);
-            const newNode = n.ff50node{ .name = name, .id = id, .children = children};
-            return n.node{ .ff50node = newNode};
+            const newNode = n.ff50node{ .name = name, .id = id, .children = children };
+            return n.node{ .ff50node = newNode };
         } else if (std.mem.eql(u8, attrsAndVals.peek().?, "type")) {
             _ = attrsAndVals.next();
             const dType = n.dataTypeMap.get(attrsAndVals.next().?).?;
             const value = if (nodeSections.peek() == null)
                 try convertToDataUnion(dType, "")
-                else try convertToDataUnion(dType, nodeSections.next().?);
-            const newNode = n.ff56node{ .name = name, .dType = dType, .value = value};
-            return n.node{ .ff56node = newNode};
+            else
+                try convertToDataUnion(dType, nodeSections.next().?);
+            const newNode = n.ff56node{ .name = name, .dType = dType, .value = value };
+            return n.node{ .ff56node = newNode };
         } else if (std.mem.eql(u8, attrsAndVals.peek().?, "numElements")) {
             var valuesList = std.ArrayList(n.dataUnion).init(allocator);
             _ = attrsAndVals.next();
             const numElements = try std.fmt.parseInt(u8, attrsAndVals.next().?, 0);
             _ = attrsAndVals.next();
             const dType = n.dataTypeMap.get(attrsAndVals.next().?).?;
-            
+
             var values = std.mem.tokenize(u8, nodeSections.next().?, " ");
             var i: usize = 0;
             while (i < numElements) : (i += 1) {
                 try valuesList.append(try convertToDataUnion(dType, values.next().?));
             }
 
-            const newNode = n.ff41node{ .name = name, .numElements = numElements, .dType = dType, .values = valuesList};
-            return n.node{ .ff41node = newNode};
+            const newNode = n.ff41node{ .name = name, .numElements = numElements, .dType = dType, .values = valuesList };
+            return n.node{ .ff41node = newNode };
         }
-        return n.node{ .ff4enode = n.ff4enode{}};
+        return n.node{ .ff4enode = n.ff4enode{} };
     }
 }
 
@@ -360,11 +360,7 @@ test "Convert to node, ff41" {
     try valuesArray.append(n.dataUnion{ ._sFloat32 = 2 });
     try valuesArray.append(n.dataUnion{ ._sFloat32 = 3 });
     try valuesArray.append(n.dataUnion{ ._sFloat32 = 4 });
-    const expectedNode = n.node{ .ff41node = n.ff41node{ 
-        .name = "Scale", 
-        .numElements = 4, 
-        .dType = n.dataType._sFloat32,
-        .values = valuesArray } };
+    const expectedNode = n.node{ .ff41node = n.ff41node{ .name = "Scale", .numElements = 4, .dType = n.dataType._sFloat32, .values = valuesArray } };
 
     // Act
     const actual = try convert2node(inputLine);
@@ -392,9 +388,9 @@ test "Convert to node, ff4e" {
 
 test "Convert to node, ff50" {
     // Arrange
-	const inputLine = "<cConsist id=\"514373264\" children=\"12\">";
-    const expectedNode = n.node{ .ff50node = n.ff50node{ 
-        .name = "cConsist", 
+    const inputLine = "<cConsist id=\"514373264\" children=\"12\">";
+    const expectedNode = n.node{ .ff50node = n.ff50node{
+        .name = "cConsist",
         .id = 514373264,
         .children = 12,
     } };
@@ -409,9 +405,9 @@ test "Convert to node, ff50" {
 
 test "Convert to node, ff52" {
     // Arrange
-	const inputLine = "<cOwnedEntity>526466256</cOwnedEntity>";
-    const expectedNode = n.node{ .ff52node = n.ff52node{ 
-        .name = "cOwnedEntity", 
+    const inputLine = "<cOwnedEntity>526466256</cOwnedEntity>";
+    const expectedNode = n.node{ .ff52node = n.ff52node{
+        .name = "cOwnedEntity",
         .value = 526466256,
     } };
 
@@ -424,11 +420,8 @@ test "Convert to node, ff52" {
 
 test "Convert to node, ff56" {
     // Arrange
-	const inputLine = "<Palette2Index type=\"sUInt8\">252</Palette2Index>";
-    const expectedNode = n.node{ .ff56node = n.ff56node{ 
-        .name = "Palette2Index", 
-        .dType = n.dataType._sUInt8,
-        .value = n.dataUnion{ ._sUInt8 = 252 } } };
+    const inputLine = "<Palette2Index type=\"sUInt8\">252</Palette2Index>";
+    const expectedNode = n.node{ .ff56node = n.ff56node{ .name = "Palette2Index", .dType = n.dataType._sUInt8, .value = n.dataUnion{ ._sUInt8 = 252 } } };
 
     // Act
     const actual = try convert2node(inputLine);
@@ -440,11 +433,8 @@ test "Convert to node, ff56" {
 
 test "Convert to node, ff56 with empty string" {
     // Arrange
-	const inputLine = "<Palette1Index type=\"cDeltaString\"/>";
-    const expectedNode = n.node{ .ff56node = n.ff56node{ 
-        .name = "Palette1Index", 
-        .dType = n.dataType._cDeltaString,
-        .value = n.dataUnion{ ._cDeltaString = "" } } };
+    const inputLine = "<Palette1Index type=\"cDeltaString\"/>";
+    const expectedNode = n.node{ .ff56node = n.ff56node{ .name = "Palette1Index", .dType = n.dataType._cDeltaString, .value = n.dataUnion{ ._cDeltaString = "" } } };
 
     // Act
     const actual = try convert2node(inputLine);
@@ -456,8 +446,8 @@ test "Convert to node, ff56 with empty string" {
 
 test "Convert to node, ff70" {
     // Arrange
-	const inputLine = "</Property>";
-    const expectedNode = n.node{ .ff70node = n.ff70node{ 
+    const inputLine = "</Property>";
+    const expectedNode = n.node{ .ff70node = n.ff70node{
         .name = "Property",
     } };
 
@@ -469,9 +459,9 @@ test "Convert to node, ff70" {
 
 test "Convert to node, ff50 with -" {
     // Arrange
-	const inputLine = "<cCon-sist id=\"514373264\" children=\"12\">";
-    const expectedNode = n.node{ .ff50node = n.ff50node{ 
-        .name = "cCon::sist", 
+    const inputLine = "<cCon-sist id=\"514373264\" children=\"12\">";
+    const expectedNode = n.node{ .ff50node = n.ff50node{
+        .name = "cCon::sist",
         .id = 514373264,
         .children = 12,
     } };
